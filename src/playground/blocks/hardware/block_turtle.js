@@ -26,6 +26,7 @@ Entry.Turtle = {
         ko: '거북이',
         jp: 'カメ',
         vn: 'Turtle',
+        uz: 'Toshbaqa'
     },
     monitorTemplate: () => ({
         imgPath: 'hw/turtle.png',
@@ -795,6 +796,179 @@ Entry.Turtle.setLanguage = () => ({
             turtle_battery_empty: 'battery empty',
         },
     },
+    uz: {
+      template: {
+          turtle_button_state: 'Tugmachani %1 ?',
+          turtle_change_buzzer_by: "Gudok ohangini %1 dan o'zgartirish %2",
+          turtle_change_head_led_by_rgb: "Bosh LEDni R: %1 G: %2 B: %3 dan o'zgartirish %4",
+          turtle_change_tempo_by: "Chalish tezligini %1 dan o'zgartirish %2",
+          turtle_change_wheel_by: "%1 g'ildirag'i %2 dan o'zgartirish %3",
+          turtle_change_wheels_by_left_right: "Chap g'ildirag'i %1 O'ng g'ildirag'i %2 dan o'zgartirish %3",
+          turtle_clear_head_led: "Bosh LEDni o'chrish %1",
+          turtle_clear_sound: "Ovozni o'chirish %1",
+          turtle_cross_intersection: "Qora chorrahasini o'tib ketish %1",
+          turtle_follow_line: '%1 chiziqini ergashib yurish %2',
+          turtle_follow_line_until: 'Qora chiziqni ergashib %1 gacha yurish %2',
+          turtle_follow_line_until_black: '%1 chiziqni ergashib qora rangigacha yurish %2',
+          turtle_is_color_pattern: 'Rang naqshi %1 %2 mi?',
+          turtle_move_backward_unit: 'Orqaga %1 %2 yurish %3',
+          turtle_move_forward_unit: "To'g'riga %1 %2 yurish %3",
+          turtle_pivot_around_wheel_unit_in_direction:"%1 g'ildirag'idagi markaziga %2 %3 %4 yo'nalishga aylanish %5",
+          turtle_play_note: '%1 %2 ohangni chalish %3',
+          turtle_play_note_for_beats: '%1 %2 ohangini %3 zarba chalish %4',
+          turtle_play_sound_times: '%1 ohangi %2 marta ijro etish %3',
+          turtle_play_sound_times_until_done: '%1 ohangi %2 marta ijro etib kutish %3',
+          turtle_rest_for_beats: '%1 zarbasi dam olish %2',
+          turtle_set_buzzer_to: 'Gudok ohangini %1 ga sozlash %2',
+          turtle_set_following_speed_to: 'Chiziq ergashish tezligini %1 ga sozlash %2',
+          turtle_set_head_led_to: 'Bosh LEDni %1 ga sozlash %2',
+          turtle_set_head_led_to_rgb: 'Bosh LEDni R: %1 G: %2 B: %3 ga sozlash %4',
+          turtle_set_tempo_to: 'Chalish tezligini %1 BPMga sozlash %2',
+          turtle_set_wheel_to: "%1 g'ildirag'i %2 ga sozlash %3",
+          turtle_set_wheels_to_left_right: "Chap g'ildirag'i %1 O'ng g'ildirag'i %2 ga sozlash %3",
+          turtle_stop: "To'xtatish %1",
+          turtle_touching_color: '%1 ga tegganmi?',
+          turtle_turn_at_intersection: 'Qora chorrahasida %1 ga aylanish %2',
+          turtle_turn_unit_in_place: "%1 ga %2 %3 o'zi joyida aylanish %4",
+          turtle_turn_unit_with_radius_in_direction: "%1 ga %2 %3 radius %4 smni %5 yo'nalishga aylanish %6",
+          turtle_value: '%1',
+          turtle_boolean: '%1?',
+          turtle_pick_head_led: 'Bosh LEDni %1 ga sozlash %2',
+      },
+      Helper: {
+          turtle_button_state:
+              'If the button clicked/double-clicked/long-pressed, true, otherwise false.',
+          turtle_change_buzzer_by:
+              'Adds the entered value to the current pitch (Hz) of the buzzer sound. You can enter up to two decimal places.',
+          turtle_change_head_led_by_rgb:
+              'Adds the entered values to the current R, G, B values of the head LED, respectively.',
+          turtle_change_tempo_by:
+              'Adds the entered value to the current BPM (beats per minute) of the playing or resting speed.',
+          turtle_change_wheel_by:
+              'Adds the entered value to the current speed value (%) of the left/right/both wheels. If the result is positive, the wheel rotates forward; if negative, the wheel rotates backward.',
+          turtle_change_wheels_by_left_right:
+              'Adds the entered values to the current speed values (%) of the left and right wheels respectively. If the result is positive, the wheel rotates forward; if negative, the wheel rotates backward.',
+          turtle_clear_head_led: 'Turns off the head LED.',
+          turtle_clear_sound: 'Turns off sound.',
+          turtle_cross_intersection:
+              'Moves forward for a moment at the black intersection, then finds the black line and moves again.',
+          turtle_follow_line: 'Moves along the selected color line on a white background.',
+          turtle_follow_line_until:
+              'Moves along the black line on a white background and stops when the color sensor detects the selected color.',
+          turtle_follow_line_until_black:
+              'Moves along the selected color line on a white background and stops when the color sensor detects black.',
+          turtle_is_color_pattern:
+              'If the color sensor detects the selected color pattern, true, otherwise false.',
+          turtle_move_backward_unit:
+              'Moves backward for the number of cm/seconds/pulses entered.',
+          turtle_move_forward_unit: 'Moves forward for the number of cm/seconds/pulses entered.',
+          turtle_pivot_around_wheel_unit_in_direction:
+              'Pivots around the left/right wheel in the head/tail direction for the number of degrees/seconds/pulses entered.',
+          turtle_play_note: 'It sounds the selected tone and octave.',
+          turtle_play_note_for_beats:
+              'It sounds the selected tone and octave as much as the beat you entered.',
+          turtle_play_sound_times: 'Plays the selected sound as many times as entered.',
+          turtle_play_sound_times_until_done:
+              'Plays the selected sound as many times as entered, and waits for completion.',
+          turtle_rest_for_beats: 'Rests as much as the beat you entered.',
+          turtle_set_buzzer_to:
+              'Sets the pitch of the buzzer sound to the entered value (Hz). You can enter up to two decimal places. Entering the number 0 turns off the buzzer sound.',
+          turtle_set_following_speed_to:
+              'Sets the speed (1 to 8) to move along the line. The larger the number, the faster the movement.',
+          turtle_set_head_led_to: 'Turns the head LED to the selected color.',
+          turtle_set_head_led_to_rgb:
+              'Sets the R, G, B values of the head LED to the entered values.',
+          turtle_set_tempo_to:
+              'Sets the playing or resting speed to the entered BPM (beats per minute).',
+          turtle_set_wheel_to:
+              'Sets the speed of the left/right/both wheels to the entered value (-400 to 400%). If you enter a positive value, the wheel rotates forward. If you enter a negative value, the wheel rotates backward. Entering the number 0 stops it.',
+          turtle_set_wheels_to_left_right:
+              'Sets the speed of the left and right wheels to the entered values (-400 to 400%), respectively. If you enter a positive value, the wheel rotates forward. If you enter a negative value, the wheel rotates backward. Entering the number 0 stops it.',
+          turtle_stop: 'Stops both wheels.',
+          turtle_touching_color:
+              'If the color sensor detects the selected color, true, otherwise false.',
+          turtle_turn_at_intersection:
+              'Moves forward for a moment at the black intersection, then turns left/right/back in place, finds the black line and moves again.',
+          turtle_turn_unit_in_place:
+              'Turns left/right in place for the number of degrees/seconds/pulses entered.',
+          turtle_turn_unit_with_radius_in_direction:
+              'Turns left/right drawing the circle of the entered radius in the head/tail direction for the number of degrees/seconds/pulses entered.',
+          turtle_value:
+              'color number: color number detected by the color sensor (range: -1 to 8, initial value: -1)<br/>color pattern: value of the color pattern detected by the color sensor (range: -1 ~ 88, initial value: -1) <br/>floor: value of floor sensor (range: 0 to 100, initial value: 0)<br/>button: status of the button (when pressed 1, otherwise 0, initial value: 0)<br/>x acceleration: x-axis value of acceleration sensor (range: -32768 to 32767, initial value: 0) The direction in which the robot moves forward is the positive direction of the x axis.<br/>y acceleration: y-axis value of acceleration sensor (range: -32768 to 32767, initial value: 0) The left direction of the robot is the positive direction of the y axis.<br/>z acceleration: z-axis value of acceleration sensor (range: -32768 to 32767, initial value: 0) The upward direction of the robot is the positive direction of the z axis.',
+          turtle_boolean:
+              'tilt forward: If tilted forward, true, otherwise false<br/>tilt backward: If tilted backward, true, otherwise false<br/>tilt left: If tilted to the left, true, otherwise false<br/>tilt right: If tilted to the right, true, otherwise false<br/>tilt flip: If upside-down, true, otherwise false<br/>not tilt: If not tilted, true, otherwise false<br/>battery normal: If the battery is enough, true, otherwise false<br/>battery low: If the battery is low, true, otherwise false<br/>battery empty: If the battery is empty, true, otherwise false',
+          turtle_pick_head_led: 'Turns the head LED to the selected color.',
+      },
+      Blocks: {
+          turtle_acceleration_x: "X-o'qi tezlashuvi",
+          turtle_acceleration_y: "Y-o'qi tezlashuvi",
+          turtle_acceleration_z: "Z-o'qi tezlashuvi",
+          turtle_back: 'Orqa',
+          turtle_both: 'Ikkala',
+          turtle_button: 'Tugmacha',
+          turtle_buzzer: 'Gudok',
+          turtle_clicked: 'bosgan',
+          turtle_color_any: 'Hamma rangi',
+          turtle_color_black: 'Qora rangi',
+          turtle_color_blue: "Ko'k rangi",
+          turtle_color_green: 'Yasil rangi',
+          turtle_color_number: 'Rang raqami',
+          turtle_color_orange: "To'q sariq rangi",
+          turtle_color_pattern: 'Rang naqshi',
+          turtle_color_purple: 'Binafsha rangi',
+          turtle_color_red: 'Qizil rangi',
+          turtle_color_sky_blue: 'Havo rangi',
+          turtle_color_violet: 'Siyoh rangi',
+          turtle_color_white: 'Oq rangi',
+          turtle_color_yellow: 'Sariq rangi',
+          turtle_double_clicked: 'ikki marta bosgan',
+          turtle_floor: 'Tagi sensor',
+          turtle_head: 'Bosh',
+          turtle_head_color: 'Bosh rangi',
+          turtle_left: "Chap",
+          turtle_left_wheel: "Chap gi'ldiragi",
+          turtle_long_pressed: 'uzun bosgan',
+          turtle_note: 'Nota',
+          turtle_right: "O'ng",
+          turtle_right_wheel: "O'ng g'ildiragi",
+          turtle_sound_beep: 'Qisqa',
+          turtle_sound_birthday: "Tug'lgan kuni",
+          turtle_sound_dibidibidip: 'DiBiDiBiDib',
+          turtle_sound_engine: 'Motor',
+          turtle_sound_good_job: 'Barakalla',
+          turtle_sound_march: 'Marsh',
+          turtle_sound_random_beep: 'Tasodify',
+          turtle_sound_robot: 'Robot',
+          turtle_sound_siren: 'Sirena',
+          turtle_tail: 'Dum',
+          turtle_unit_cm: 'sm',
+          turtle_unit_deg: 'gradusi',
+          turtle_unit_pulse: 'tomiri',
+          turtle_unit_sec: 'soniya',
+          turtle_note_c: 'Do',
+          turtle_note_c_sharp: 'Do♯(Re♭)',
+          turtle_note_d: 'Re',
+          turtle_note_d_sharp: 'Re♯(Mi♭)',
+          turtle_note_e: 'Mi',
+          turtle_note_f: 'Pa',
+          turtle_note_f_sharp: 'Pa♯(Sol♭)',
+          turtle_note_g: 'Sol',
+          turtle_note_g_sharp: 'Sol♯(Ra♭)',
+          turtle_note_a: 'La',
+          turtle_note_a_sharp: 'Ra♯(Si♭)',
+          turtle_note_b: 'Si',
+          turtle_tilt_forward: 'Oldinga egilgan',
+          turtle_tilt_backward: 'Orqaga egilgan',
+          turtle_tilt_left: 'Chapga egilgan',
+          turtle_tilt_right: "O'ngga egilgan",
+          turtle_tilt_flip: "To'nkarilgan",
+          turtle_tilt_not: 'Egailmagan',
+          turtle_battery_normal: "Batareya normal",
+          turtle_battery_low: "Batareya kam",
+          turtle_battery_empty: "Batareya yo'q",
+
+      },
+  },
 });
 
 Entry.Turtle.blockMenuBlocks = [
