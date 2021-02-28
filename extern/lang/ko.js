@@ -8786,5 +8786,5 @@ Lang.SharePolicy = {
     title: '엔트리 작품/게시물 공유 가이드',
 };
 
-Lang.Support = ['ko', 'en', 'vn', 'jp'];
+Lang.Support = ['ko', 'en', 'vn', 'jp', 'uz'];
 if (typeof exports == 'object') exports.Lang = Lang;
