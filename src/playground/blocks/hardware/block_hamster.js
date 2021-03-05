@@ -22,8 +22,7 @@ Entry.Hamster = {
         ko: '햄스터',
         en: 'Hamster',
         jp: 'ハムスター',
-        vn: 'Hamster',
-        uz: 'Hamster'
+        vn: 'Hamster'
     },
     monitorTemplate: {
         imgPath: 'hw/hamster.png',
