@@ -1657,16 +1657,10 @@ Entry.Neobot.getBlocks = function() {
                 {
                     type: 'Dropdown',
                     options: [
-                        ['100%', '255'],
-                        ['90%', '230'],
-                        ['80%', '204'],
-                        ['70%', '179'],
-                        ['60%', '153'],
-                        ['50%', '128'],
-                        ['40%', '102'],
-                        ['30%', '77'],
-                        ['20%', '51'],
-                        ['10%', '26'],
+                        [Lang.Blocks.neobot_direction_forward, '1'],
+                        [Lang.Blocks.neobot_direction_backward, '2'],
+                        [Lang.Blocks.neobot_direction_left, '3'],
+                        [Lang.Blocks.neobot_direction_right, '4'],
                     ],
                     value: '255',
                     fontSize: 11,
@@ -1712,9 +1706,83 @@ Entry.Neobot.getBlocks = function() {
             isNotFor: ['neobot'],
             func: function(sprite, script) {
                 if (!script.isStart) {
-                    var port = script.getStringField('PORT', script);
-                    var value = script.getNumberField('VALUE', script);
-                    var duration = script.getNumberField('DURATION', script);
+                    const motor = script.getStringField('MOTOR', script);
+                    const direction = script.getStringField('DIRECTION', script);
+                    const speed = script.getStringValue('SPEED', script);
+                    const duration = script.getStringValue('DURATION', script);
+
+                    if (duration != '계속' && Entry.parseNumber(duration) <= 0) {
+                        return script.callReturn();
+                    }
+
+                    let moveLeft = false;
+                    let moveRight = false;
+                    if (motor == 1) {
+                        moveLeft = true;
+                        moveRight = true;
+                    } else if (motor == 2) {
+                        moveLeft = true;
+                    } else {
+                        moveRight = true;
+                    }
+
+                    let leftDirectionValue;
+                    let rightDirectionValue;
+                    if (direction == 1) {
+                        leftDirectionValue = 0x10;
+                        rightDirectionValue = 0x10;
+                    } else if (direction == 2) {
+                        leftDirectionValue = 0x20;
+                        rightDirectionValue = 0x20;
+                    } else if (direction == 3) {
+                        leftDirectionValue = 0x20;
+                        rightDirectionValue = 0x10;
+                    } else {
+                        leftDirectionValue = 0x10;
+                        rightDirectionValue = 0x20;
+                    }
+
+                    let speedValue = 0;
+                    let maxSpeed;
+                    if (Entry.Utils.isNumber(speed)) {
+                        maxSpeed = 100;
+                        speedValue = Entry.parseNumber(speed);
+                    } else {
+                        if (speed.indexOf('p') == 0) { // percent
+                            maxSpeed = 100;
+                            speedValue = Entry.parseNumber(speed.substring(1));
+                        } else { // IN
+                            maxSpeed = 255;
+                            speedValue = Entry.hw.portData[speed];
+                        }
+                    }
+                    speedValue = Math.max(speedValue, 0);
+                    speedValue = Math.min(speedValue, maxSpeed);
+                    speedValue = Math.round(speedValue / maxSpeed * 15);
+
+                    const leftOutValue = leftDirectionValue + speedValue;
+                    const rightOutValue = rightDirectionValue + speedValue;
+
+                    if (Entry.Neobot.log_to_console) {
+                        Entry.console.print('=== neobot_motor_start ===', 'speak');
+                        Entry.console.print('motor : ' + motor, 'speak');
+                        Entry.console.print('direction : ' + direction, 'speak');
+                        Entry.console.print('speed : ' + speed, 'speak');
+                        Entry.console.print('duration : ' + duration, 'speak');
+                        Entry.console.print('left direction value : ' + leftDirectionValue, 'speak');
+                        Entry.console.print('right direction value : ' + rightDirectionValue, 'speak');
+                        Entry.console.print('speed value : ' + speedValue, 'speak');
+                        Entry.console.print('left output value : ' + leftOutValue, 'speak');
+                        Entry.console.print('right output value : ' + rightOutValue, 'speak');
+                        Entry.console.print('==========================', 'speak');
+                    }
+
+                    if (moveLeft) {
+                        Entry.hw.sendQueue['DCL'] = leftOutValue;
+                    }
+                    if (moveRight) {
+                        Entry.hw.sendQueue['DCR'] = rightOutValue;
+                    }
 
                     Entry.hw.sendQueue[port] = value;
                     if (duration == 0) {
