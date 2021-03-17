@@ -6776,6 +6776,7 @@ Lang.TextCoding = {
     "alert_function_name_empty_text_add_change": "The empty text can't be included in function name.",
     "alert_no_save_on_error": "The code with an error can't save.",
     "alert_api_no_support": "You can not convert into the text mode when extension blocks are used in your project.",
+    "alert_not_supported_block": "Now in development, it will be supported at next version.",
     "warn_unnecessary_arguments": "&(calleeName)(); command doesn't require value within parentheses. (line:&(lineNumber))",
     "python_code": "'s python code",
     "eof": "line change",
