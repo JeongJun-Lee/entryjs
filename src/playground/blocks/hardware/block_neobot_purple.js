@@ -415,13 +415,13 @@ Entry.NeobotPurple.setLanguage = function() {
 
                 // motor
                 neobot_purple_robot: 'Robotni %1 %2',
-                neobot_purple_motor_start: 'Motorni aylantirish   %1 %2 %3 %4 %5',
+                neobot_purple_motor_start: 'Motorni aylantirish %1 %2 %3 %4 %5',
                 neobot_purple_motor_stop: "%1 motorini to'xtatish %2",
                 neobot_purple_arg_motor_speed: '%1',
                 neobot_purple_arg_motor_duration: '%1',
 
                 // melody
-                neobot_purple_play_note_for: 'Buzzer yangrash: Oktava %2, Tovush %1, Nota %3 %4',
+                neobot_purple_play_note_for: "Buzzer yangrash: %2 Oktava, %1 Tovush, %3 O'lchov %4",
                 neobot_purple_melody_play_with_sensor: '%1 sensoridan buzzerni yangrash %2',
                 neobot_purple_melody_stop: "Buzzerni to'xtatish %1",
 
@@ -448,7 +448,7 @@ Entry.NeobotPurple.setLanguage = function() {
                 neobot_purple_color_blue: "Ko'k",
                 neobot_purple_direction_forward: "Tog'ri",
                 neobot_purple_direction_backward: 'Orqa',
-                neobot_purple_sound_silent: 'Sukunat',
+                neobot_purple_sound_silent: 'Ovozsiz',
                 neobot_purple_sound_do: 'Do',
                 neobot_purple_sound_do_shop: 'Do#',
                 neobot_purple_sound_re: 'Re',
