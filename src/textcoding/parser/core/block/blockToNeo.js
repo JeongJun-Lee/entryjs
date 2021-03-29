@@ -415,21 +415,21 @@ Entry.BlockToNeoParser = class {
                 motor = Number(this._pramVal[0]);
                 switch (motor) {
                     case 1: // Both
-                        mortor = 0xFF;
+                        motor = 0xFF;
                         break;
 
                     case 2: // Left
                     case 3: // Right 
-                        mortor = motor - 1; // Left should be 1
+                        motor = motor - 1; // Left should be 1
                         break;
                 }
                 cmd = [0x05, 0x00, 0x00, 0x00, motor];
                 break;
 
-            case 'neobot_purple_melody':
-                octave = this._pramVal[0];
-                note = this._pramVal[1];
-                duration = this._pramVal[2];
+            case 'neobot_purple_play_note_for':
+                octave = Number(this._pramVal[0]);
+                note = Number(this._pramVal[1]);
+                duration = Number(this._pramVal[2]);
                 cmd = [0x09, octave, note, duration, 0x00];
                 break;
 

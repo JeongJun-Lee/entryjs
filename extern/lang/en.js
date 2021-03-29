@@ -6778,7 +6778,7 @@ Lang.TextCoding = {
     "alert_api_no_support": "You can not convert into the text mode when extension blocks are used in your project.",
     "alert_not_hw_supported_block": "Sorry, upload is not possible because the red marked block is not supported in hardware, Please change the block to the hw supported block.",
     "alert_too_many_start_block": 'The start block should be only one in whole code.',
-    "alert_should_be_zero_or_positive": 'Zero, Minus or blank value is not allowed.',
+    "alert_should_be_zero_or_positive": 'Zero, minus or blank value is not allowed.',
     "alert_not_allowed_param": 'Not allowed argument is used',
     "warn_exceed_max_value": 'The input value exeeds max. The value will be the allowable max internally.',
     "warn_unnecessary_arguments": "&(calleeName)(); command doesn't require value within parentheses. (line:&(lineNumber))",

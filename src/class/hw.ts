@@ -554,7 +554,6 @@ export default class Hardware {
                 break;
             case hardwareConnected:
                 blockMenu.banClass('arduinoDisconnected', true);
-                blockMenu.unbanClass('arduinoConnected', true);
                 blockMenu.banClass('arduinoConnect', true);
                 break;
         }

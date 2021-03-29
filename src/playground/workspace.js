@@ -273,6 +273,23 @@ Entry.Workspace = class Workspace {
                 Entry.commander.setCurrentEditor('board', this.overlayBoard);
                 dispatchChangeBoardEvent();
                 break;
+
+            case WORKSPACE.MODE_UPLOAD:
+                try {
+                    return this.codeToText(this.board.code, mode);
+                } catch (e) {
+                    e.block && Entry.getMainWS() && Entry.getMainWS().board.activateBlock(e.block);    
+                } finally{ // Always return to Board mode
+                    this.vimBoard.hide();
+                    this.board.show();
+                    blockMenu.unbanClass('functionInit');
+                    this.set({ selectedBoard: this.board });
+                    this.mode = WORKSPACE.MODE_BOARD;
+                    mode.boardType = WORKSPACE.MODE_BOARD;
+                    mode.runType = VIM.WORKSPACE_MODE;
+                    dispatchChangeBoardEvent();
+                }
+                break;
         }
 
         function checkObjectAndAlert(object, message) {
@@ -740,3 +757,4 @@ Entry.Workspace = class Workspace {
 Entry.Workspace.MODE_BOARD = 0;
 Entry.Workspace.MODE_VIMBOARD = 1;
 Entry.Workspace.MODE_OVERLAYBOARD = 2;
+Entry.Workspace.MODE_UPLOAD = 3;
