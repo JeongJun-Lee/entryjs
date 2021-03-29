@@ -8,6 +8,7 @@ require('./parser/core/text/pyToBlock');
 require('./parser/core/text/jsToBlock');
 require('./parser/core/block/blockToPy');
 require('./parser/core/block/blockToJs');
+require('./parser/core/block/blockToNeo');
 
 Entry.Parser = function(mode, type, cm, syntax) {
     this._mode = mode; // maze ai workspace
@@ -112,6 +113,10 @@ Entry.Parser = function(mode, type, cm, syntax) {
                 this._execParser = new Entry.BlockToPyParser(this.syntax);
                 cm && cm.setOption('mode', { name: 'python', globalVars: true });
                 this._execParserType = Entry.Vim.PARSER_TYPE_BLOCK_TO_PY;
+                break;
+            case Entry.Vim.PARSER_TYPE_BLOCK_TO_NEO:
+                this._execParser = new Entry.BlockToNeoParser(this.syntax, this);
+                this._execParserType = Entry.Vim.PARSER_TYPE_BLOCK_TO_NEO;
                 break;
         }
     };
@@ -366,6 +371,30 @@ Entry.Parser = function(mode, type, cm, syntax) {
 
                 break;
             }
+            case Entry.Vim.PARSER_TYPE_BLOCK_TO_NEO:
+                try {
+                    result = this._execParser.Code(code, parseMode);
+                } catch (e) {
+                    console.error(e);
+                    if (e.type === 'error') {
+                        switch (e.msg) {
+                            case 'UnsupportedBlk':
+                                Entry.toast.alert(Lang.TextCoding.title_converting, Lang.TextCoding.alert_not_hw_supported_block);
+                                break;
+                            case 'TooManyStart':
+                                Entry.toast.alert(Lang.TextCoding.title_converting, Lang.TextCoding.alert_too_many_start_block);
+                                break;
+                            case 'WrongInputVal':
+                                Entry.toast.alert(Lang.TextCoding.title_converting, Lang.TextCoding.alert_not_allowed_param);
+                                break;
+                            case 'MinusInputVal':
+                                Entry.toast.alert(Lang.TextCoding.title_converting, Lang.TextCoding.alert_should_be_zero_or_positive);
+                                break;
+                        }
+                        throw e;
+                    } 
+                }
+                break;
         }
 
         return result;

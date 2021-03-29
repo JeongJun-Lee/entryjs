@@ -4,6 +4,7 @@ import createHardwarePopup from './hardware/functions/createHardwarePopup';
 import ExternalProgramLauncher from './hardware/externalProgramLauncher';
 // eslint-disable-next-line prettier/prettier
 import PopupHelper from './popup_helper';
+import { WSAEACCES } from 'constants';
 
 enum HardwareModuleType {
     builtIn = 'builtin',
