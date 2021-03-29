@@ -7687,8 +7687,12 @@ Lang.TextCoding = {
     alert_no_save_on_error: '문법 오류가 존재하여 작품을 저장할 수 없습니다.',
     alert_api_no_support:
         '확장, 데이터분석, 인공지능 블록이 조립된 경우에는\n엔트리파이선 모드로 변경할 수 없습니다.\n해당 블록을 모두 삭제하고 엔트리파이선 모드로 변경할까요?',
-    alert_not_supported_block:
-        '현재 개발 중입니다.\n 다음 버전에서 지원됩니다.',        
+    alert_not_hw_supported_block:
+        '현재 하드웨어가 지원할 수 없는 블록이 조립된 경우에는\n코드를 업로드 할 수 없습니다.\n해당 블록을 하드웨어 지원가능 블럭으로 수정하세요.',
+    alert_too_many_start_block: '코드 전체 시작 블록은 1개 여야 합니다.',
+    alert_should_be_zero_or_positive: '0, 음수값, 빈 값을 허용하지 않습니다.',
+    alert_not_allowed_param: '허용하지 않은 인자값을 사용했습니다.',
+    warn_exceed_max_value: '입력값의 최대치를 초과하여 내부적으로 최대값으로 조정되었습니다.',
     warn_unnecessary_arguments:
         '&(calleeName)(); 는 괄호 사이에 값이 입력될 필요가 없는 명령어 입니다. (line:&(lineNumber))',
     python_code: ' 오브젝트의 파이선 코드',

@@ -517,6 +517,46 @@ class TextCodingUtil {
         }
     }
 
+    hasUnSupportedBlkInNeo(block) {
+      const blockType = block.data.type;
+      const blockCategory = EntryStatic.getCategoryByBlock(block.data.type);
+      const acceptBlocks =  
+          blockType === 'when_run_button_click' 
+          || blockType === 'wait_second'
+          || blockType === 'repeat_basic'
+          || blockType === 'repeat_inf'
+          || blockType === 'repeat_stop'
+          || blockType === '_if'
+          || blockType === 'if_else'
+          || blockType === 'wait_until_true'
+          || blockCategory === 'arduino' // HW blocks
+          
+      // Not acceptable blocks
+      if (Entry.expansionBlocks.length > 0 
+        || Entry.aiUtilizeBlocks.length > 0 
+        || Entry.aiLearning.isLoaded 
+        || Entry.playground.dataTable.tables.length > 0 
+        || blockCategory === 'moving'
+        || blockCategory === 'looks'
+        || blockCategory === 'brush'
+        || blockCategory === 'text'
+        || blockCategory === 'sound'
+        || blockCategory === 'judgement'
+        || blockCategory === 'calc'
+        || blockCategory === 'variable'
+        || blockCategory === 'func'
+        || blockCategory === 'analysis'
+        || blockCategory === 'ai_utilize'
+        || blockCategory === 'expansion'
+        || blockType === 'neobot_purple_sensor_convert_scale'
+        || blockType === 'neobot_purple_set_output'
+        || !acceptBlocks) {
+          return true;
+      }
+
+      return false;
+    }
+
     /**
      * 현재 코드 내 변수, 리스트에 대해 공백/특수문자/예약어/숫자시작 여부를 검사한다.
      * @return {Object} 에러오브젝트
