@@ -556,7 +556,7 @@ function getBlocks() {
         arduino_upload_to_hw: {
             skeleton: 'basic_button',
             color: EntryStatic.colorSet.common.BUTTON_BACKGROUND,
-            isNotFor: ['arduinoConnected', 'uploadAvail'],
+            isNotFor: ['uploadAvail'],
             template: '%1',
             params: [
                 {
