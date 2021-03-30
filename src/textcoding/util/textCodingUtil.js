@@ -529,6 +529,13 @@ class TextCodingUtil {
           || blockType === '_if'
           || blockType === 'if_else'
           || blockType === 'wait_until_true'
+          || blockType === 'number'
+          || blockType === 'text' 
+          || blockType === 'neobot_purple_arg_led_duration' 
+          || blockType === 'neobot_purple_sensor_value' 
+          || blockType === 'neobot_purple_arg_motor_speed' 
+          || blockType === 'neobot_purple_arg_motor_duration' 
+          || blockType === 'get_servo_degree'
           || blockCategory === 'arduino' // HW blocks
           
       // Not acceptable blocks
