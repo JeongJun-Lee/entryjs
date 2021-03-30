@@ -75,9 +75,7 @@ Entry.BlockToNeoParser = class {
         if (this._parseMode === Entry.Parser.PARSE_GENERAL) {
             blocks.map((block) => {
                 if (Entry.TextCodingUtil.hasUnSupportedBlkInNeo(block)) {
-                    const error = new Error();
-                    error.block = block;
-                    throw error;
+                    this.throwErr('error', 'UnsupportedBlk', block);
                 } else {
                     const val = this.Block(block);
                     if (val) {
@@ -121,8 +119,13 @@ Entry.BlockToNeoParser = class {
         ) {
             return '';
         }
-        !block._schema && block.loadSchema();
 
+        // One more check in low level
+        if (Entry.TextCodingUtil.hasUnSupportedBlkInNeo(block)) {
+            this.throwErr('error', 'UnsupportedBlk', block);
+        }
+
+        !block._schema && block.loadSchema();
         const val = this.getValueFromParam(block);
         val.length && (this._pramVal = val);
 
@@ -197,7 +200,7 @@ Entry.BlockToNeoParser = class {
             case 'wait_second':
                 value = Number(this._pramVal); // String to Number
                 if (isNaN(value)) {
-                    this.throwErr('warn', 'ExcessiveInputVal', block);
+                    this.throwErr('error', 'WrongInputVal', block);
                     break;
                 } else if (value <= 0) { // min is 1
                     this.throwErr('error', 'MinusInputVal', block);
@@ -280,7 +283,7 @@ Entry.BlockToNeoParser = class {
                 break;
 
             case 'neobot_purple_decision_equal_with_sensor':
-                port = Number(this._pramVal[0]);
+                port = this.extractNum(this._pramVal[0]);
                 switch (this._pramVal[1]) {
                     case 0: // White color
                         value = 200;
