@@ -329,6 +329,7 @@ function getBlocks() {
             class: 'arduino_default_noti',
             isNotFor: ['arduinoDisconnected'],
             events: {},
+            syntax: { js: [], py: [''] },
         },
         arduino_noti: {
             skeleton: 'basic_text',
@@ -348,6 +349,7 @@ function getBlocks() {
             class: 'arduino_default_noti',
             isNotFor: ['arduinoDisconnected'],
             events: {},
+            syntax: { js: [], py: [''] },
         },
         arduino_download_connector: {
             skeleton: 'clickable_text',
@@ -374,6 +376,7 @@ function getBlocks() {
                     },
                 ],
             },
+            syntax: { js: [], py: [''] },
         },
         download_guide: {
             skeleton: 'clickable_text',
@@ -400,6 +403,7 @@ function getBlocks() {
                     },
                 ],
             },
+            syntax: { js: [], py: [''] },
         },
         arduino_download_source: {
             skeleton: 'clickable_text',
@@ -426,6 +430,7 @@ function getBlocks() {
                     },
                 ],
             },
+            syntax: { js: [], py: [''] },
         },
         arduino_connected: {
             skeleton: 'basic_button',
@@ -456,6 +461,7 @@ function getBlocks() {
                 },
             ],
             events: {},
+            syntax: { js: [], py: [''] },
         },
         arduino_reconnect: {
             skeleton: 'basic_button',
@@ -477,6 +483,7 @@ function getBlocks() {
                     },
                 ],
             },
+            syntax: { js: [], py: [''] },
         },
         robot_reconnect: {
             skeleton: 'basic_button',
@@ -498,6 +505,7 @@ function getBlocks() {
                     },
                 ],
             },
+            syntax: { js: [], py: [''] },
         },
         arduino_open: {
             skeleton: 'basic_button',
@@ -520,6 +528,7 @@ function getBlocks() {
                     },
                 ],
             },
+            syntax: { js: [], py: [''] },
         },
         arduino_cloud_pc_open: {
             skeleton: 'basic_button',
@@ -542,6 +551,30 @@ function getBlocks() {
                     },
                 ],
             },
+            syntax: { js: [], py: [''] },
+        },
+        arduino_upload_to_hw: {
+            skeleton: 'basic_button',
+            color: EntryStatic.colorSet.common.BUTTON_BACKGROUND,
+            isNotFor: ['uploadAvail'],
+            template: '%1',
+            params: [
+                {
+                    type: 'Text',
+                    text: Lang.Blocks.ARDUINO_upload_to_hw,
+                    color: EntryStatic.colorSet.common.BUTTON,
+                    align: 'center',
+                },
+            ],
+            class: 'arduino_default',
+            events: {
+                mousedown: [
+                    function() {
+                        Entry.hw.upload();
+                    },
+                ],
+            },
+            syntax: { js: [], py: [''] },
         },
         //endregion hardware 하드웨어 기본
         //region basic 기본블록

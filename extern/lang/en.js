@@ -555,6 +555,7 @@ Lang.Blocks = {
     "ROBOT_reconnect": "Connect Robot",
     "ARDUINO_program": "Run the program",
     "ARDUINO_cloud_pc_connector": "Connect to Cloud PC",
+    "ARDUINO_upload_to_hw": "Upload to Hardware",
     "ARDUINO_connected": "Hardware connected",
     "ARDUINO_connect": "* Connect hardware",
     "ARDUINO_arduino_get_number_1": "number result of signal",
@@ -6780,6 +6781,11 @@ Lang.TextCoding = {
     "alert_function_name_empty_text_add_change": "The empty text can't be included in function name.",
     "alert_no_save_on_error": "The code with an error can't save.",
     "alert_api_no_support": "You can not convert into the text mode when extension blocks are used in your project.",
+    "alert_not_hw_supported_block": "Sorry, upload is not possible because the red marked block is not supported in hardware, Please change the block to the hw supported block.",
+    "alert_too_many_start_block": 'The start block should be only one in whole code.',
+    "alert_should_be_zero_or_positive": 'Zero, minus or blank value is not allowed.',
+    "alert_not_allowed_param": 'Not allowed argument is used',
+    "warn_exceed_max_value": 'The input value exeeds max. The value will be the allowable max internally.',
     "warn_unnecessary_arguments": "&(calleeName)(); command doesn't require value within parentheses. (line:&(lineNumber))",
     "python_code": "'s python code",
     "eof": "line change",
@@ -7438,10 +7444,33 @@ Lang.DataAnalytics = {
     "do_not_delete_row": "The row cannot be deleted.",
     "rows_cannot_less_one": "Tables must have at least one row."
 };
+Lang.AiLearning = {
+  equation: '회귀식',
+  predict: '예측',
+  cluster_number: '군집',
+  centriod: '중심점',
+  class: '클래스',
+  show: '보이기',
+  hide: '숨기기',
+  open: '열기',
+  close: '닫기',
+  probability: '정확도',
+  neighbor_count: '이웃 개수',
+  cluster_option_centroids_kmpp: '가장 먼 거리',
+  cluster_option_centroids_random: '무작위',
+  model_attr_str: '특성',
+  model_status_0: '상태: 준비',
+  model_status_1: '상태: 학습중',
+  model_status_2: '상태: 학습완료',
+  model_status_3: '상태: 모델없음',
+  train_param_learningRate: '학습률',
+  train_param_epochs: '세대',
+  train_param_validationRate: '테스트 데이터 비율',
+};
 Lang.SharePolicy = {
     "title": "Entry Project/Post share Guide"
 };
 
-Lang.Support = ["ko", "en", "vn", "jp"];
+Lang.Support = ["ko", "en", "vn", "jp", "uz"];
 if (typeof exports == "object")
     exports.Lang = Lang;

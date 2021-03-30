@@ -511,7 +511,29 @@ Entry.Arduino.getBlocks = function() {
                 return script.callReturn();
             },
             syntax: {
-                js: [],
+                js: [
+                    {
+                      syntax: 'pinMode(%1, %2)',
+                      textParams: [
+                          {
+                              type: 'Block',
+                              accept: 'string',
+                          },
+                          {
+                              type: 'Dropdown',
+                              options: [
+                                  [Lang.Blocks.ARDUINO_on, 'on'],
+                                  [Lang.Blocks.ARDUINO_off, 'off'],
+                              ],
+                              value: 'on',
+                              fontSize: 11,
+                              bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                              arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                              converter: Entry.block.converters.returnStringValue,
+                          },
+                      ],   
+                  },
+                ],
                 py: [
                     {
                         syntax: 'Arduino.pin_digital(%1, %2)',
@@ -533,6 +555,29 @@ Entry.Arduino.getBlocks = function() {
                                 converter: Entry.block.converters.returnStringValue,
                             },
                         ],
+                    },
+                ],
+                ar: [
+                    {
+                        syntax: 'pinMode(%1, %2)',
+                        textParams: [
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    [Lang.Blocks.ARDUINO_on, 'on'],
+                                    [Lang.Blocks.ARDUINO_off, 'off'],
+                                ],
+                                value: 'on',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue,
+                            },
+                        ],   
                     },
                 ],
             },
@@ -605,6 +650,21 @@ Entry.Arduino.getBlocks = function() {
                         ],
                     },
                 ],
+                ar: [
+                    {
+                        syntax: 'digitalWrite(%1, %2)',
+                        textParams: [
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                        ],
+                    }
+                ]
             },
         },
         arduino_convert_scale: {
