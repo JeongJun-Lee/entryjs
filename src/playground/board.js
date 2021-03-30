@@ -1258,7 +1258,7 @@ Entry.Board = class Board {
         let evt = Entry.documentMousedown;
         if (evt) {
             evt.attach(this, this.setSelectedBlock);
-            evt.attach(this, this._removeActivated);
+            // evt.attach(this, this._removeActivated);
         }
 
         evt = Entry.windowResized;
