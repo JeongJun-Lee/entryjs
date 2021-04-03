@@ -339,6 +339,13 @@ export default class Hardware {
         }
         this.communicationType = this.hwModule.communicationType || 'auto';
         this._banClassAllHardware();
+        if ( // Before sending 'hwChanged', change uploadEnable
+            // this.hwModule.name === 'arduino' ||
+            // this.hwModule.name === 'ArduinoExt ' ||
+            this.hwModule.name === 'neobot_purple' // Currently Neobot only
+        ) {
+            Entry.options.uploadEnable = true;
+        }
         Entry.dispatchEvent('hwChanged');
 
         let descMsg;
@@ -580,6 +587,7 @@ export default class Hardware {
             Entry.propertyPanel && Entry.propertyPanel.removeMode('hw');
             this.currentDeviceKey = undefined;
             this.hwModule = undefined;
+            Entry.options.uploadEnable = false;
             Entry.dispatchEvent('hwChanged');
         }
     }

@@ -323,8 +323,12 @@ Entry.BlockToNeoParser = class {
                 bright = Number(this._pramVal[1]); // String to Number
                 cmd = [0x04, port, bright, 0x00, 0x01];
 
-                if (this.extractNum(this._pramVal[2])) { // Not constantly
+                // duration is not actual parameter in led block, but for now, suppor it
+                if (this._pramVal[2] !== 'CONT') { // Not CONT
                     duration = Number(this._pramVal[2]); // String to Number
+                    if (isNaN(duration)) { // IN1~3, BAT, IR
+                        this.throwErr('error', 'WrongInputVal', block);
+                    }
                 }
                 break;
 
@@ -401,14 +405,19 @@ Entry.BlockToNeoParser = class {
                 direction = Number(this._pramVal[1]);
 
                 speed = this.extractNum(this._pramVal[2]);
-                if (speed < 4) { // IN1~3 will be 1~3
+                if (!Entry.Utils.isNumber(this._pramVal[2]) && speed < 4) { // IN1~3 will be 1~3
                     speed = speed + 100; // IN1~3 should 101~103
                 }
 
-                if (!this.extractNum(this._pramVal[3])) { // Constantly
+                if (this._pramVal[3] === 'CONT') {
                     duration = 0xFF;
                 } else {
                     duration = Number(this._pramVal[3]);
+                }
+
+                // Not allow IN1~3, BAT, IR in duration and BAT, IR in speed
+                if (isNaN(duration) || isNaN(speed)) {
+                    this.throwErr('error', 'WrongInputVal', block);
                 }
 
                 cmd = [0x05, direction, speed, duration, motor];
@@ -496,8 +505,22 @@ Entry.BlockToNeoParser = class {
                     speed = speed + 100; // IN1~3 should 101~103
                 }
 
+                if ( // Not allow wrong val in switched block
+                    this._pramVal[0] === 'BAT' ||
+                    this._pramVal[0] === 'IR' ||
+                    this._pramVal[0] === 'ALL' ||
+                    this._pramVal[0] === 'CONT'
+                ) { 
+                    this.throwErr('error', 'WrongInputVal', block);
+                }
+
                 degree = Number(this._pramVal[0]);
-                if (isNaN(NaN)) { // IN1~3 could not be converted to number
+                if (degree > 180) {
+                    this.throwErr('warn', 'ExcessiveInputVal', block);
+                    degree = 180;
+                }
+
+                if (isNaN(degree)) { // IN1~3 could not be converted to number
                     degree = this.extractNum(this._pramVal[0]);
                     degree = degree + 200; // IN1~3 should 201~203
                 }
@@ -518,9 +541,9 @@ Entry.BlockToNeoParser = class {
         // Since the HW doen't support the duration param, handle it manually
         if (block.type === 'neobot_purple_led_on' && duration) {
             this._pramVal = duration;
-            const waitCmd = this.createDataFrame('wait_second');
+            const waitCmd = this.createDataFrame({type: 'wait_second'});
             this._pramVal = ['ALL'];
-            const ledOffCmd = this.createDataFrame('neobot_purple_output_led_off');
+            const ledOffCmd = this.createDataFrame({type: 'neobot_purple_output_led_off'});
             cmd = cmd.concat(waitCmd).concat(ledOffCmd);
         }
 
