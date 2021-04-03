@@ -24,6 +24,7 @@ Entry.Playground = class Playground {
         this._destroyer.destroy();
         this.isTextBGMode_ = false;
         this.dataTable = DataTable;
+        this._uploadButton = null;;
 
         /**
          * playground's current view type
@@ -35,6 +36,8 @@ Entry.Playground = class Playground {
             this.injectText();
         });
         Entry.addEventListener('commentVisibleChanged', this.toggleCommentButtonVisible.bind(this));
+
+        Entry.addEventListener('hwChanged', this.updateUploadBtn.bind(this));
 
         Entry.windowResized.attach(this, this.clearClientRectMemo.bind(this));
     }
@@ -215,6 +218,23 @@ Entry.Playground = class Playground {
         this.variableTab = variableTab;
     }
 
+    updateUploadBtn() {
+      if (Entry.options.uploadEnable && !this._uploadButton) {
+          this._uploadButton = Entry.createElement('div')
+              .addClass('entryPlaygroundUploadButtonWorkspace')
+              .appendTo(this.tabButtonView_);
+          this._uploadButton.setAttribute('alt', Lang.Blocks.ARDUINO_upload_to_hw);
+          this._uploadButton.setAttribute('title', Lang.Blocks.ARDUINO_upload_to_hw);
+          this._uploadButton.bindOnClick(() => {
+              this.toast.show(Lang.Blocks.ARDUINO_upload_to_hw);
+              Entry.hw.upload();
+          });
+      } else if (!Entry.options.uploadEnable) {
+          this._uploadButton && Entry.removeElement(this._uploadButton);
+          this._uploadButton = null;
+      }
+    }
+
     createButtonTabView(tabButtonView) {
         const { options = {} } = Entry;
         const { commentDisable, backpackDisable } = options;
@@ -245,6 +265,8 @@ Entry.Playground = class Playground {
                 Entry.dispatchEvent('openBackPack');
             });
         }
+
+        this.updateUploadBtn();
     }
 
     createBackPackView(backPackView) {
@@ -2285,6 +2307,7 @@ Entry.Playground = class Playground {
     }
 
     destroy() {
+        this._uploadButton && this._uploadButton.unBindOnClick();
         this.commentToggleButton_ && this.commentToggleButton_.unBindOnClick();
         this.backPackButton_ && this.backPackButton_.unBindOnClick();
         this.blockBackPackEvent && this.blockBackPackEvent.off();

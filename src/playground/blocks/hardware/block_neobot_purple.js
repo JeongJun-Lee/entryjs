@@ -1145,7 +1145,7 @@ Entry.NeobotPurple.getBlocks = function() {
                         Entry.console.print('==========================', 'speak');
                     }
 
-                    if ((duration != '계속' && duration != 'constantly') && Entry.parseNumber(duration) <= 0) {
+                    if ((duration != 'CONT' && duration != 'constantly') && Entry.parseNumber(duration) <= 0) {
                         return script.callReturn();
                     }
 
@@ -1157,7 +1157,7 @@ Entry.NeobotPurple.getBlocks = function() {
                         Entry.hw.sendQueue[port] = value;
                     }
 
-                    if (duration == '계속' || duration == 'constantly') {
+                    if (duration == 'CONT' || duration == 'constantly') {
                         return script.callReturn();
                     }
 
@@ -1717,7 +1717,7 @@ Entry.NeobotPurple.getBlocks = function() {
                     const speed = script.getStringValue('SPEED', script);
                     const duration = script.getStringValue('DURATION', script);
 
-                    if (duration != '계속' && duration != 'constantly' && Entry.parseNumber(duration) <= 0) {
+                    if (duration != 'CONT' && duration != 'constantly' && Entry.parseNumber(duration) <= 0) {
                         return script.callReturn();
                     }
 
@@ -1790,7 +1790,7 @@ Entry.NeobotPurple.getBlocks = function() {
                         Entry.hw.sendQueue['DCR'] = rightOutValue;
                     }
 
-                    if (duration == '계속' || duration == 'constantly') {
+                    if (duration == 'CONT' || duration == 'constantly') {
                         return script.callReturn();
                     }
 
@@ -2528,7 +2528,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 {
                     type: 'Dropdown',
                     options: [
-                        [Lang.Blocks.neobot_purple_duration_cont, '계속'],
+                        [Lang.Blocks.neobot_purple_duration_cont, 'CONT'],
                         [Lang.Blocks.neobot_purple_duration_1s, '1'],
                         [Lang.Blocks.neobot_purple_duration_2s, '2'],
                         [Lang.Blocks.neobot_purple_duration_3s, '3'],
@@ -2539,7 +2539,7 @@ Entry.NeobotPurple.getBlocks = function() {
                         [Lang.Blocks.neobot_purple_duration_8s, '8'],
                         [Lang.Blocks.neobot_purple_duration_9s, '9'],
                     ],
-                    value: '계속',
+                    value: 'CONT',
                     fontSize: 11,
                     bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
                     arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
@@ -2612,7 +2612,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 {
                     type: 'Dropdown',
                     options: [
-                        [Lang.Blocks.neobot_purple_duration_cont, '계속'],
+                        [Lang.Blocks.neobot_purple_duration_cont, 'CONT'],
                         [Lang.Blocks.neobot_purple_duration_1s, '1'],
                         [Lang.Blocks.neobot_purple_duration_2s, '2'],
                         [Lang.Blocks.neobot_purple_duration_3s, '3'],
@@ -2623,7 +2623,7 @@ Entry.NeobotPurple.getBlocks = function() {
                         [Lang.Blocks.neobot_purple_duration_8s, '8'],
                         [Lang.Blocks.neobot_purple_duration_9s, '9'],
                     ],
-                    value: '계속',
+                    value: 'CONT',
                     fontSize: 11,
                     bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
                     arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,

@@ -553,29 +553,6 @@ function getBlocks() {
             },
             syntax: { js: [], py: [''] },
         },
-        arduino_upload_to_hw: {
-            skeleton: 'basic_button',
-            color: EntryStatic.colorSet.common.BUTTON_BACKGROUND,
-            isNotFor: ['uploadAvail'],
-            template: '%1',
-            params: [
-                {
-                    type: 'Text',
-                    text: Lang.Blocks.ARDUINO_upload_to_hw,
-                    color: EntryStatic.colorSet.common.BUTTON,
-                    align: 'center',
-                },
-            ],
-            class: 'arduino_default',
-            events: {
-                mousedown: [
-                    function() {
-                        Entry.hw.upload();
-                    },
-                ],
-            },
-            syntax: { js: [], py: [''] },
-        },
         //endregion hardware 하드웨어 기본
         //region basic 기본블록
         change_opacity: {
