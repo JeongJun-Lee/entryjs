@@ -13,6 +13,8 @@ function replaceLanguageCode(originalLanguage) {
             return 'ja';
         case 'vn':
             return 'vi';
+        case 'uz': // Currently UZ is not supported, so change to EN
+            return 'en';
         default:
             return originalLanguage;
     }
