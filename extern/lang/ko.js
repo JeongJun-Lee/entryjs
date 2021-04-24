@@ -565,6 +565,7 @@ Lang.Blocks = {
     ROBOT_reconnect: '로봇 연결하기',
     ARDUINO_program: '프로그램 실행하기',
     ARDUINO_cloud_pc_connector: '클라우드 PC 연결하기',
+    ARDUINO_upload_to_hw: '하드웨어로 코드 업로드',
     ARDUINO_connected: '하드웨어가 연결되었습니다. ',
     ARDUINO_connect: '* 하드웨어를 연결하세요.',
     ARDUINO_arduino_get_number_1: '신호',

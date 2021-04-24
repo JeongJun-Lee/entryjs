@@ -290,6 +290,18 @@ export default class Hardware {
         this.hwModule && this.hwModule.afterSend && this.hwModule.afterSend(this.sendQueue);
     }
 
+    upload() {
+        let option = {boardType: Entry.Workspace.MODE_UPLOAD};
+        if (this.hwModule.name === 'neobot_purple') {
+            option.textType = Entry.Vim.TEXT_TYPE_NEO;
+        }
+        const uploadObj = Entry.getMainWS().setMode(option);
+
+        if (this.socket && !this.socket.disconnected) {
+            this._sendUploadMessage(uploadObj);
+        }
+    }
+
     closeConnection() {
         this.socket?.close();
     }
@@ -562,6 +574,7 @@ export default class Hardware {
             case hardwareConnected:
                 blockMenu.banClass('arduinoDisconnected', true);
                 blockMenu.banClass('arduinoConnect', true);
+                blockMenu.unbanClass('arduinoConnected', true);
                 break;
         }
     }
@@ -595,6 +608,20 @@ export default class Hardware {
     private _sendSocketMessage(message: WebSocketMessage) {
         if (this.programConnected && this.socket && !this.socket.disconnected) {
             this.socket.emit('message', message);
+        }
+    }
+
+    private _sendUploadMessage(uploadObj: HardwareMessageData) {
+        if (this.programConnected && this.socket && !this.socket.disconnected) {
+            if (uploadObj && uploadObj.type === Entry.Vim.TEXT_TYPE_NEO) {
+                this.socket.emit('message', {
+                    data: JSON.stringify(uploadObj),
+                    mode: this.socketMode,
+                    type: 'utf8',
+                });
+            } else { // Arduino
+                this.socket.emit('message', 'flash');
+            }
         }
     }
 
