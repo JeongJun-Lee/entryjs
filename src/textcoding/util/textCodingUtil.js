@@ -540,9 +540,6 @@ class TextCodingUtil {
           
       // Not acceptable blocks
       if (Entry.expansionBlocks.length > 0 
-        || Entry.aiUtilizeBlocks.length > 0 
-        || Entry.aiLearning.isLoaded 
-        || Entry.playground.dataTable.tables.length > 0 
         || blockCategory === 'moving'
         || blockCategory === 'looks'
         || blockCategory === 'brush'
