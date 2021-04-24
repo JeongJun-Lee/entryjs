@@ -1,7 +1,7 @@
 'use strict';
 
 Entry.Neobot = {
-    id: '5.1',
+    id: '5.5',
     name: 'neobot',
     url: 'http://www.neobot.co.kr',
     imageName: 'neobot.png',
@@ -432,166 +432,194 @@ Entry.Neobot.setLanguage = function() {
                 neobot_degree_180: '180degrees',
             },
         }, //
-        uz: {
-          // en.js에 작성하던 내용
-          template: {
-              neobot_sensor_value: '%1 qiymati',
-              neobot_sensor_connect_external: "%1 ga bog'langan %2 qiymati",
-              neobot_sensor_convert_scale: "%1 sensorning %2 ~ %3 ni %4 ~ %5 ga sozlagan qiymati",
-              
-              neobot_compare_symbol: '%1',
-              neobot_decision_sensor_is_over: "%1 sensor qiymati %2 %3", 
-              neobot_decision_equal_with_sensor: "1% ga bo'glangan rangli sensori %2 ni o'qigan",
-              neobot_remote_button : 'Teleboshqarishning %1 tugumasini bosgan',
+	  uz: {
+            template: {
+                // sensor
+                neobot_sensor_value: '%1', // edited 210217, old : $1 값
+                neobot_sensor_connect_external: '%1 에 연결한 %2 값', // deprecated 210217
+                neobot_sensor_convert_scale: "O'zgartirilgan %1 qiymat doirasi: %2 ~ %3 O'zgartirish: %4 ~ %5", // edited 210302 neopia, old : %1 센서값 %2 ~ %3 를 %4 ~ %5 (으)로 바꾼 값
 
-              get_motor_speed: '%1',
-              neobot_left_motor: 'Chap motorni %1 ga %2 tezlikda aylantirish %3',
-              neobot_stop_left_motor: "Chap motorni to'xtatish %1",
-              neobot_right_motor: "O'ng motorni %1 ga %2 tezlikda aylantirish %3",
-              neobot_stop_right_motor: "O'ng motorni to'xtatish %1",
-              neobot_both_motor: "Chap motorni %1 ga %2 tezlikda & Chap motorni %3 ga %4 tezlikda aylantirish %5",
-              neobot_all_motor: "Ikkala motorlarni %1 ga %2 tezlikda %3 aylantirish %1",
-              neobot_stop_all_motor: "Ikkala motorlarni to'xtatish %1",
-              neobot_robot: 'Robotni %1 %2',
+                // decision
+                neobot_compare_symbol: '%1', // deprecated 210217
+                neobot_decision_sensor_is_over: '%1 %2 %3', // edited 210217, old : %1 의 센서값이 %2 %3
+                neobot_decision_equal_with_sensor: '%1 rangi %2', // edited 210302 neopia, old : %1 에 연결한 컬러센서가 %2 을 감지함
+                neobot_decision_sensor_angle: '%1 gradusi %2 %3', // added 210217
 
-              neobot_output_led_type1: "%1 bog'langan LEDni %2 yorug'ilidan %3 yoqish %4",
-              neobot_output_led_on: "%1 bog'langan LEDni yoqish %2",
-              neobot_output_led_off: "%1 bog'lansgan LEDni o'chirish %2",
-              neobot_set_output: '%1 da %2 qiymatidan chiqarish %3',
+                // remote
+                neobot_remote_button: 'Teleboshqarishning tugumasi %1 ni bosgan', // edited 210217, old : 리모컨의 %1 버튼을 누름
 
-              get_servo_degree: '%1',
-              neobot_servo_init: "%1 Servo motorni nollashtirish %2",
-              neobot_servo_change_degree: "Servo motorning gradusini o'zgartirish: %1 %2 %3 %4 %5",
-              neobot_servo_rotate: 'Servo motorni aylantirish: %1 %2 %3 %4',
-              neobot_servo_stop: "%1 Servo motorni to'xtatish %2",
+                // LED
+                neobot_arg_led_duration: '%1',
+                neobot_led_on: 'LED yoqish: %1 %2 %3 %4', // edited 210217, old : %1 에 연결한 LED를 %2 밝기로 %3 켜기 %4
+                neobot_output_led_on: '%1 에 연결한 %2 값', // deprecated 210217
+                neobot_output_led_off: "%1 LEDni o'chirish %2", // edited 210217, old : %1 에 연결한 LED 끄기 %2
+                neobot_led_brightness_with_sensor: "%1 sensoridan %2 LED yorug'likni o'zgartirish %3",
+                neobot_color_led_on: '%1 rangli LEDni yoqish: R %2 G %3 B %4 %5',
+                neobot_output_led_type1: '%1 에 연결한 LED를 %2 밝기로 %3 켜기 %4', // deprecated 210223
 
-              neobot_play_note_for: '%1 ni %2 oktavada as %3 uzunligidan ovoz chiqarish %4',
-              neobot_play_note_with_sensor: "Kontrollerda %1 sensorning %2 ~ %3 qiymatidan ohang chalash %4",
-          },
-          Blocks: {
-              //for dropdown
-              neobot_port_1: 'IN1',
-              neobot_port_2: 'IN2',
-              neobot_port_3: 'IN3',
-              neobot_port_4: 'IN4',
-              neobot_port_bat: 'Batareya',
-              neobot_port_remot: 'Teleboshqarish',
-              neobot_color_white: 'oq',
-              neobot_color_red: 'qizil',
-              neobot_color_yellow: 'sariq',
-              neobot_color_green: 'yasil',
-              neobot_color_blue: "ko'k",
-              neobot_direction_forward: "tog'ri",
-              neobot_direction_backward: 'orqa',
-              neobot_sound_silent: 'silent',
-              neobot_sound_do: 'Do',
-              neobot_sound_do_shop: 'Do#',
-              neobot_sound_re: 'Re',
-              neobot_sound_re_shop: 'Re#',
-              neobot_sound_mi: 'Mi',
-              neobot_sound_fa: 'Fa',
-              neobot_sound_fa_shop: 'Fa#',
-              neobot_sound_so: 'Sol',
-              neobot_sound_so_shop: 'Sol#',
-              neobot_sound_la: 'Lya',
-              neobot_sound_la_shop: 'Lya#',
-              neobot_sound_ti: 'Si',
-              neobot_sound_half_note: 'yarim nota',
-              neobot_sound_quarter_note: 'chorak nota',
-              neobot_sound_eighth_note: '1/8 nota',
-              neobot_sound_sixteenth_note: '1/16 nota',
-              neobot_sensor_infrared : 'IR sensor',
-              neobot_sensor_light : 'nur sensor',
-              neobot_sensor_sound : 'ovoz sensor',
-              neobot_compare_symbol1 : '＝',
-              neobot_compare_symbol2 : '＞',
-              neobot_compare_symbol3 : '＜',
-              neobot_compare_symbol4 : '≥',
-              neobot_compare_symbol5 : '≤',
-              neobot_remote_btn_a: 'A',
-              neobot_remote_btn_b: 'B',
-              neobot_remote_btn_c: 'C',
-              neobot_remote_btn_d: 'D',
-              neobot_remote_btn_1: '1',
-              neobot_remote_btn_2: '2',
-              neobot_remote_btn_3: '3',
-              neobot_remote_btn_4: '4',
-              neobot_remote_btn_up: '▲',
-              neobot_remote_btn_down: '▼',
-              neobot_remote_btn_left: '◀',
-              neobot_remote_btn_right: '▶',
-              neobot_duration_cont: 'davom etib',
-              neobot_duration_1s: '1 soniya',
-              neobot_duration_2s: '2 soniya',
-              neobot_duration_3s: '3 soniya',
-              neobot_duration_4s: '4 soniya',
-              neobot_duration_5s: '5 soniya',
-              neobot_duration_6s: '6 soniya',
-              neobot_duration_7s: '7 soniya',
-              neobot_duration_8s: '8 soniya',
-              neobot_duration_9s: '9 soniya',
-              neobot_motor_both: 'ikkala',
-              neobot_motor_left: "chap",
-              neobot_motor_right: "o'ng",
-              neobot_motor_move_forward: "to'g'riga yurish",
-              neobot_motor_move_backward: "orqaga yurish",
-              neobot_motor_move_left: 'chapga birilish',
-              neobot_motor_move_right: "o'nga birilish",
-              neobot_motor_move_stop: "to'xtatish",
-              // modified string by cky 191205
-              neobot_servo_dir_1: "to'g'ri tomoni",
-              neobot_servo_dir_2: 'qarish tomoni',
-              // added by cky 191205
-              neobot_percent_10: '10% tezlik',
-              neobot_percent_20: '20% tezlik',
-              neobot_percent_30: '30% tezlik',
-              neobot_percent_40: '40% tezlik',
-              neobot_percent_50: '50% tezlik',
-              neobot_percent_60: '60% tezlik',
-              neobot_percent_70: '70% tezlik',
-              neobot_percent_80: '80% tezlik',
-              neobot_percent_90: '90% tezlik',
-              neobot_percent_100: '100% tezlik',
+                // output
+                neobot_set_output: '%1 ga %2 qiymatini chiqarish %3', // edited 210217, old : %1 에 %2값만큼 출력 %3
 
-              neobot_degree_0: '0 gradus',
-              neobot_degree_5: '5 gradus',
-              neobot_degree_10: '10 gradus',
-              neobot_degree_15: '15 gradus',
-              neobot_degree_20: '20 gradus',
-              neobot_degree_25: '25 gradus',
-              neobot_degree_30: '30 gradus',
-              neobot_degree_35: '35 gradus',
-              neobot_degree_40: '40 gradus',
-              neobot_degree_45: '45 gradus',
-              neobot_degree_50: '50 gradus',
-              neobot_degree_55: '55 gradus',
-              neobot_degree_60: '60 gradus',
-              neobot_degree_65: '65 gradus',
-              neobot_degree_70: '70 gradus',
-              neobot_degree_75: '75 gradus',
-              neobot_degree_80: '80 gradus',
-              neobot_degree_85: '85 gradus',
-              neobot_degree_90: '90 gradus',
-              neobot_degree_95: '95 gradus',
-              neobot_degree_100: '100 gradus',
-              neobot_degree_105: '105 gradus',
-              neobot_degree_110: '110 gradus',
-              neobot_degree_115: '115 gradus',
-              neobot_degree_120: '120 gradus',
-              neobot_degree_125: '125 gradus',
-              neobot_degree_130: '130 gradus',
-              neobot_degree_135: '135 gradus',
-              neobot_degree_140: '140 gradus',
-              neobot_degree_145: '145 gradus',
-              neobot_degree_150: '150 gradus',
-              neobot_degree_155: '155 gradus',
-              neobot_degree_160: '160 gradus',
-              neobot_degree_165: '165 gradus',
-              neobot_degree_170: '170 gradus',
-              neobot_degree_175: '175 gradus',
-              neobot_degree_180: '180 gradus',
-          },
-        }, 
+                // motor
+                get_motor_speed: '%1', // deprecated 210217
+                neobot_left_motor: '왼쪽 모터를 %1 %2 의 속도로 회전 %3', // deprecated 210217
+                neobot_stop_left_motor: '왼쪽 모터를 정지 %1', // deprecated 210217
+                neobot_right_motor: '오른쪽 모터를 %1 %2 의 속도로 회전 %3', // deprecated 210217
+                neobot_stop_right_motor: '오른쪽 모터를 정지 %1', // deprecated 210217
+                neobot_both_motor: '왼쪽 모터를 %1 %2 & 오른쪽 모터를 %3 %4 의 속도로 회전 %5', // deprecated 210217
+                neobot_all_motor: '양쪽 모터를 %1 %2의 속도로 %3 회전 %4', // deprecated 210217
+                neobot_stop_all_motor: '양쪽 모터를 정지 %1', // deprecated 210217
+
+                neobot_robot: 'Robotni %1 %2',
+                neobot_motor_start: 'Motorni aylantirish   %1 %2 %3 %4 %5',
+                neobot_motor_stop: "%1 motorini to'xtatish %2",
+                neobot_arg_motor_speed: '%1',
+                neobot_arg_motor_duration: '%1',
+
+                // melody
+                neobot_play_note_for: 'Buzzer yangrash: Oktava %2, Tovush %1, Nota %3 %4', // edited 210302 neopia, old : 멜로디 %1 을(를) %2 옥타브로 %3 길이만큼 소리내기 %4
+                neobot_melody_play_with_sensor: '%1 sensoridan buzzerni yangrash %2', // edited 210302 neopia
+                neobot_melody_stop: "Buzzerni to'xtatish %1", // edited 210302 neopia
+                neobot_play_note_with_sensor: '컨트롤러에서 %1 센서의 %2 ~ %3 값으로 멜로디 연주하기 %4', // deprecated 210217
+
+                // servo
+                get_servo_degree: '%1',
+                neobot_servo_init: '%1 servo motorini nollashtirish %2', // edited 210217, old : %1 Servo모터 리셋 %2
+                neobot_servo_rotate: 'Servo motorni aylantirish: %1 %2 %3 %4', // edited 210217, old : Servo모터 회전하기 : %1 %2 %3 %4
+                neobot_servo_stop: "%1 servo motorini to'xtatish %2", // edited 210217, old : %1 Servo모터 멈추기 %2
+                neobot_servo_change_degree: "Servo motor gradusini o'zgartirish   %2 %3 %4 %1 %5", // edited 210217, old : Servo모터 각도 바꾸기 : %1 %2 %3 %4 %5
+            },
+            Blocks: {
+                //for dropdown
+                neobot_port_1: 'IN1',
+                neobot_port_2: 'IN2',
+                neobot_port_3: 'IN3',
+                neobot_port_4: 'IN4',
+                neobot_port_12: 'IN1 & IN2',
+                neobot_port_bat: 'Batareya',
+                neobot_port_remot: 'Teleboshqarish',
+                neobot_port_buz: 'Buzzer',
+                neobot_color_white: 'Oq',
+                neobot_color_red: 'Qizil',
+                neobot_color_yellow: 'Sariq',
+                neobot_color_green: 'Yasil',
+                neobot_color_blue: "Ko'k",
+                neobot_direction_forward: "Tog'ri",
+                neobot_direction_backward: 'Orqa',
+                neobot_sound_silent: 'Sukunat',
+                neobot_sound_do: 'Do',
+                neobot_sound_do_shop: 'Do#',
+                neobot_sound_re: 'Re',
+                neobot_sound_re_shop: 'Re#',
+                neobot_sound_mi: 'Mi',
+                neobot_sound_fa: 'Fa',
+                neobot_sound_fa_shop: 'Fa#',
+                neobot_sound_so: 'Sol',
+                neobot_sound_so_shop: 'Sol#',
+                neobot_sound_la: 'Lya',
+                neobot_sound_la_shop: 'Lya#',
+                neobot_sound_ti: 'Si',
+                neobot_sound_half_note: 'Yarim',
+                neobot_sound_quarter_note: 'Chorak',
+                neobot_sound_eighth_note: '1/8',
+                neobot_sound_sixteenth_note: '1/16',
+                neobot_sensor_infrared: 'IR sensor',
+                neobot_sensor_light: 'nur sensor',
+                neobot_sensor_sound: 'ovoz sensor',
+                neobot_compare_symbol1: '＝',
+                neobot_compare_symbol2: '＞',
+                neobot_compare_symbol3: '＜',
+                neobot_compare_symbol4: '≥',
+                neobot_compare_symbol5: '≤',
+                neobot_remote_btn_a: 'A',
+                neobot_remote_btn_b: 'B',
+                neobot_remote_btn_c: 'C',
+                neobot_remote_btn_d: 'D',
+                neobot_remote_btn_1: '1',
+                neobot_remote_btn_2: '2',
+                neobot_remote_btn_3: '3',
+                neobot_remote_btn_4: '4',
+                neobot_remote_btn_up: '▲',
+                neobot_remote_btn_down: '▼',
+                neobot_remote_btn_left: '◀',
+                neobot_remote_btn_right: '▶',
+                neobot_duration_cont: 'Davom etish',
+                neobot_duration_1s: '1 soniya',
+                neobot_duration_2s: '2 soniya',
+                neobot_duration_3s: '3 soniya',
+                neobot_duration_4s: '4 soniya',
+                neobot_duration_5s: '5 soniya',
+                neobot_duration_6s: '6 soniya',
+                neobot_duration_7s: '7 soniya',
+                neobot_duration_8s: '8 soniya',
+                neobot_duration_9s: '9 soniya',
+                neobot_motor_both: 'Ikkala',
+                neobot_motor_left: "Chap",
+                neobot_motor_right: "O'ng",
+                neobot_motor_move_forward: "to'g'riga yurish",
+                neobot_motor_move_backward: "orqaga yurish",
+                neobot_motor_move_left: 'chapga birilish',
+                neobot_motor_move_right: "o'nga birilish",
+                neobot_motor_move_stop: "to'xtatish",
+                // modified string by cky 191205
+                neobot_servo_dir_1: "To'g'ri tomoni",
+                neobot_servo_dir_2: 'Qarish tomoni',
+                // added by cky 191205
+                neobot_percent_10: '10% tezlik',
+                neobot_percent_20: '20% tezlik',
+                neobot_percent_30: '30% tezlik',
+                neobot_percent_40: '40% tezlik',
+                neobot_percent_50: '50% tezlik',
+                neobot_percent_60: '60% tezlik',
+                neobot_percent_70: '70% tezlik',
+                neobot_percent_80: '80% tezlik',
+                neobot_percent_90: '90% tezlik',
+                neobot_percent_100: '100% tezlik',
+
+                neobot_angle_0: '0 gradus',
+                neobot_angle_5: '5 gradus',
+                neobot_angle_10: '10 gradus',
+                neobot_angle_15: '15 gradus',
+                neobot_angle_20: '20 gradus',
+                neobot_angle_25: '25 gradus',
+                neobot_angle_30: '30 gradus',
+                neobot_angle_35: '35 gradus',
+                neobot_angle_40: '40 gradus',
+                neobot_angle_45: '45 gradus',
+                neobot_angle_50: '50 gradus',
+                neobot_angle_55: '55 gradus',
+                neobot_angle_60: '60 gradus',
+                neobot_angle_65: '65 gradus',
+                neobot_angle_70: '70 gradus',
+                neobot_angle_75: '75 gradus',
+                neobot_angle_80: '80 gradus',
+                neobot_angle_85: '85 gradus',
+                neobot_angle_90: '90 gradus',
+                neobot_angle_95: '95 gradus',
+                neobot_angle_100: '100 gradus',
+                neobot_angle_105: '105 gradus',
+                neobot_angle_110: '110 gradus',
+                neobot_angle_115: '115 gradus',
+                neobot_angle_120: '120 gradus',
+                neobot_angle_125: '125 gradus',
+                neobot_angle_130: '130 gradus',
+                neobot_angle_135: '135 gradus',
+                neobot_angle_140: '140 gradus',
+                neobot_angle_145: '145 gradus',
+                neobot_angle_150: '150 gradus',
+                neobot_angle_155: '155 gradus',
+                neobot_angle_160: '160 gradus',
+                neobot_angle_165: '165 gradus',
+                neobot_angle_170: '170 gradus',
+                neobot_angle_175: '175 gradus',
+                neobot_angle_180: '180 gradus',
+
+                // added 210217
+                neobot_out_all: 'Hammasi',
+                neobot_direction_left: 'chapga',
+                neobot_direction_right: "o'ngga",
+            },
+        },
     };
 };
 
