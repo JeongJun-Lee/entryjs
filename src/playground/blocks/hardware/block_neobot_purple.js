@@ -401,7 +401,7 @@ Entry.NeobotPurple.setLanguage = function() {
                 neobot_purple_decision_sensor_angle: '%1 gradusi %2 %3',
 
                 // remote
-                neobot_purple_remote_button: 'Teleboshqarishning tugumasi %1 ni bosish',
+                neobot_purple_remote_button: 'Teleboshqarishning tugumasi %1 ni bosgan',
 
                 // LED
                 neobot_purple_arg_led_duration: '%1',
