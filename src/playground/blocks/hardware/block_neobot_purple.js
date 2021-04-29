@@ -414,7 +414,7 @@ Entry.NeobotPurple.setLanguage = function() {
                 neobot_purple_set_output: '%1 ga %2 qiymatini chiqarish %3',
 
                 // motor
-                neobot_purple_robot: 'Robotni %1 %2',
+                neobot_purple_robot: 'Robot %1 %2',
                 neobot_purple_motor_start: 'Motorni aylantirish %1 %2 %3 %4 %5',
                 neobot_purple_motor_stop: "%1 motorini to'xtatish %2",
                 neobot_purple_arg_motor_speed: '%1',

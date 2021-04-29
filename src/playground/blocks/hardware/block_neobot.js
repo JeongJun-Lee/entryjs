@@ -470,7 +470,7 @@ Entry.Neobot.setLanguage = function() {
                 neobot_all_motor: '양쪽 모터를 %1 %2의 속도로 %3 회전 %4', // deprecated 210217
                 neobot_stop_all_motor: '양쪽 모터를 정지 %1', // deprecated 210217
 
-                neobot_robot: 'Robotni %1 %2',
+                neobot_robot: 'Robot %1 %2',
                 neobot_motor_start: 'Motorni aylantirish   %1 %2 %3 %4 %5',
                 neobot_motor_stop: "%1 motorini to'xtatish %2",
                 neobot_arg_motor_speed: '%1',
