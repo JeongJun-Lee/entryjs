@@ -149,6 +149,21 @@ Entry.Arduino.setLanguage = function() {
                 arduino: 'Arduino',
             },
         },
+        uz: {
+          template: {
+              arduino_get_number_sensor_value: 'Analog %1 pin sensor qiymati',
+              arduino_get_digital_value: 'Raqamli %1 pin sensor qiymati',
+              arduino_toggle_led: 'Raqamli %1pinini %2 ga solzash %3',
+              arduino_toggle_pwm: 'PWM %1 pinini %2 ga solzash %3',
+              arduino_convert_scale: "%1ning doirasini %2 ~ %3 dan %4 ~ %5 ga o'zgartirgan qiymati",
+          },
+          Device: {
+              arduino: 'arduino',
+          },
+          Menus: {
+              arduino: 'Arduino',
+          },
+      },
     };
 };
 
