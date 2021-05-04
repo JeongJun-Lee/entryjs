@@ -659,7 +659,7 @@ Entry.Hamster.setLanguage = () => ({
             hamster_gripper: 'Qisqichini %1 %2',
             hamster_release_gripper: 'Qisqichini o\'chirish %1',
             hamster_boolean: '%1?',
-            hamster_play_note: '%1 %2 notasini yangrash %3',
+            hamster_play_note: '%1 %2 tovushni yangrash %3',
         },
         Helper: {
             hamster_gripper: 'Opens or closes the gripper.',
