@@ -67,6 +67,104 @@ Entry.ArduinoExt = {
     highList: ['high', '1', 'on'],
     lowList: ['low', '0', 'off'],
     BlockState: {},
+    monitorTemplate: {
+        imgPath: 'hw/arduino.png',
+        width: 605,
+        height: 434,
+        listPorts: {
+            '2': {
+                name: `${Lang.Hw.port_en} 2 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            '3': {
+                name: `${Lang.Hw.port_en} 3 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            '4': {
+                name: `${Lang.Hw.port_en} 4 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            '5': {
+                name: `${Lang.Hw.port_en} 5 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            '6': {
+                name: `${Lang.Hw.port_en} 6 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            '7': {
+                name: `${Lang.Hw.port_en} 7 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            '8': {
+                name: `${Lang.Hw.port_en} 8 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            '9': {
+                name: `${Lang.Hw.port_en} 9 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            '10': {
+                name: `${Lang.Hw.port_en} 10 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            '11': {
+                name: `${Lang.Hw.port_en} 11 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            '12': {
+                name: `${Lang.Hw.port_en} 12 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            '13': {
+                name: `${Lang.Hw.port_en} 13 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            a0: {
+                name: `${Lang.Hw.port_en} A0 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            a1: {
+                name: `${Lang.Hw.port_en} A1 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            a2: {
+                name: `${Lang.Hw.port_en} A2 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            a3: {
+                name: `${Lang.Hw.port_en} A3 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            a4: {
+                name: `${Lang.Hw.port_en} A4 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            a5: {
+                name: `${Lang.Hw.port_en} A5 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+        },
+        mode: 'both',
+  },
 };
 
 Entry.ArduinoExt.setLanguage = function() {
@@ -102,7 +200,7 @@ Entry.ArduinoExt.setLanguage = function() {
                 arduino_ext_get_ultrasonic_value: "Ultrasonik sensor trig %1 eko %2 sensor qiymati",
                 arduino_ext_toggle_led: "Raqamli %1 pinini %2 %3",
                 arduino_ext_digital_pwm: "PWM %1 pinini %2 ga solzash %3",
-                arduino_ext_set_tone: "Raqamli %1 pinning buzzerni %2 %3o'lchovda %4 soniya yangrash %5",
+                arduino_ext_set_tone: "Raqamli %1 pinning buzzerni %2 %3 oktavada %4 soniya yangrash %5",
                 arduino_ext_set_servo: "Raqamli %1 pinning servo motorini %2 gradusiga sozlash %3",
                 arduino_ext_get_digital: "Raqamli %1 pin sensor qiymati"
           },
