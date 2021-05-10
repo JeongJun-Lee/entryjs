@@ -167,7 +167,7 @@ Entry.Workspace = class Workspace {
                     mode.runType = VIM.MAZE_MODE;
                 } else if (this.oldTextType === VIM.TEXT_TYPE_PY) {
                     mode.runType = VIM.WORKSPACE_MODE;
-                }
+                } 
                 e.block && Entry.getMainWS() && Entry.getMainWS().board.activateBlock(e.block);
             }
         };
@@ -252,6 +252,10 @@ Entry.Workspace = class Workspace {
                         this.boardType = WORKSPACE.MODE_VIMBOARD;
                         this.textType = VIM.TEXT_TYPE_PY;
                         this.runType = VIM.WORKSPACE_MODE;
+                    } else if (this.oldTextType === VIM.TEXT_TYPE_AR) {
+                        this.boardType = WORKSPACE.MODE_ARBOARD;
+                        this.textType = VIM.TEXT_TYPE_AR;
+                        this.runType = VIM.WORKSPACE_MODE;
                     }
                 }
                 Entry.commander.setCurrentEditor('board', this.board);
@@ -288,6 +292,31 @@ Entry.Workspace = class Workspace {
                     mode.boardType = WORKSPACE.MODE_BOARD;
                     mode.runType = VIM.WORKSPACE_MODE;
                     dispatchChangeBoardEvent();
+                }
+                break;
+
+            case WORKSPACE.MODE_ARBOARD:
+                try {
+                    this.board && this.board.hide();
+                    this.overlayBoard && this.overlayBoard.hide();
+                    this.set({ selectedBoard: this.vimBoard });
+                    this.vimBoard.codeMirror.options.readOnly = true; // Don't allow code editiong in AR mode
+                    this.vimBoard.show();
+                    blockMenu.banClass('functionInit', true);
+                    this.codeToText(this.board.code, mode);
+                    dispatchChangeBoardEvent();
+                } catch (e) {
+                    // First return to Board mode
+                    this.vimBoard.hide();
+                    this.board.show();
+                    blockMenu.unbanClass('functionInit');
+                    this.set({ selectedBoard: this.board });
+                    this.mode = WORKSPACE.MODE_BOARD;
+                    mode.boardType = WORKSPACE.MODE_BOARD;
+                    mode.runType = VIM.WORKSPACE_MODE;
+                    dispatchChangeBoardEvent();
+
+                    e.block && Entry.getMainWS() && Entry.getMainWS().board.activateBlock(e.block);    
                 }
                 break;
         }
@@ -337,7 +366,10 @@ Entry.Workspace = class Workspace {
             return;
         }
 
-        code.load(changedCode);
+        // Skip applying changes, because there is no changes
+        if (oldTextType != Entry.Vim.TEXT_TYPE_AR) {
+            code.load(changedCode);
+        }
         this.changeBoardCode(code);
         setTimeout(() => {
             if (code.view) {
@@ -758,3 +790,4 @@ Entry.Workspace.MODE_BOARD = 0;
 Entry.Workspace.MODE_VIMBOARD = 1;
 Entry.Workspace.MODE_OVERLAYBOARD = 2;
 Entry.Workspace.MODE_UPLOAD = 3;
+Entry.Workspace.MODE_ARBOARD = 4;

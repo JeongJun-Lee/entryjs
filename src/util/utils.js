@@ -95,6 +95,11 @@ Entry.loadProject = function(project) {
                 mode.boardType = Entry.Workspace.MODE_VIMBOARD;
                 mode.textType = Entry.Vim.TEXT_TYPE_JS;
                 mode.runType = Entry.Vim.MAZE_MODE;
+            } else if (pMode == 3) {
+                // Arduino in Text Coding
+                mode.boardType = Entry.Workspace.MODE_VIMBOARD;
+                mode.textType = Entry.Vim.TEXT_TYPE_AR;
+                mode.runType = Entry.Vim.WORKSPACE_MODE;
             }
             Entry.getMainWS().setMode(mode);
         }

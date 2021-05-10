@@ -9,6 +9,7 @@ require('./parser/core/text/jsToBlock');
 require('./parser/core/block/blockToPy');
 require('./parser/core/block/blockToJs');
 require('./parser/core/block/blockToNeo');
+require('./parser/core/block/blockToAr');
 
 Entry.Parser = function(mode, type, cm, syntax) {
     this._mode = mode; // maze ai workspace
@@ -115,8 +116,12 @@ Entry.Parser = function(mode, type, cm, syntax) {
                 this._execParserType = Entry.Vim.PARSER_TYPE_BLOCK_TO_PY;
                 break;
             case Entry.Vim.PARSER_TYPE_BLOCK_TO_NEO:
-                this._execParser = new Entry.BlockToNeoParser(this.syntax, this);
+                this._execParser = new Entry.BlockToNeoParser();
                 this._execParserType = Entry.Vim.PARSER_TYPE_BLOCK_TO_NEO;
+                break;
+            case Entry.Vim.PARSER_TYPE_BLOCK_TO_AR:
+                this._execParser = new Entry.BlockToArParser();
+                this._execParserType = Entry.Vim.PARSER_TYPE_BLOCK_TO_AR;
                 break;
         }
     };
@@ -372,6 +377,7 @@ Entry.Parser = function(mode, type, cm, syntax) {
                 break;
             }
             case Entry.Vim.PARSER_TYPE_BLOCK_TO_NEO:
+            case Entry.Vim.PARSER_TYPE_BLOCK_TO_AR:
                 try {
                     result = this._execParser.Code(code, parseMode);
                 } catch (e) {
