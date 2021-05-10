@@ -26,6 +26,9 @@
             <button style="border: 1px solid black" onclick="changeWorkspaceMode('upload')">
                 Upload Mode
             </button>
+            <button style="border: 1px solid black" onclick="changeWorkspaceMode('arduino')">
+                Arduino Mode
+          </button>
         </section>
         <div id="workspace"></div>
 
@@ -148,6 +151,10 @@
                 } else if (mode === 'upload') {
                     option.boardType = Entry.Workspace.MODE_UPLOAD;
                     option.textType = Entry.Vim.TEXT_TYPE_NEO;
+                } else if (mode === 'arduino') {
+                    option.boardType = Entry.Workspace.MODE_ARBOARD;
+                    option.textType = Entry.Vim.TEXT_TYPE_AR; 
+                    option.runType = Entry.Vim.WORKSPACE_MODE;
                 } else {
                     option.boardType = Entry.Workspace.MODE_VIMBOARD;
                     option.textType = Entry.Vim.TEXT_TYPE_PY;

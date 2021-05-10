@@ -518,47 +518,90 @@ class TextCodingUtil {
     }
 
     hasUnSupportedBlkInNeo(block) {
-      const blockType = block.data.type;
-      const blockCategory = EntryStatic.getCategoryByBlock(block.data.type);
-      const acceptBlocks =  
-          blockType === 'when_run_button_click' 
-          || blockType === 'wait_second'
-          || blockType === 'repeat_basic'
-          || blockType === 'repeat_inf'
-          || blockType === 'repeat_stop'
-          || blockType === '_if'
-          || blockType === 'if_else'
-          || blockType === 'wait_until_true'
-          || blockType === 'number'
-          || blockType === 'text' 
-          || blockType === 'neobot_purple_arg_led_duration' 
-          || blockType === 'neobot_purple_sensor_value' 
-          || blockType === 'neobot_purple_arg_motor_speed' 
-          || blockType === 'neobot_purple_arg_motor_duration' 
-          || blockType === 'get_servo_degree'
-          || blockCategory === 'arduino' // HW blocks
-          
-      // Not acceptable blocks
-      if (Entry.expansionBlocks.length > 0 
-        || blockCategory === 'moving'
-        || blockCategory === 'looks'
-        || blockCategory === 'brush'
-        || blockCategory === 'text'
-        || blockCategory === 'sound'
-        || blockCategory === 'judgement'
-        || blockCategory === 'calc'
-        || blockCategory === 'variable'
-        || blockCategory === 'func'
-        || blockCategory === 'analysis'
-        || blockCategory === 'ai_utilize'
-        || blockCategory === 'expansion'
-        || blockType === 'neobot_purple_sensor_convert_scale'
-        || blockType === 'neobot_purple_set_output'
-        || !acceptBlocks) {
-          return true;
-      }
+        const blockType = block.data.type;
+        const blockCategory = EntryStatic.getCategoryByBlock(block.data.type);
+        const acceptBlocks =  
+            blockType === 'when_run_button_click' 
+            || blockType === 'wait_second'
+            || blockType === 'repeat_basic'
+            || blockType === 'repeat_inf'
+            || blockType === 'repeat_stop'
+            || blockType === '_if'
+            || blockType === 'if_else'
+            || blockType === 'wait_until_true'
+            || blockType === 'number'
+            || blockType === 'text' 
+            || blockType === 'neobot_purple_arg_led_duration' 
+            || blockType === 'neobot_purple_sensor_value' 
+            || blockType === 'neobot_purple_arg_motor_speed' 
+            || blockType === 'neobot_purple_arg_motor_duration' 
+            || blockType === 'get_servo_degree'
+            || blockCategory === 'arduino' // HW blocks
+            
+        // Not acceptable blocks
+        if (Entry.expansionBlocks.length > 0 
+            || blockCategory === 'moving'
+            || blockCategory === 'looks'
+            || blockCategory === 'brush'
+            || blockCategory === 'text'
+            || blockCategory === 'sound'
+            || blockCategory === 'judgement'
+            || blockCategory === 'calc'
+            || blockCategory === 'variable'
+            || blockCategory === 'func'
+            || blockCategory === 'analysis'
+            || blockCategory === 'ai_utilize'
+            || blockCategory === 'expansion'
+            || blockType === 'neobot_purple_sensor_convert_scale'
+            || blockType === 'neobot_purple_set_output'
+            || !acceptBlocks) {
+              return true;
+        }
 
-      return false;
+        return false;
+    }
+
+    hasUnSupportedBlkInAr(block) {
+        const blockType = block.data.type;
+        const blockCategory = EntryStatic.getCategoryByBlock(block.data.type);
+        const acceptBlocks =  
+            blockType === 'when_run_button_click' 
+            || blockType === 'repeat_basic'
+            || blockType === 'repeat_while_true'
+            || blockType === 'repeat_inf'
+            || blockType === 'stop_repeat'
+            || blockType === '_if'
+            || blockType === 'if_else'
+            || blockType === 'wait_second'
+            || blockType === 'number'
+            || blockType === 'text' 
+            || blockType === 'arduino_get_sensor_number'
+            || blockType === 'arduino_get_port_number'
+            || blockType === 'arduino_get_pwm_port_number'
+            || blockType === 'arduino_text'
+            || blockType === 'boolean_basic_operator'
+            || blockType === 'set_variable'
+            || blockType === 'change_variable'
+            || blockType === 'get_variable'
+            || blockCategory === 'arduino' // HW blocks
+            
+        // Not acceptable blocks
+        if (Entry.expansionBlocks.length > 0 
+            || blockCategory === 'moving'
+            || blockCategory === 'looks'
+            || blockCategory === 'brush'
+            || blockCategory === 'text'
+            || blockCategory === 'sound'
+            || blockCategory === 'calc'
+            || blockCategory === 'func'
+            || blockCategory === 'analysis'
+            || blockCategory === 'ai_utilize'
+            || blockCategory === 'expansion'
+            || !acceptBlocks) {
+              return true;
+        }
+
+        return false;
     }
 
     /**

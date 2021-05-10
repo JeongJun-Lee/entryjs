@@ -7,12 +7,14 @@ class Vim {
     static TEXT_TYPE_JS = 0;
     static TEXT_TYPE_PY = 1;
     static TEXT_TYPE_NEO = 2;
+    static TEXT_TYPE_AR = 3;
 
     static PARSER_TYPE_JS_TO_BLOCK = 0;
     static PARSER_TYPE_PY_TO_BLOCK = 1;
     static PARSER_TYPE_BLOCK_TO_JS = 2;
     static PARSER_TYPE_BLOCK_TO_PY = 3;
     static PARSER_TYPE_BLOCK_TO_NEO = 4;
+    static PARSER_TYPE_BLOCK_TO_AR = 5;
 
     static INEDITABLE_LINE_PY = 3;
 
@@ -149,7 +151,10 @@ class Vim {
         } else if (type === Vim.TEXT_TYPE_PY) {
             this._parserType = Vim.PARSER_TYPE_PY_TO_BLOCK;
             this._parser.setParser(this._mode, this._parserType, this.codeMirror);
-        }
+        } else if (type === Vim.TEXT_TYPE_AR) {
+            // Not need AR_TO_BLK parser, because read-only edting in AR codes
+            return null;
+        } 
 
         let textCode = this.codeMirror.getValue();
         const cursor = this.doc.getCursor();
@@ -184,6 +189,12 @@ class Vim {
             this._oldParserType = this._parserType;
         } else if (textType === Vim.TEXT_TYPE_NEO) {
             this._parserType = Vim.PARSER_TYPE_BLOCK_TO_NEO;
+            if (this._oldParserType !== this._parserType) {
+                this._parser.setParser(this._mode, this._parserType, this.codeMirror);
+            }
+            this._oldParserType = this._parserType;
+        } else if (textType === Vim.TEXT_TYPE_AR) {
+            this._parserType = Vim.PARSER_TYPE_BLOCK_TO_AR;
             if (this._oldParserType !== this._parserType) {
                 this._parser.setParser(this._mode, this._parserType, this.codeMirror);
             }
@@ -232,7 +243,13 @@ class Vim {
             doc.setCursor({ line: doc.lastLine() - 1 });
         } else if (textType === Vim.TEXT_TYPE_NEO) {
             var dataFrame = this._parser.parse(code, Entry.Parser.PARSE_GENERAL);
-            return {type: textType, frame: dataFrame}
+            return {name: Entry.hw.hwModule.name, frame: dataFrame};
+        } else if (textType === Vim.TEXT_TYPE_AR) {
+            textCode = this._parser.parse(code, Entry.Parser.PARSE_GENERAL);
+            this.codeMirror.setValue(textCode);
+            doc = this.codeMirror.getDoc();
+            doc.setCursor({ line: doc.lastLine() - 1 });
+            return {name: Entry.hw.hwModule ? Entry.hw.hwModule.name : '', frame: textCode};
         }
 
         if (Entry.isTextMode) {
@@ -278,6 +295,9 @@ class Vim {
             this._parser.setParser(this._mode, this._parserType, this.codeMirror);
         } else if (textType === Vim.TEXT_TYPE_PY) {
             this._parserType = Vim.PARSER_TYPE_BLOCK_TO_PY;
+            this._parser.setParser(this._mode, this._parserType, this.codeMirror);
+        } else if (textType === Vim.TEXT_TYPE_AR) {
+            this._parserType = Vim.PARSER_TYPE_BLOCK_TO_AR;
             this._parser.setParser(this._mode, this._parserType, this.codeMirror);
         }
     }

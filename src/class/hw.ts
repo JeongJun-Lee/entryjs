@@ -292,11 +292,17 @@ export default class Hardware {
 
     upload() {
         let option = {boardType: Entry.Workspace.MODE_UPLOAD};
-        if (this.hwModule.name === 'neobot_purple') {
-            option.textType = Entry.Vim.TEXT_TYPE_NEO;
+        switch (this.hwModule.name) {
+            case 'neobot_purple':
+                option.textType = Entry.Vim.TEXT_TYPE_NEO;
+                break;
+            case 'arduino':
+            case 'ArduinoExt':
+                option.textType = Entry.Vim.TEXT_TYPE_AR;
+                break;
         }
-        const uploadObj = Entry.getMainWS().setMode(option);
 
+        const uploadObj = Entry.getMainWS().setMode(option);
         if (this.socket && !this.socket.disconnected) {
             this._sendUploadMessage(uploadObj);
         }
@@ -352,9 +358,9 @@ export default class Hardware {
         this.communicationType = this.hwModule.communicationType || 'auto';
         this._banClassAllHardware();
         if ( // Before sending 'hwChanged', change uploadEnable
-            // this.hwModule.name === 'arduino' ||
-            // this.hwModule.name === 'ArduinoExt ' ||
-            this.hwModule.name === 'neobot_purple' // Currently Neobot only
+            this.hwModule.name == 'arduino' ||
+            this.hwModule.name == 'ArduinoExt' ||
+            this.hwModule.name == 'neobot_purple'
         ) {
             Entry.options.uploadEnable = true;
         }
@@ -613,15 +619,11 @@ export default class Hardware {
 
     private _sendUploadMessage(uploadObj: HardwareMessageData) {
         if (this.programConnected && this.socket && !this.socket.disconnected) {
-            if (uploadObj && uploadObj.type === Entry.Vim.TEXT_TYPE_NEO) {
-                this.socket.emit('message', {
-                    data: JSON.stringify(uploadObj),
-                    mode: this.socketMode,
-                    type: 'utf8',
-                });
-            } else { // Arduino
-                this.socket.emit('message', 'flash');
-            }
+            this.socket.emit('message', {
+                data: JSON.stringify(uploadObj),
+                mode: this.socketMode,
+                type: 'utf8',
+            });
         }
     }
 
