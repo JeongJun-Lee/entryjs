@@ -567,7 +567,6 @@ class TextCodingUtil {
         const acceptBlocks =  
             blockType === 'when_run_button_click' 
             || blockType === 'repeat_basic'
-            || blockType === 'repeat_while_true'
             || blockType === 'repeat_inf'
             || blockType === 'stop_repeat'
             || blockType === '_if'
@@ -579,6 +578,10 @@ class TextCodingUtil {
             || blockType === 'arduino_get_port_number'
             || blockType === 'arduino_get_pwm_port_number'
             || blockType === 'arduino_text'
+            || blockType === 'arduino_get_digital_toggle'
+            || blockType === 'arduino_ext_analog_list'
+            || blockType === 'arduino_ext_octave_list'
+            || blockType === 'arduino_ext_tone_list'
             || blockType === 'boolean_basic_operator'
             || blockType === 'set_variable'
             || blockType === 'change_variable'
@@ -972,6 +975,50 @@ class TextCodingUtil {
             }
 
             result += `${name} = ${value}\n`;
+        }
+
+        return result;
+    }
+
+    generateVariablesDeclarationForAr() {
+        let result = '';
+        const currentObject = Entry.playground.object;
+        const vc = Entry.variableContainer;
+        if (!vc) {
+            return;
+        }
+        //inspect variables
+        const targets = vc.variables_ || [];
+
+        for (let i = targets.length - 1; i >= 0; i--) {
+            const v = targets[i];
+            let name = v.name_;
+            let value = v.value_;
+
+            if (v.object_) {
+                if (v.object_ == currentObject.id) {
+                    name = `self.${name}`;
+                } else {
+                    continue;
+                }
+            }
+
+            if (typeof value === 'string') {
+                if (isNaN(value)) { // Not a only number
+                    return false;
+                } else {
+                    value = '"()"'.replace('"()"', value);
+                    if (Number.isInteger(Number(value))) {
+                        name = 'int ' + name;
+                    } else { 
+                        name = 'float ' + name;
+                    }
+                }
+            } else { // default
+                name = 'int ' + name;
+            }
+
+            result += `${name} = ${value};\n`;
         }
 
         return result;

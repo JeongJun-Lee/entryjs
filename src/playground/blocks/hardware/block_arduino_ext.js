@@ -311,7 +311,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 PORT: 0,
             },
             class: 'ArduinoExtGet',
-            isNotFor: ['ArduinoExt'],
+            // isNotFor: ['ArduinoExt'],
             func(sprite, script) {
                 let port = script.getValue('PORT', script);
                 const ANALOG = Entry.hw.portData.ANALOG;
@@ -334,6 +334,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
+                ar: [{syntax: 'analogRead(%1)'}]
             },
         },
         arduino_ext_get_analog_value_map: {
@@ -407,7 +408,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 VALUE5: 4,
             },
             class: 'ArduinoExtGet',
-            isNotFor: ['ArduinoExt'],
+            // isNotFor: ['ArduinoExt'],
             func(sprite, script) {
                 let result = script.getValue('PORT', script);
                 const ANALOG = Entry.hw.portData.ANALOG;
@@ -480,6 +481,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
+                ar: [{syntax: 'map(%1, %2, %3, %4, %5);'}]
             },
         },
         arduino_ext_get_ultrasonic_value: {
@@ -519,7 +521,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 PORT2: 1,
             },
             class: 'ArduinoExtGet',
-            isNotFor: ['ArduinoExt'],
+            // isNotFor: ['ArduinoExt'],
             func(sprite, script) {
                 const port1 = script.getNumberValue('PORT1', script);
                 const port2 = script.getNumberValue('PORT2', script);
@@ -585,7 +587,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 PORT: 0,
             },
             class: 'ArduinoExtGet',
-            isNotFor: ['ArduinoExt'],
+            // isNotFor: ['ArduinoExt'],
             func(sprite, script) {
                 const { hwModule = {} } = Entry.hw;
                 const { name } = hwModule;
@@ -618,6 +620,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
+                ar: [{syntax: 'digitalRead(%1)'}]
             },
         },
         arduino_get_digital_toggle: {
@@ -711,7 +714,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 VALUE: 1,
             },
             class: 'ArduinoExt',
-            isNotFor: ['ArduinoExt'],
+            // isNotFor: ['ArduinoExt'],
             func(sprite, script) {
                 const port = script.getNumberValue('PORT');
                 let value = script.getValue('VALUE');
@@ -753,6 +756,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
+                ar: [{syntax: 'digitalWrite(%1, %2);'}]
             },
         },
         arduino_ext_digital_pwm: {
@@ -796,7 +800,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 VALUE: 1,
             },
             class: 'ArduinoExt',
-            isNotFor: ['ArduinoExt'],
+            // isNotFor: ['ArduinoExt'],
             func(sprite, script) {
                 const port = script.getNumberValue('PORT');
                 let value = script.getNumberValue('VALUE');
@@ -830,6 +834,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
+                ar: [{syntax: 'digitalWrite(%1, %2);'}]
             },
         },
         arduino_ext_tone_list: {
@@ -1046,7 +1051,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 DURATION: 3,
             },
             class: 'ArduinoExt',
-            isNotFor: ['ArduinoExt'],
+            // isNotFor: ['ArduinoExt'],
             func(sprite, script) {
                 const sq = Entry.hw.sendQueue;
                 const port = script.getNumberValue('PORT', script);
@@ -1151,6 +1156,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
+                ar: [{syntax: 'tone(%1, %2);'}]
             },
         },
         arduino_ext_set_servo: {
@@ -1191,7 +1197,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 VALUE: 1,
             },
             class: 'ArduinoExt',
-            isNotFor: ['ArduinoExt'],
+            // isNotFor: ['ArduinoExt'],
             func(sprite, script) {
                 const sq = Entry.hw.sendQueue;
                 const port = script.getNumberValue('PORT', script);
@@ -1227,6 +1233,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
+                ar: [{syntax: 'myServo.write(%1);'}]
             },
         },
     };

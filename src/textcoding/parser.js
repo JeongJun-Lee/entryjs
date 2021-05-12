@@ -396,6 +396,12 @@ Entry.Parser = function(mode, type, cm, syntax) {
                             case 'MinusInputVal':
                                 Entry.toast.alert(Lang.TextCoding.title_converting, Lang.TextCoding.alert_should_be_zero_or_positive);
                                 break;
+                            case 'UnsupportedDefaultVal':
+                                Entry.toast.alert(Lang.TextCoding.title_converting, Lang.TextCoding.alert_wrong_variable_value);
+                                break;
+                            default:
+                                Entry.toast.alert(Lang.TextCoding.title_converting, e.msg);
+                                break;
                         }
                         throw e;
                     } 

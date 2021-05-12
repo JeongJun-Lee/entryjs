@@ -218,6 +218,7 @@ module.exports = {
                             ],
                         },
                     ],
+                    ar: [{syntax: 'while (true) {'}]
                 },
             },
             repeat_while_true: {

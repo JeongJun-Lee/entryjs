@@ -436,7 +436,7 @@ Entry.Arduino.getBlocks = function() {
                 VALUE: 0,
             },
             class: 'arduino_value',
-            //isNotFor: ['arduino'],
+            isNotFor: ['arduino'],
             func(sprite, script) {
                 const signal = script.getValue('VALUE', script);
                 return Entry.hw.getAnalogPortValue(signal[1]);
@@ -455,11 +455,7 @@ Entry.Arduino.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [
-                    {
-                        syntax: 'analogRead(%1)'
-                    }
-                ]
+                ar: [{syntax: 'analogRead(%1)'}]
             },
         },
         arduino_get_digital_value: {
@@ -488,7 +484,7 @@ Entry.Arduino.getBlocks = function() {
                 PORT: 0,
             },
             class: 'arduino_value',
-            // isNotFor: ['arduino'],
+            isNotFor: ['arduino'],
             func(sprite, script) {
                 const { hwModule = {} } = Entry.hw;
                 const { name } = hwModule;
@@ -514,11 +510,7 @@ Entry.Arduino.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [
-                    {
-                        syntax: 'digitalRead(%1)'
-                    }
-                ]
+                ar: [{syntax: 'digitalRead(%1)'}]
             },
         },
         arduino_toggle_led: {
@@ -565,7 +557,7 @@ Entry.Arduino.getBlocks = function() {
                 OPERATOR: 1,
             },
             class: 'arduino_set',
-            // isNotFor: ['arduino'],
+            isNotFor: ['arduino'],
             func(sprite, script) {
                 const port = script.getNumberValue('VALUE');
                 const operator = script.getField('OPERATOR');
@@ -598,11 +590,7 @@ Entry.Arduino.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [
-                    {
-                        syntax: 'digitalWrite(%1, %2);'
-                    }
-                ]
+                ar: [{syntax: 'digitalWrite(%1, %2);'}]
             },
         },
         arduino_toggle_pwm: {
@@ -646,7 +634,7 @@ Entry.Arduino.getBlocks = function() {
                 VALUE: 1,
             },
             class: 'arduino_set',
-            // isNotFor: ['arduino'],
+            isNotFor: ['arduino'],
             func(sprite, script) {
                 const port = script.getNumberValue('PORT');
                 let value = script.getNumberValue('VALUE');
@@ -673,11 +661,7 @@ Entry.Arduino.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [
-                    {
-                        syntax: 'digitalWrite(%1, %2);'
-                    }
-                ]
+                ar: [{syntax: 'digitalWrite(%1, %2);'}]
             },
         },
         arduino_convert_scale: {
@@ -752,7 +736,7 @@ Entry.Arduino.getBlocks = function() {
                 VALUE5: 4,
             },
             class: 'arduino',
-            // isNotFor: ['arduino'],
+            isNotFor: ['arduino'],
             func(sprite, script) {
                 const value1 = script.getNumberValue('VALUE1', script);
                 let value2 = script.getNumberValue('VALUE2', script);
@@ -826,11 +810,7 @@ Entry.Arduino.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [
-                    {
-                        syntax: 'map(%1, %2, %3, %4, %5);'
-                    }
-                ]
+                ar: [{syntax: 'map(%1, %2, %3, %4, %5);'}]
             },
         },
         //endregion arduino 아두이노
