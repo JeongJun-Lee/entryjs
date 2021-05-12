@@ -508,6 +508,7 @@ module.exports = {
                             ],
                         },
                     ],
+                    ar: [{syntax: '%1 += %2;'}]
                 },
             },
             set_variable: {
@@ -623,6 +624,7 @@ module.exports = {
                             ],
                         },
                     ],
+                    ar: [{syntax: '%1 = %2;'}]
                 },
             },
             show_variable: {

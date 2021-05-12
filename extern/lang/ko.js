@@ -7692,6 +7692,7 @@ Lang.TextCoding = {
         '현재 하드웨어가 지원할 수 없는 블록이 조립된 경우에는\n코드를 업로드 할 수 없습니다.\n해당 블록을 하드웨어 지원가능 블럭으로 수정하세요.',
     alert_too_many_start_block: '코드 전체 시작 블록은 1개 여야 합니다.',
     alert_should_be_zero_or_positive: '0, 음수값, 빈 값을 허용하지 않습니다.',
+    alert_wrong_variable_value: '변수의 기본값은 숫자이어야 합니다.',
     alert_not_allowed_param: '허용하지 않은 인자값을 사용했습니다.',
     warn_exceed_max_value: '입력값의 최대치를 초과하여 내부적으로 최대값으로 조정되었습니다.',
     warn_unnecessary_arguments:

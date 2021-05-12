@@ -11,7 +11,7 @@ Entry.BlockToArParser = class {
 
     init() {
         this._iterVar = 'i';
-        this._source =  ['setup() {', '}\n', 'loop() {', '}'];
+        this._source =  ['// Created by Entry\n', 'setup() {', '}\n', 'loop() {', '}\n'];
         this._curLine = this._source.length - 1; // the end of the source
         this._funcName = '';
         this._pinNum = -1;
@@ -86,7 +86,7 @@ Entry.BlockToArParser = class {
                 } else {
                     const stat = this.Block(block);
                     if (stat) {
-                        this.insertIntoSrc(stat);
+                        this.insertIntoSrc(stat, block);
                     }
                 }
 
@@ -101,7 +101,12 @@ Entry.BlockToArParser = class {
                         }
 
                         // When escape loop or condition, add closed frame
-                        if (block.statements[idx].parent.type !== 'repeat_inf' && idx === block.statements.length - 1) {
+                        if (idx === block.statements.length - 1 && (
+                            block.statements[idx].parent.type !== 'repeat_inf' ||
+                            block.thread.parent.type === 'repeat_basic' || 
+                            block.thread.parent.type === '_if' ||
+                            block.thread.parent.type === 'if_else'
+                        )) {
                             this.insertIntoSrc('}');                            
                         } else if (block.statements[idx].parent.type === 'repeat_inf') {
                             this._isInRepeat = false;
@@ -116,6 +121,13 @@ Entry.BlockToArParser = class {
 
     // If possilbe, find at early stage
     isUnsupportedBlkInTopLvl(blocks) {
+        // Check variable error
+        const err = Entry.TextCodingUtil.validateVariableAndListToPython() ||
+                        Entry.TextCodingUtil.validateFunctionToPython();
+        if (err) {
+            this.throwErr('error', err.message);
+        }
+
         blocks.forEach((block) => {
             if (Entry.TextCodingUtil.hasUnSupportedBlkInAr(block)) {
                 this.throwErr('error', 'UnsupportedBlk', block);
@@ -123,8 +135,16 @@ Entry.BlockToArParser = class {
         });
     }
 
-    insertIntoSrc(stat) {        
-        // Frist, Setup pin mode in case of Digital
+    insertIntoSrc(stat, block) {
+        if (block && (
+            block._schema.class === 'variable' ||
+            block.type === 'arduino_ext_set_servo' ||
+            block.type === 'arduino_ext_get_ultrasonic_value'
+        )) {
+            this.insertIntoGlobal(block.type); 
+        }
+        
+        // Frist, Setup the pin mode in case of Digital
         this.insertIntoSetup();
 
         // If the block is Not in the repeat, locate it in the setup();
@@ -141,39 +161,78 @@ Entry.BlockToArParser = class {
         this._pinNum = -1;
     }
 
+    insertIntoGlobal(blockType) {
+        let stat = '';
+        if (blockType === 'arduino_ext_set_servo') {
+            stat = '#include <Servo.h>\nServo myServo;\n'
+        } else if (blockType === 'arduino_ext_get_ultrasonic_value') {
+            
+        } else { // variable
+            stat = Entry.TextCodingUtil.generateVariablesDeclarationForAr();
+        }
+        if (stat) {
+            if (!this._source.find(val => { // Don't allow duplicated additon
+                return val.includes(stat);
+            })) {
+                this._source.splice(1, 0, stat);
+                this._curLine++;
+            }
+        } else {
+            this.throwErr('error', 'UnsupportedDefaultVal');
+        }
+    }
+
     insertIntoSetup() {
         let pinStat = '';
         if (this._funcName === 'digitalRead') { 
             pinStat = `pinMode(${this._pinNum}, INPUT);`; 
         } else if (this._funcName === 'digitalWrite') { 
             pinStat = `pinMode(${this._pinNum}, OUTPUT);`;   
+        } else if (this._funcName === 'myServo.write') { 
+            pinStat = `myServo.attach(${this._pinNum});`;
         }
 
         if (!this._source.find(val => { // Don't allow duplicated additon
             return val.includes(pinStat);
         })) {
-            let idx = this._source.indexOf('setup() {'); // At the start of the setup()
-            this._source.splice(++idx, 0, pinStat);
+            let idx = this._source.indexOf('setup() {'); 
+            this._source.splice(++idx, 0, pinStat); // At nextline of the start of the setup()
             this._curLine++;
         }
     }
 
     indent() {
-        let tabCnt = 0;
+        let tabCnt = 1, prevVal = '';
 
-        return this._source.map((val, idx) => {
-            if (val.includes('{') && (val.includes('if') || val.includes('for') || val.includes('while'))) {
+        return this._source.map((val) => {
+            if (
+                val.includes('//') || 
+                val.includes('#include') || 
+                (prevVal === '// Created by Entry\n' && val.includes('=')) || 
+                val.includes('setup()') || 
+                val.includes('loop()') || 
+                val === '}\n' // The end of the default func
+            ) {
+                prevVal = val;
+                return val;
+            }
+
+            // If the overlapped, add one more indentation
+            if (!(val === '}' || val.includes('else')) &&
+                (prevVal.includes('if') || prevVal.includes('else') || prevVal.includes('for') || prevVal.includes('while'))
+            ) {
                 tabCnt++;
+            } else if ((val === '}' || val.includes('else')) && 
+                !(prevVal.includes('if') || prevVal.includes('else') || prevVal.includes('for') || prevVal.includes('while'))
+            ) {
+                tabCnt--;
             } 
 
             for (let i = 0; i < tabCnt; i++) {
                 val = '\t' + val;
             }
 
-            if (val.includes('}')) {
-                tabCnt <= 0 ? tabCnt : tabCnt--;
-            }
-            
+            prevVal = val;
             return val;
         });
     }
@@ -197,12 +256,19 @@ Entry.BlockToArParser = class {
         if (
             block.type === 'number' ||
             block.type === 'text' ||
+            block.type === 'get_variable' ||
             block.type === 'arduino_text' ||                 // Value for AnalogWrite
             block.type === 'arduino_get_port_number' ||      // Digital port
             block.type === 'arduino_get_pwm_port_number' ||  // PWM port
-            block.type === 'arduino_get_seonsor_number'      // Port for AnalogRead
+            block.type === 'arduino_get_seonsor_number' ||   // Port for AnalogRead
+            block.type === 'arduino_get_digital_toggle' ||
+            block.type === 'arduino_ext_analog_list' ||
+            block.type === 'arduino_ext_octave_list' ||
+            block.type === 'arduino_ext_tone_list'
         ) {
-            return val[0]; // value is in the array
+            // Even usage of variable in the block without setting initial value(set_variable)
+            // Declare the variable at global area, But in case of normal, just return with param value
+            return block.type === 'get_variable' ? this.insertIntoGlobal(block.type) : val[0]; 
         } else if (
             block.type === '_if' ||
             block.type === 'if_else' 
@@ -216,10 +282,22 @@ Entry.BlockToArParser = class {
 
     getValueFromParam(block) {
         let rtn = [];
+
+        if (block._schema.class === 'variable') {
+            const param = block._schema.params[0].options.filter((option => {
+                return option[1] === block.data.params[0];
+            }));
+            if (!param.length) {
+                this.throwErr('error', Lang.TextCoding.message_conv_no_variable, block);
+            } else {
+                rtn.push(param[0][0]);
+            }
+        }
+
         block.data.params.forEach(param => {
             if (param instanceof Entry.Block) {
                 rtn.push(this.Block(param));
-            } else if (param) {
+            } else if (param && block._schema.class !== 'variable') { // Skip if param is from 'variable'
                 rtn.push(param);
             }
         });
@@ -232,7 +310,15 @@ Entry.BlockToArParser = class {
 
         switch (block.type) {
             case 'repeat_inf':
-                this._isInRepeat = true;
+                if (
+                    block.thread.parent.type === 'repeat_basic' || 
+                    block.thread.parent.type === '_if' ||
+                    block.thread.parent.type === 'if_else'
+                ) {
+                    stat = block._schema.syntax.ar[0].syntax;
+                } else {
+                    this._isInRepeat = true;
+                }
                 break;
 
             case 'repeat_basic':
@@ -241,19 +327,12 @@ Entry.BlockToArParser = class {
                     this.throwErr('error', 'WrongInputVal', block);
                     break;
                 }
-
-                if (value > 99) { // max is 99
-                    this.throwErr('warn', 'ExcessiveInputVal', block);
-                    value = 99;
-                } else if (value <= 0) { // min is 1
+                if (value <= 0) { // min is 1
                     this.throwErr('error', 'MinusInputVal', block);
                 }
 
                 stat = `for (int ${this._iterVar} = 0; i < ${value}; ${this._iterVar}++) {`;
                 // this._iterVar = String.fromCharCode(this._iterVar.charCodeAt(0) + 1); // Move iterVar to the next
-                break;
-
-            case 'repeat_while_true':
                 break;
 
             case 'stop_repeat':
@@ -320,6 +399,7 @@ Entry.BlockToArParser = class {
                 break;
 
             case 'arduino_toggle_led': // digitalWrite
+            case 'arduino_ext_toggle_led':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
                 this._pinNum = Number(this._pramVal[0]); // Arr to Number
@@ -330,6 +410,7 @@ Entry.BlockToArParser = class {
                 break;
 
             case 'arduino_toggle_pwm': // pwm(digitalWrite)
+            case 'arduino_ext_digital_pwm':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
                 this._pinNum = Number(this._pramVal[0]); // Arr to Number
@@ -340,6 +421,7 @@ Entry.BlockToArParser = class {
                 break;
 
             case 'arduino_get_digital_value': // digitalRead
+            case 'arduino_ext_get_digital':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
                 this._pinNum = Number(this._pramVal[0]); // Arr to Number
@@ -348,6 +430,7 @@ Entry.BlockToArParser = class {
                 break;    
 
             case 'arduino_get_number_sensor_value': // analogRead
+            case 'arduino_ext_get_analog_value':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
                 this._pinNum = Number(this._pramVal[0]); // Arr to Number
@@ -355,14 +438,57 @@ Entry.BlockToArParser = class {
                 break;
 
             case 'arduino_convert_scale': // map
+            case 'arduino_ext_get_analog_value_map':
+                stat = block._schema.syntax.ar[0].syntax;
+                stat = stat.replace('%1', this._pramVal[0]);
+                stat = stat.replace('%2', this._pramVal[1]);
+                stat = stat.replace('%3', this._pramVal[2]);
+                stat = stat.replace('%4', this._pramVal[3]);
+                stat = stat.replace('%5', this._pramVal[4]);
+                break;
+
+            case 'arduino_ext_set_tone': //tone
+                const octave_tone_hz = [
+                    [32.7, 34.6, 36.7, 38.9, 41.2, 43.7, 46.2, 49.0, 51.9, 55.0, 58.3, 61.7], // 1octave
+                    [65.4, 69.3, 73.4, 77.8, 82.4, 87.3, 92.5, 98.0, 103.8, 110.0, 116.5, 123.5],
+                    [130.8, 138.6, 146.9, 155.6, 164.8, 174.6, 185.0, 196.0, 207.7, 220.0, 233.1, 246.9],
+                    [261.6, 277.2, 293.7, 311.1, 329.6, 349.2, 370.0, 392.0, 415.3, 440.0, 466.2, 493.9],
+                    [523.3, 554.4, 587.3, 622.3, 659.3, 698.5, 740.0, 784.0, 830.6, 880.0, 932.3, 987.8]
+                    [1046.5, 1108.7, 1174.7, 1244.5, 1318.5, 1396.9, 1480.0, 1568.0, 1661.2, 1760.0, 1864.7, 1975.5],
+                ];
+                const charToIdx = {
+                    C: 0, CS: 1, D: 2, DS: 3, E: 4, F: 5, FS: 6, G:7, GS: 8, A: 9, AS: 10, B: 11
+                }
+                stat = block._schema.syntax.ar[0].syntax; 
+                this._pinNum = Number(this._pramVal[0]); // Arr to Number
+                stat = stat.replace('%1', this._pinNum);
+                stat = stat.replace('%2', octave_tone_hz[this._pramVal[2]-1][charToIdx[this._pramVal[1]]]);
+                value = this._pramVal[0] * 1000;
+                stat = stat + ` delay(${value});`
+                break;
+
+            case 'arduino_ext_get_ultrasonic_value':
+                break;
+
+            case 'arduino_ext_set_servo':
+                stat = block._schema.syntax.ar[0].syntax; 
+                this._funcName = 'myServo.write';
+                this._pinNum = Number(this._pramVal[0]); // Arr to Number
+                value = this._pramVal[1]; // Arr to Number
+                stat = stat.replace('%1', value);
                 break;
 
             case 'set_variable':
+                stat = block._schema.syntax.ar[0].syntax;
+                stat = stat.replace('%1', this._pramVal[0]);
+                stat = stat.replace('%2', this._pramVal[1]); 
                 break;
+
             case 'change_variable':
+                stat = block._schema.syntax.ar[0].syntax;
+                stat = stat.replace('%1', this._pramVal[0]);
+                stat = stat.replace('%2', this._pramVal[1]); 
                 break;    
-            case 'get_variable':
-                break;
         }
 
         return stat;
