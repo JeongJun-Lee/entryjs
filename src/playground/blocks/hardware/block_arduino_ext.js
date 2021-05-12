@@ -311,7 +311,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 PORT: 0,
             },
             class: 'ArduinoExtGet',
-            // isNotFor: ['ArduinoExt'],
+            isNotFor: ['ArduinoExt'],
             func(sprite, script) {
                 let port = script.getValue('PORT', script);
                 const ANALOG = Entry.hw.portData.ANALOG;
@@ -408,7 +408,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 VALUE5: 4,
             },
             class: 'ArduinoExtGet',
-            // isNotFor: ['ArduinoExt'],
+            isNotFor: ['ArduinoExt'],
             func(sprite, script) {
                 let result = script.getValue('PORT', script);
                 const ANALOG = Entry.hw.portData.ANALOG;
@@ -481,7 +481,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [{syntax: 'map(%1, %2, %3, %4, %5);'}]
+                ar: [{syntax: 'map(%1, %2, %3, %4, %5)'}]
             },
         },
         arduino_ext_get_ultrasonic_value: {
@@ -521,7 +521,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 PORT2: 1,
             },
             class: 'ArduinoExtGet',
-            // isNotFor: ['ArduinoExt'],
+            isNotFor: ['ArduinoExt'],
             func(sprite, script) {
                 const port1 = script.getNumberValue('PORT1', script);
                 const port2 = script.getNumberValue('PORT2', script);
@@ -559,6 +559,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
+                ar: [{syntax: 'distance()'}]
             },
         },
         arduino_ext_get_digital: {
@@ -587,7 +588,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 PORT: 0,
             },
             class: 'ArduinoExtGet',
-            // isNotFor: ['ArduinoExt'],
+            isNotFor: ['ArduinoExt'],
             func(sprite, script) {
                 const { hwModule = {} } = Entry.hw;
                 const { name } = hwModule;
@@ -714,7 +715,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 VALUE: 1,
             },
             class: 'ArduinoExt',
-            // isNotFor: ['ArduinoExt'],
+            isNotFor: ['ArduinoExt'],
             func(sprite, script) {
                 const port = script.getNumberValue('PORT');
                 let value = script.getValue('VALUE');
@@ -800,7 +801,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 VALUE: 1,
             },
             class: 'ArduinoExt',
-            // isNotFor: ['ArduinoExt'],
+            isNotFor: ['ArduinoExt'],
             func(sprite, script) {
                 const port = script.getNumberValue('PORT');
                 let value = script.getNumberValue('VALUE');
@@ -1051,7 +1052,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 DURATION: 3,
             },
             class: 'ArduinoExt',
-            // isNotFor: ['ArduinoExt'],
+            isNotFor: ['ArduinoExt'],
             func(sprite, script) {
                 const sq = Entry.hw.sendQueue;
                 const port = script.getNumberValue('PORT', script);
@@ -1197,7 +1198,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 VALUE: 1,
             },
             class: 'ArduinoExt',
-            // isNotFor: ['ArduinoExt'],
+            isNotFor: ['ArduinoExt'],
             func(sprite, script) {
                 const sq = Entry.hw.sendQueue;
                 const port = script.getNumberValue('PORT', script);

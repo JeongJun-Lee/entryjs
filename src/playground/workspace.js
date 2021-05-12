@@ -278,7 +278,7 @@ Entry.Workspace = class Workspace {
                 dispatchChangeBoardEvent();
                 break;
 
-            case WORKSPACE.MODE_UPLOAD:
+            case WORKSPACE.MODE_UPLOAD: // Upload to board
                 try {
                     return this.codeToText(this.board.code, mode);
                 } catch (e) {
@@ -295,7 +295,7 @@ Entry.Workspace = class Workspace {
                 }
                 break;
 
-            case WORKSPACE.MODE_ARBOARD:
+            case WORKSPACE.MODE_ARBOARD:  // Arduino code view
                 try {
                     this.board && this.board.hide();
                     this.overlayBoard && this.overlayBoard.hide();
