@@ -301,6 +301,26 @@
         margin: 0 8px;
     }
 
+    .entryPlaygroundArButtonWorkspace {
+        float: left;
+        .backgroundImage('btn-toggle-ardu-off.png');
+        background-repeat: no-repeat;
+        background-size: 32px auto;
+        background-position: 50% 50%;
+        cursor: pointer;
+        width: 32px;
+        height: 32px;
+        margin: 0 8px;
+        &.showAr {
+            .backgroundImage('btn-toggle-ardu-select.png');
+            background-size: 32px auto;
+            width: 32px;
+            height: 32px;
+            border: 0;
+            background-color: inherit;
+        }
+    }
+
     &.entryRemove.entryCode {
         display: block !important;
     }

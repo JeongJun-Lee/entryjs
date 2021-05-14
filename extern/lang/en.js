@@ -4500,6 +4500,7 @@ Lang.Menus = {
     "cobl_bt": "Cobl BT",
     "block_coding": "Block Coding",
     "python_coding": "Entry Python",
+    "arduino_coding": "Arduino Coding",
     "dadublock": "DaduBlock",
     "dadublock_car": "DaduBlock Car",
     "blacksmith": "Blacksmith Board",

@@ -4906,6 +4906,7 @@ Lang.Menus = {
     cobl_bt: '코블 블루투스',
     block_coding: '블록코딩',
     python_coding: '엔트리파이선',
+    arduino_coding: '아두이노 코딩',
     dadublock: '다두블럭',
     dadublock_car: '다두블럭 자동차',
     blacksmith: '대장장이 보드',

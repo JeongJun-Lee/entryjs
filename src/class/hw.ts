@@ -303,8 +303,14 @@ export default class Hardware {
         }
 
         const uploadObj = Entry.getMainWS().setMode(option);
-        if (this.socket && !this.socket.disconnected) {
-            this._sendUploadMessage(uploadObj);
+        if (uploadObj) {
+            Entry.propertyPanel.select('console');
+            Entry.console.clear();
+            Entry.console.print('Upload started...\n');
+
+            if (this.socket && !this.socket.disconnected) {
+                this._sendUploadMessage(uploadObj);
+            }
         }
     }
 
@@ -357,12 +363,17 @@ export default class Hardware {
         }
         this.communicationType = this.hwModule.communicationType || 'auto';
         this._banClassAllHardware();
-        if ( // Before sending 'hwChanged', change uploadEnable
+
+        // Before sending 'hwChanged', change uploadEnable
+        if (
             this.hwModule.name == 'arduino' ||
             this.hwModule.name == 'ArduinoExt' ||
             this.hwModule.name == 'neobot_purple'
         ) {
             Entry.options.uploadEnable = true;
+        }
+        if (this.hwModule.name == 'arduino' || this.hwModule.name == 'ArduinoExt') {
+            Entry.options.arEnable = true;
         }
         Entry.dispatchEvent('hwChanged');
 
@@ -471,6 +482,19 @@ export default class Hardware {
             this._updatePortData(portData);
             if (this.hwModule && this.hwModule.afterReceive) {
                 this.hwModule.afterReceive(portData);
+            }
+        });
+
+        // Entry console msg's handler for firmware upload
+        messageHandler.addEventListener('data', (recvData: any) => {
+            if (recvData.upload) {
+                Entry.propertyPanel.select('console');
+                Entry.console.print(recvData.upload);
+
+                // If compile fail, change mode to arduino code
+                if (recvData.upload.includes('failed')) {
+                    Entry.playground.toggleArButtonVisible();
+                }
             }
         });
 

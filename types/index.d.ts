@@ -102,6 +102,7 @@ declare module IEntry {
         checkVariables: () => void;
         hideTabs: () => void;
         showTabs: () => void;
+        toggleArButtonVisible: () => void;
     }
 
     export interface Stage {
