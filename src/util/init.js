@@ -526,6 +526,11 @@ Entry.parseOptions = function(options) {
         this.uploadEnable = false;
     }
 
+    this.arEnable = options.arEnable;
+    if (this.arEnable === undefined) {
+        this.arEnable = false;
+    }
+
     this.listEnable = options.listEnable;
     if (this.listEnable === undefined) {
         this.listEnable = true;

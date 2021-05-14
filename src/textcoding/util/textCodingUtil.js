@@ -596,7 +596,7 @@ class TextCodingUtil {
             || blockCategory === 'text'
             || blockCategory === 'sound'
             || blockCategory === 'calc'
-            || blockCategory === 'func'
+            // || blockCategory === 'func'
             || blockCategory === 'analysis'
             || blockCategory === 'ai_utilize'
             || blockCategory === 'expansion'

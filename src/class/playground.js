@@ -25,6 +25,8 @@ Entry.Playground = class Playground {
         this.isTextBGMode_ = false;
         this.dataTable = DataTable;
         this._uploadButton = null;;
+        this._arToggleButton = null;
+        this._arToggleVisible = false;
 
         /**
          * playground's current view type
@@ -37,6 +39,7 @@ Entry.Playground = class Playground {
         });
         Entry.addEventListener('commentVisibleChanged', this.toggleCommentButtonVisible.bind(this));
 
+        Entry.addEventListener('hwChanged', this.toggleArBtn.bind(this));
         Entry.addEventListener('hwChanged', this.updateUploadBtn.bind(this));
 
         Entry.windowResized.attach(this, this.clearClientRectMemo.bind(this));
@@ -235,6 +238,54 @@ Entry.Playground = class Playground {
       }
     }
 
+    toggleArBtn() {
+        if (Entry.options.uploadEnable && Entry.options.arEnable && !this._arToggleButton) {
+            this._arToggleButton = Entry.createElement('div')
+                .addClass('entryPlaygroundArButtonWorkspace')
+                .appendTo(this.tabButtonView_);
+                this._arToggleButton.setAttribute('alt', Lang.Menus.block_coding);
+            this._arToggleButton.setAttribute('title', Lang.Menus.block_coding);
+            this._arToggleButton.bindOnClick(() => {
+                this.toggleArButtonVisible();
+            });
+        } else if (!Entry.options.uploadEnable) {
+            this._arToggleButton && Entry.removeElement(this._arToggleButton);
+            this._arToggleButton = null;
+        }
+    }
+
+    toggleArButtonVisible() {
+        const button = this._arToggleButton;
+        this._arToggleVisible = !this._arToggleVisible;
+        const option = {};
+
+        if (this._arToggleVisible) {
+            // Arduino coding
+            option.boardType = Entry.Workspace.MODE_ARBOARD;
+            option.textType = Entry.Vim.TEXT_TYPE_AR; 
+            option.runType = Entry.Vim.WORKSPACE_MODE;
+        } else {
+            // Block coding
+            option.boardType = Entry.Workspace.MODE_BOARD;
+            option.textType = -1;
+        }
+        const expectedBoardType = option.boardType;
+        Entry.getMainWS().setMode(option);
+        const actualBoardType = Entry.getMainWS().getMode();
+
+        if ((expectedBoardType === actualBoardType) && this._arToggleVisible) { 
+            button.addClass('showAr');
+            button.setAttribute('alt', Lang.Menus.arduino_coding);
+            button.setAttribute('title', Lang.Menus.arduino_coding);
+            this.toast.show(Lang.Menus.arduino_coding);
+        } else {
+            button.removeClass('showAr');
+            button.setAttribute('alt', Lang.Menus.block_coding);
+            button.setAttribute('title', Lang.Menus.block_coding);
+            this.toast.show(Lang.Menus.block_coding);            
+        }
+    }
+
     createButtonTabView(tabButtonView) {
         const { options = {} } = Entry;
         const { commentDisable, backpackDisable } = options;
@@ -265,8 +316,6 @@ Entry.Playground = class Playground {
                 Entry.dispatchEvent('openBackPack');
             });
         }
-
-        this.updateUploadBtn();
     }
 
     createBackPackView(backPackView) {
@@ -2308,6 +2357,7 @@ Entry.Playground = class Playground {
 
     destroy() {
         this._uploadButton && this._uploadButton.unBindOnClick();
+        this._arToggleButton && this._arToggleButton.unBindOnClick();
         this.commentToggleButton_ && this.commentToggleButton_.unBindOnClick();
         this.backPackButton_ && this.backPackButton_.unBindOnClick();
         this.blockBackPackEvent && this.blockBackPackEvent.off();
