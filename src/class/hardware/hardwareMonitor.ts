@@ -322,8 +322,12 @@ export default class HardwareMonitor {
 
         if (sendQueue) {
             for (const elem in sendQueue) {
-                if (sendQueue[elem] != 0 && portView[elem]) {
-                    portView[elem].type = 'output';
+                if (portView[elem]) {
+                    if (sendQueue[elem] != 0) {
+                        portView[elem].type = 'output';
+                    } else { // init port
+                        portView[elem].type = 'input';
+                    }
                 }
             }
         }

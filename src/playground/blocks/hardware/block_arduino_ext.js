@@ -1,5 +1,7 @@
 'use strict';
 
+const { monitorTemplate } = require("./block_arduino");
+
 Entry.ArduinoExt = {
     id: '1.9',
     name: 'ArduinoExt',
@@ -21,6 +23,12 @@ Entry.ArduinoExt = {
                 Entry.hw.sendQueue.SET[key].data = 0;
                 Entry.hw.sendQueue.SET[key].time = new Date().getTime();
             });
+
+            // For legacy port writing
+            for (const val in monitorTemplate.listPorts) {
+                const cvt = Number(val);
+                if (!isNaN(cvt)) Entry.hw.sendQueue[cvt] = 0;
+            }
         }
         Entry.hw.update();
     },
@@ -738,6 +746,8 @@ Entry.ArduinoExt.getBlocks = function() {
                     data: value,
                     time: new Date().getTime(),
                 };
+                // For legacy port writing
+                Entry.hw.sendQueue[port] = value;
                 return script.callReturn();
             },
             syntax: {
