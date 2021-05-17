@@ -296,9 +296,6 @@ class Vim {
         } else if (textType === Vim.TEXT_TYPE_PY) {
             this._parserType = Vim.PARSER_TYPE_BLOCK_TO_PY;
             this._parser.setParser(this._mode, this._parserType, this.codeMirror);
-        } else if (textType === Vim.TEXT_TYPE_AR) {
-            this._parserType = Vim.PARSER_TYPE_BLOCK_TO_AR;
-            this._parser.setParser(this._mode, this._parserType, this.codeMirror);
         }
     }
 
