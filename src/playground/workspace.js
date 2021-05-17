@@ -304,6 +304,7 @@ Entry.Workspace = class Workspace {
                     this.vimBoard.show();
                     blockMenu.banClass('functionInit', true);
                     this.codeToText(this.board.code, mode);
+                    this.oldTextType = this.textType;
                     dispatchChangeBoardEvent();
                 } catch (e) {
                     // First return to Board mode
@@ -354,7 +355,10 @@ Entry.Workspace = class Workspace {
     }
 
     textToCode(mode, oldTextType) {
-        if (!this.vimBoard || mode !== Entry.Workspace.MODE_VIMBOARD) {
+        if (
+            !this.vimBoard || 
+            (mode !== Entry.Workspace.MODE_VIMBOARD && mode !== Entry.Workspace.MODE_ARBOARD)
+        ) {
             return;
         }
 

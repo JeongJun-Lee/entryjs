@@ -288,7 +288,7 @@ Entry.Playground = class Playground {
             this.toast.show(Lang.Menus.block_coding);
             
             if (expectedBoardType === actualBoardType) { // Accept for only real mode change
-                Entry.toast.warning(Lang.Users.confirm_load_header, Lang.TextCoding.alert_return_to_origin);
+                Entry.toast.success(Lang.Workspace.confirm_load_header, Lang.TextCoding.alert_return_to_origin);
             }
         }
     }
