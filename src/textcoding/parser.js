@@ -121,6 +121,7 @@ Entry.Parser = function(mode, type, cm, syntax) {
                 break;
             case Entry.Vim.PARSER_TYPE_BLOCK_TO_AR:
                 this._execParser = new Entry.BlockToArParser();
+                cm && cm.setOption('mode', 'text/x-c++src');
                 this._execParserType = Entry.Vim.PARSER_TYPE_BLOCK_TO_AR;
                 break;
         }
