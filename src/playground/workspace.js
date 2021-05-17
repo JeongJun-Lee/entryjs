@@ -300,7 +300,7 @@ Entry.Workspace = class Workspace {
                     this.board && this.board.hide();
                     this.overlayBoard && this.overlayBoard.hide();
                     this.set({ selectedBoard: this.vimBoard });
-                    this.vimBoard.codeMirror.options.readOnly = true; // Don't allow code editiong in AR mode
+                    // this.vimBoard.codeMirror.options.readOnly = true; // Don't allow code editiong in AR mode
                     this.vimBoard.show();
                     blockMenu.banClass('functionInit', true);
                     this.codeToText(this.board.code, mode);

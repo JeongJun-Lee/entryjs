@@ -272,8 +272,11 @@ Entry.Playground = class Playground {
         const expectedBoardType = option.boardType;
         Entry.getMainWS().setMode(option);
         const actualBoardType = Entry.getMainWS().getMode();
+        if (expectedBoardType !== actualBoardType) { // If error, recover it to before
+            this._arToggleVisible = !this._arToggleVisible;;
+        }
 
-        if ((expectedBoardType === actualBoardType) && this._arToggleVisible) { 
+        if (this._arToggleVisible) { 
             button.addClass('showAr');
             button.setAttribute('alt', Lang.Menus.arduino_coding);
             button.setAttribute('title', Lang.Menus.arduino_coding);
@@ -282,7 +285,11 @@ Entry.Playground = class Playground {
             button.removeClass('showAr');
             button.setAttribute('alt', Lang.Menus.block_coding);
             button.setAttribute('title', Lang.Menus.block_coding);
-            this.toast.show(Lang.Menus.block_coding);            
+            this.toast.show(Lang.Menus.block_coding);
+            
+            if (expectedBoardType === actualBoardType) { // Accept for only real mode change
+                Entry.toast.warning(Lang.Users.confirm_load_header, Lang.TextCoding.alert_return_to_origin);
+            }
         }
     }
 

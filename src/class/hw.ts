@@ -302,7 +302,14 @@ export default class Hardware {
                 break;
         }
 
-        const uploadObj = Entry.getMainWS().setMode(option);
+        const ws = Entry.getMainWS();
+        let uploadObj = null;
+        if (ws.getMode() === Entry.Workspace.MODE_BOARD) {
+            uploadObj = ws.setMode(option);
+        } else if (ws.getMode() === Entry.Workspace.MODE_ARBOARD) {
+            const doc = ws.vimBoard.codeMirror.getValue(); // Get source code in editor
+            uploadObj = { name: Entry.hw.hwModule ? Entry.hw.hwModule.name : '', frame: doc };
+        }
         if (uploadObj) {
             Entry.propertyPanel.select('console');
             Entry.console.clear();
@@ -491,9 +498,22 @@ export default class Hardware {
                 Entry.propertyPanel.select('console');
                 Entry.console.print(recvData.upload);
 
-                // If compile fail, change mode to arduino code
                 if (recvData.upload.includes('failed')) {
-                    Entry.playground.toggleArButtonVisible();
+                    // If compile fail, change mode to arduino code
+                    if (Entry.getMainWS().getMode() != Entry.Workspace.MODE_ARBOARD) {
+                        Entry.playground.toggleArButtonVisible();
+                    }
+
+                    const splited = recvData.upload.match('\\d+:\\d+')[0].split(':');
+                    const annotation = {
+                        from: { line: Number(splited[0]) - 1, ch: Number(splited[1]) - 1 },
+                        to: { line: Number(splited[0]) - 1, ch: Number(splited[1]) },
+                    };
+                    const doc = Entry.getMainWS().vimBoard.codeMirror.getDoc();
+                    doc.markText(annotation.from, annotation.to, {
+                        // css: 'background-color : red'
+                    });
+                    doc.setCursor(annotation.from);
                 }
             }
         });
