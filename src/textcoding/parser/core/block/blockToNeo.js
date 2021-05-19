@@ -324,7 +324,7 @@ Entry.BlockToNeoParser = class {
                 cmd = [0x04, port, bright, 0x00, 0x01];
 
                 // duration is not actual parameter in led block, but for now, suppor it
-                if (this._pramVal[2] !== 'CONT') { // Not CONT
+                if (this._pramVal[2] !== '계속') { // Not 계속
                     duration = Number(this._pramVal[2]); // String to Number
                     if (isNaN(duration)) { // IN1~3, BAT, IR
                         this.throwErr('error', 'WrongInputVal', block);
@@ -409,7 +409,7 @@ Entry.BlockToNeoParser = class {
                     speed = speed + 100; // IN1~3 should 101~103
                 }
 
-                if (this._pramVal[3] === 'CONT') {
+                if (this._pramVal[3] === '계속') {
                     duration = 0xFF;
                 } else {
                     duration = Number(this._pramVal[3]);
@@ -509,7 +509,7 @@ Entry.BlockToNeoParser = class {
                     this._pramVal[0] === 'BAT' ||
                     this._pramVal[0] === 'IR' ||
                     this._pramVal[0] === 'ALL' ||
-                    this._pramVal[0] === 'CONT'
+                    this._pramVal[0] === '계속'
                 ) { 
                     this.throwErr('error', 'WrongInputVal', block);
                 }
