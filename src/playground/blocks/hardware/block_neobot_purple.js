@@ -407,7 +407,7 @@ Entry.NeobotPurple.setLanguage = function() {
                 neobot_purple_arg_led_duration: '%1',
                 neobot_purple_led_on: 'LED yoqish: %1 %2 %3 %4',
                 neobot_purple_output_led_off: "%1 LEDni o'chirish %2",
-                neobot_purple_led_brightness_with_sensor: "%1 dan %2 LED boshqarish %3",
+                neobot_purple_led_brightness_with_sensor: "%1 dan %2 LEDni boshqarish %3",
                 neobot_purple_color_led_on: '%1 rangli LEDni yoqish: R %2 G %3 B %4 %5',
 
                 // output
