@@ -64,6 +64,8 @@ export default class Hardware {
     public programLauncher: ExternalProgramLauncher;
     private popupHelper?: PopupHelper;
 
+    private timerId: number; // For waiting msg for uplaod
+
     constructor() {
         const prevRoomId = localStorage.getItem(this.cloudRoomIdKey);
         this.sessionRoomId = prevRoomId || this._createRandomRoomId();
@@ -313,7 +315,10 @@ export default class Hardware {
         if (uploadObj) {
             Entry.propertyPanel.select('console');
             Entry.console.clear();
-            Entry.console.print('Upload started...\n');
+            Entry.console.print('Upload started.');
+            if (this.hwModule.name != 'neobot_purple') { // Neobot don't return the upload result
+                this.timerId = window.setInterval(() => Entry.console.print('.'), 1000);
+            }
 
             if (this.socket && !this.socket.disconnected) {
                 this._sendUploadMessage(uploadObj);
@@ -497,6 +502,7 @@ export default class Hardware {
             if (recvData.upload) {
                 Entry.propertyPanel.select('console');
                 Entry.console.print(recvData.upload);
+                window.clearInterval(this.timerId);
 
                 if (recvData.upload.includes('failed')) {
                     // If compile fail, change mode to arduino code
