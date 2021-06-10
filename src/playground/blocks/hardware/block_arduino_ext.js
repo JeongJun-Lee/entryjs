@@ -845,7 +845,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [{syntax: 'digitalWrite(%1, %2);'}]
+                ar: [{syntax: 'analogWrite(%1, %2);'}]
             },
         },
         arduino_ext_tone_list: {

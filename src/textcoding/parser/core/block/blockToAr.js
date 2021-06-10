@@ -410,7 +410,7 @@ Entry.BlockToArParser = class {
                 stat = stat.replace('%2', on_off);
                 break;
 
-            case 'arduino_toggle_pwm': // pwm(digitalWrite)
+            case 'arduino_toggle_pwm': // pwm(anlogWrite)
             case 'arduino_ext_digital_pwm':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
