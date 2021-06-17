@@ -195,7 +195,9 @@ Entry.BlockToArParser = class {
         let pinStat = '';
         switch (this._funcName) {
             case 'digitalRead': pinStat = `pinMode(${this._pinNum}, INPUT);`; break;
-            case 'digitalWrite': pinStat = `pinMode(${this._pinNum}, OUTPUT);`; break;
+            case 'analogWrite': 
+            case 'digitalWrite': 
+                pinStat = `pinMode(${this._pinNum}, OUTPUT);`; break;
             case 'myServo.write': pinStat = `myServo.attach(${this._pinNum});`; break;
             case 'distance': pinStat = `pinMode(${this._pinNum}, OUTPUT);\n\tpinMode(${this._pinNum2}, INPUT);`; break;
         }
@@ -276,10 +278,10 @@ Entry.BlockToArParser = class {
             block.type === 'number' ||
             block.type === 'text' ||
             block.type === 'get_variable' ||
-            block.type === 'arduino_text' ||                 // Value for AnalogWrite
+            block.type === 'arduino_text' ||                 // Value for analogWrite
             block.type === 'arduino_get_port_number' ||      // Digital port
             block.type === 'arduino_get_pwm_port_number' ||  // PWM port
-            block.type === 'arduino_get_sensor_number' ||    // Port for AnalogRead
+            block.type === 'arduino_get_sensor_number' ||    // Port for analogRead
             block.type === 'arduino_get_digital_toggle' ||
             block.type === 'arduino_ext_analog_list' ||
             block.type === 'arduino_ext_octave_list' ||
