@@ -24,7 +24,7 @@ Entry.Playground = class Playground {
         this._destroyer.destroy();
         this.isTextBGMode_ = false;
         this.dataTable = DataTable;
-        this._uploadButton = null;;
+        this._uploadButton = null;
         this._arToggleButton = null;
         this._arToggleVisible = false;
 

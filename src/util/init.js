@@ -57,6 +57,11 @@ Entry.init = function(container, options) {
 
     Entry.paintMode = options.paintMode || 'literallycanvas';
     container && this.createDom(container, this.type);
+
+    if (Lang.type.includes('uz')) { // If Lang is UZ, remove expansion category
+        Entry.playground.blockMenu.banCategory('expansion');
+    }
+
     this.loadInterfaceState();
     this.overridePrototype();
     this.maxCloneLimit = 360;
@@ -210,7 +215,7 @@ Entry.initialize_ = function() {
     this.playground = new Entry.Playground();
     this._destroyer.add(this.playground);
 
-    if (this.options.expansionDisable === false || this.options.expansionDisable === undefined) {
+    if (this.options.expansionDisable === false || this.options.expansionDisable === undefined || !Lang.type.includes('uz')) {
         this.expansion = new Expansion(this.playground);
         this._destroyer.add(this.expansion);
     }
