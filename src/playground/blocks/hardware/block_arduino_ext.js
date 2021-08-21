@@ -322,11 +322,7 @@ Entry.ArduinoExt.getBlocks = function() {
             isNotFor: ['ArduinoExt'],
             func(sprite, script) {
                 let port = script.getValue('PORT', script);
-                const ANALOG = Entry.hw.portData.ANALOG;
-                if (port[0] === 'A') {
-                    port = port.substring(1);
-                }
-                return ANALOG ? ANALOG[port] || 0 : 0;
+                return Entry.hw.getAnalogPortValue(port);
             },
             syntax: {
                 js: [],
