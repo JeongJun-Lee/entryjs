@@ -5315,15 +5315,15 @@ Lang.Workspace = {
     list_add_ok_msg: '을(를) 추가하였습니다.',
     list_create: '리스트 추가하기',
     list_create_placeholder: '리스트의 이름을 입력해주세요.',
-    list_dup: '같은 이름의 리스트가 이미 존재합니다.',
+    list_dup: '같은 이름의 리스트가 이미 있어 이름이 자동으로 변경되었습니다.',
     list_newname: '새로운 이름',
     list_export: '리스트 내보내기',
     list_import: '리스트 불러오기',
     list_remove: '리스트 삭제',
-    list_rename: '리스트 이름 변경',
+    list_rename: '리스트 이름 변경 완료',
     list_rename_failed: '리스트 이름 변경 실패',
-    list_rename_ok: '리스트의 이름이 성공적으로 변경 되었습니다.',
-    list_too_long: '리스트의 이름이 너무 깁니다.',
+    list_rename_ok: '리스트의 이름이 성공적으로 변경되었습니다.',
+    list_too_long: '리스트의 이름은 10자를 넘을 수 없습니다.',
     message: '신호',
     message_add_cancel: '신호 추가 취소',
     message_add_cancel_msg: '신호 추가를 취소하였습니다.',
@@ -5411,16 +5411,16 @@ Lang.Workspace = {
     variable_add_ok_msg: '을(를) 추가하였습니다.',
     variable_create: '변수 만들기',
     variable_add: '변수 추가하기',
-    variable_dup: '같은 이름의 변수가 이미 존재합니다.',
+    variable_dup: '같은 이름의 변수가 이미 있어 이름이 자동으로 변경되었습니다.',
     variable_newname: '새로운 이름',
     variable_remove: '변수 삭제',
     variable_remove_canceled: '변수 삭제를 취소하였습니다.',
-    variable_rename: '변수 이름을 변경합니다. ',
-    variable_rename_failed: '변수 이름 변경에 실패하였습니다. ',
+    variable_rename: '변수 이름 변경 완료',
+    variable_rename_failed: '변수 이름 변경 실패',
     variable_rename_msg: "'변수의 이름이 성공적으로 변경 되었습니다.'",
-    variable_rename_ok: '변수의 이름이 성공적으로 변경 되었습니다.',
+    variable_rename_ok: '변수의 이름이 성공적으로 변경되었습니다.',
     variable_select: '변수를 선택하세요',
-    variable_too_long: '변수의 이름이 너무 깁니다.',
+    variable_too_long: '변수의 이름은 10자를 넘을 수 없습니다.',
     open_analizy_data_import: '데이터 화면 열기',
     vehicle: '탈것',
     add_object_alert_msg: '오브젝트를 추가해주세요',
@@ -5913,7 +5913,8 @@ Lang.Helper = {
     get_date: '현재 연도, 월, 일, 시각과 같이 시간에 대한 값입니다.',
     distance_something: '해당 오브젝트와 선택한 오브젝트 또는 마우스 포인터 간의 거릿값입니다.',
     get_sound_duration: '선택한 소리의 길이(초) 값입니다.',
-    get_user_name: '작품을 실행하고 있는 사용자의 이름값입니다.',
+    get_user_name: '작품을 실행하고 있는 사용자의 아이디 값입니다.',
+    get_nickname: '작품을 실행하고 있는 사용자의 닉네임 값입니다.',
     get_project_timer_value: '이 블록이 실행되는 순간 초시계에 저장된 값입니다.',
     choose_project_timer_action:
         '초시계의 상태를 결정합니다.\n시작하기: 초시계를 시작합니다. \n정지하기: 초시계를 정지합니다. \n초기화하기: 초시계의 값을 0으로 초기화합니다. ',
@@ -6381,6 +6382,112 @@ Lang.Helper = {
         "입력한 데이터의 분류 결과가 선택한 클래스인 경우 '참'으로 판단합니다.",
     is_number_learning_group_3:
         "입력한 데이터의 분류 결과가 선택한 클래스인 경우 '참'으로 판단합니다.",
+    bitbrick_when_button_pressed:
+        "비트브릭 버튼을 누르면 아래에 연결된 블록들을 실행합니다.",
+    bitbrick_when_sensor_get_value:
+        "비트브릭 센서의 값과 오른쪽에 입력한 값을 비교합니다.\n< : 센서 값이 오른쪽에 위치한 값보다 작은 경우 ‘참’으로 판단합니다.\n> : 센서 값이 오른쪽에 위치한 값보다 큰 경우 ‘참으로 판단합니다.\n= :  센서 값이 오른쪽에 위치한 값과 같은 경우 ‘참으로 판단합니다.",
+    bitbrick_sensor_value:
+        "비트브릭 센서를 사용할 수 있는 블록입니다. 센서값의 범위는 0 ~1023입니다. 메인보드에 연결된 센서의 종류와 포트번호를 자동으로 인식합니다. 블록 안의 화살표를 눌러 사용하려고 하는 센서를 선택하세요.",
+    bitbrick_convert_scale:
+        "비트브릭 센서의 값의 범위를 바꿀 수 있습니다.",
+    bitbrick_is_touch_pressed:
+        "비트브릭 센서 중 버튼을 눌렀을 경우 ‘참’으로 판단합니다.",
+    bitbrick_turn_off_color_led:
+        "비트브릭 엘이디를 끕니다.",
+    bitbrick_turn_on_color_led_by_rgb:
+        "비트브릭 엘이디를 빛의 삼원색인 빨강,초록,파랑을 혼합하여 켭니다. 값의 범위는 0 ~ 255입니다.",
+    bitbrick_turn_on_color_led_by_picker:
+        "비트브릭 엘이디를 색상 창을 사용해 켭니다.",
+    bitbrick_turn_on_color_led_by_value:
+        "비트브릭 엘이디를 색상 값으로 켭니다. 값의 범위는 0 ~ 199입니다.",
+    bitbrick_buzzer:
+        "비트브릭 버저를 사용하여 소리를 냅니다. 값의 범위는 0 ~ 96입니다. 값이 0일 때는 버저 소리를 끕니다.",
+    bitbrick_turn_off_all_motors:
+        "비트브릭 모터를 모두 끕니다.",
+    bitbrick_dc_speed:
+        "비트브릭 디씨모터의 속도를 제어합니다. 속도 값의 범위는 –100 ~ 100입니다. 음수(-)일 때는 반시계방향으로 회전합니다. 양수(+)일 때는 시계방향으로 회전합니다. 속도가 0일 때는 회전을 멈춥니다.",
+    bitbrick_dc_direction_speed:
+        "비트브릭 디씨모터의 방향과 속력을 제어합니다. 방향은 시계방향과 반시계방향을 선택할 수 있습니다. 속력 값의 범위는 0 ~ 100입니다. 속력이 0일 때는 회전을 멈춥니다.",
+    bitbrick_servomotor_angle:
+        "비트브릭 서보모터의 각도를 제어합니다. 각도 값의 범위는 0 ~ 180입니다.",
+    diaboard_when_button_pressed:			
+        "선택한 버튼을 누르거나 누르지 않으면 아래에 연결된 블록들을 실행합니다.",
+    diaboard_when_color_is:					
+        "선택한 색상을 컬러센서가 감지하면 아래에 연결된 블록들을 실행합니다.",
+    diaboard_when_sensor_is:				
+        "선택한 센서의 값과 오른쪽의 값을 비교하여 아래에 연결된 블록들을 실행합니다.\n< : 센서값이 오른쪽 값보다 작은 경우 '참'으로 판단합니다.\n> : 센서값이 오른쪽 값보다 큰 경우 '참'으로 판단합니다.\n= : 센서값이 오른쪽 값과 같은 경우 '참'으로 판단합니다.",
+    diaboard_button_pressed:				
+        "선택한 버튼을 누르거나 누르지 않은 경우 '참'으로 판단합니다.",
+    diaboard_color_sensor_is:				
+        "선택한 색상을 컬러센서가 감지한 경우 '참'으로 판단합니다.",
+    diaboard_sensor_condition:				
+        "선택한 센서의 값과 오른쪽의 값을 비교합니다.\n< : 센서값이 오른쪽 값보다 작은 경우 '참'으로 판단합니다.\n> : 센서값이 오른쪽 값보다 큰 경우 '참'으로 판단합니다.\n= : 센서값이 오른쪽 값과 같은 경우 '참'으로 판단합니다.",
+    diaboard_color_sensor_seven_hue:		
+        "컬러센서가 감지하는 색상을 7가지로 분류한 값입니다.\n7가지 색상 : 빨강, 노랑, 녹색, 청록, 파랑, 보라, 하양",
+    diaboard_color_sensor_one_hue:			
+        "컬러센서가 감지한 색상값입니다.\n색상(hue) : 0 ~ 359 사이 범위로 설정할 수 있습니다.\n(총 360가지의 색상을 감지하며 360과 0은 같은 색으로 표현됩니다.)",
+    diaboard_sensor_value:					
+        "선택한 센서가 감지한 값입니다. 값의 범위는 0 ~ 1023입니다. \n적외선 센서 : 물체에 반사된 적외선을 양을 측정하여 물체와의 거리를 감지합니다.\n밝기 센서 : 주변 환경이 얼마나 밝고 어두운지를 감지합니다.",
+    diaboard_convert_scale:					
+        "선택한 센서가 감지한 값의 범위를 사용자가 임의로 바꿔서 사용합니다.\n적외선 센서 : 물체에 반사된 적외선을 양을 측정하여 물체와의 거리를 감지합니다.\n밝기 센서 : 주변 환경이 얼마나 밝고 어두운지를 감지합니다.",
+    diaboard_led_rainbow:					
+        "엘이디를 무지개 효과로 켭니다.",
+    diaboard_led_rainbow_time:				
+        "엘이디를 입력한 시간만큼 무지개 효과로 켭니다.\n시간 : 0 ~ 100 범위에서 0.1초 단위로 설정할 수 있습니다.",
+    diaboard_led_effect:					
+        "엘이디를 선택한 효과와 선택한 색상으로 켭니다.",
+    diaboard_led_effect_time:				
+        "엘이디를 입력한 시간만큼 선택한 효과와 선택한 색상으로 켭니다.\n시간 : 0 ~ 100 범위에서 0.1초 단위로 설정할 수 있습니다.",
+    diaboard_led_six:						
+        "엘이디 1번 ~ 6번을 선택한 색상으로 각자 켭니다.",
+    diaboard_led_one:						
+        "선택한 번호의 엘이디를 선택한 색상으로 켭니다.",
+    diaboard_led_one_time:					
+        "선택한 번호의 엘이디를 입력한 시간만큼 선택한 색상으로 켭니다.\n시간 : 0 ~ 100 범위에서 0.1초 단위로 설정할 수 있습니다.",
+    diaboard_led_hue:						
+        "선택한 번호의 엘이디를 색상(hue)값으로 켭니다.\n색상( hue) : 0 ~ 359 사이 범위로 설정할 수 있습니다.\n(총 360가지의 색상을 감지하며 360과 0은 같은 색으로 표현됩니다.)",
+    diaboard_led_color:
+        "선택한 번호의 엘이디를 현재 컬러센서가 감지한 색상(7가지)으로 켭니다. 컬러센서 색상이 '없음'일 때는 코드를 실행해도 엘이디를 켜지 않습니다.\n7가지 색상 : 빨강, 노랑, 녹색, 청록, 파랑, 보라, 하양",
+    diaboard_led_rgb:						
+        "선택한 번호의 엘이디를 빨강, 녹색, 파랑값으로 켭니다.\n빨강, 녹색, 파랑 : 0 ~ 255의 범위로 설정할 수 있습니다.\n(0이하는 0으로, 255이상은 255로 처리됩니다. )",
+    diaboard_led_turn_off_all:				
+        "선택한 번호의 엘이디를 끕니다.",
+    diaboard_servomotor_angle:				
+        "선택한 포트의 서보모터의 각도를 입력한 값으로 정합니다.\n각도 : 0 ~ 180 사이 범위로 설정할 수 있습니다.\n(0이하는 0으로, 180이상은 180으로 처리됩니다.)",
+    diaboard_servomotor_angle_time:			
+        "선택한 포트의 서보모터의 초기각도와 목표각도를 설정해 입력한 시간만큼 각도를 바꿉니다.\n각도 : 0 ~ 180 사이 범위로 설정할 수 있습니다.\n(0이하는 0으로, 180이상은 180으로 처리됩니다.)\n시간 : 0 ~ 100 범위에서 0.1초 단위로 설정할 수 있습니다.",
+    diaboard_dc_direction_speed:			
+        "선택한 포트의 디씨모터의 방향과 속력을 정합니다.\n방향 : 시계방향과 반시계 방향을 설정할 수 있습니다.\n속력 : 0 ~ 100까지 범위로 설정할 수 있습니다.\n(0이하는 0으로, 100이상은 100으로 처리됩니다.)",
+    diaboard_dc_direction_speed_time:		
+        "선택한 포트의 디씨모터의 방향과 속력을 정하고, 입력한 시간만큼 동작합니다.\n방향 : 시계방향과 반시계 방향을 설정할 수 있습니다.\n속력 : 0 ~ 100까지 범위로 설정할 수 있습니다.\n(0이하는 0으로, 100이상은 100으로 처리됩니다.)\n시간 : 0 ~ 100 범위에서 0.1초 단위로 설정할 수 있습니다.",
+    diaboard_dc_speed:						
+        "선택한 포트의 디씨모터의 속도를 정합니다.\n속도 : -100 ~ 100 사이의 범위로 설정할 수 있습니다.\n(-100이하는 -100으로, 100이상은 100으로 처리됩니다.)",
+    diaboard_dc_speed_time:					
+        "선택한 포트의 디씨모터의 속도를 정하고, 입력한 시간만큼 동작합니다.\n속도 : -100 ~ 100 사이의 범위로 설정할 수 있습니다.\n(-100이하는 -100으로, 100이상은 100으로 처리됩니다.)\n시간 : 0 ~ 100 범위에서 0.1초 단위로 설정할 수 있습니다.",
+    diaboard_turn_off_all_motors:			
+        "선택한 포트의 모터를 멈춥니다.",
+    diaboard_buzzer_melody_type:          	
+        "선택한 멜로디를 연주합니다.",
+    diaboard_buzzer_effect_type:          	
+        "선택한 효과음을 냅니다.",
+    diaboard_buzzer_eight_melody_bpm:		
+        "선택한 음들을 입력한 BPM으로 연주합니다.\n연주속도(BPM) : 30 ~ 300 사이의 범위로 설정할 수 있습니다.\n(30이하는 30으로, 300이상은 300으로 처리됩니다.)",
+    diaboard_buzzer_octave:               	
+        "선택한 옥타브와 음으로 연주합니다.",
+    diaboard_buzzer_octave_rhythm:        	
+        "선택한 옥타브와 음을 입력한 박자로 연주합니다.",
+    diaboard_buzzer_hz:                   	
+        "입력한 주파수로 연주합니다.\n주파수 : 33 ~ 7,900 사이의 범위로 설정할 수 있습니다.\n(33이하는 33으로 7,900이상은 7,900으로 처리됩니다.)",
+    diaboard_buzzer_hz_change:            	
+        "입력한 주파수만큼 바꿔서 연주합니다.",
+    diaboard_buzzer_speed_bpm:            	
+        "입력한 BPM으로 연주 속도를 정합니다.\n연주속도(BPM) : 30 ~ 300 사이의 범위로 설정할 수 있습니다.\n(30이하는 30으로, 300이상은 300으로 처리됩니다.)",
+    diaboard_buzzer_speed_bpm_change:     	
+        "입력한 BPM만큼 연주 속도를 바꿉니다.",
+    diaboard_buzzer_sleep_rhythm:         	
+        "선택한 박자만큼 쉽니다.",
+    diaboard_buzzer_stop:					
+        "버저음을 멈춥니다."
 };
 Lang.Category = {
     entrybot_friends: '엔트리봇 친구들',
@@ -6747,7 +6854,8 @@ Lang.template = {
     calc_rand: '%1 %2 %3 %4 %5',
     get_date: '%1 %2 %3',
     get_sound_duration: '%1 %2 %3',
-    get_user_name: '사용자이름',
+    get_user_name: '아이디',
+    get_nickname: '닉네임',
     reset_project_timer: '%1',
     set_visible_project_timer: '%1 %2 %3 %4',
     timer_variable: '%1 %2',
@@ -8253,10 +8361,14 @@ Lang.PythonHelper = {
         'def when_start():\n    Entry.print(Entry.value_of_sound_length_of("소리"))',
     get_sound_duration_exampleDesc:
         '[시작하기]버튼을 클릭하면 오브젝트가 "소리"의 길이를 말합니다.',
-    get_user_name_desc: '작품을 실행하고 있는 사용자의 이름 값입니다.',
+    get_user_name_desc: '작품을 실행하고 있는 사용자의 아이디 값입니다.',
     get_user_name_exampleCode: 'def when_start():\n    Entry.print(Entry.value_of_username())',
     get_user_name_exampleDesc:
-        '[시작하기]버튼을 클릭하면 작품을 실행하고 있는 사용자의 이름 값을 말합니다.',
+        '[시작하기]버튼을 클릭하면 작품을 실행하고 있는 사용자의 아이디 값을 말합니다.',
+    get_nickname_desc: '작품을 실행하고 있는 사용자의 닉네임 값입니다.',
+    get_nickname_exampleCode: 'def when_start():\n    Entry.print(Entry.value_of_nickname())',
+    get_nickname_exampleDesc:
+        '[시작하기]버튼을 클릭하면 작품을 실행하고 있는 사용자의 닉네임 값을 말합니다.',
     length_of_string_desc: '입력한 문자값의 공백을 포함한 글자 수입니다.',
     length_of_string_elements: 'A-- "문자열"',
     length_of_string_exampleCode:

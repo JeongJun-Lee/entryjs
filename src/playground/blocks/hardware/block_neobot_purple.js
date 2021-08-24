@@ -4,11 +4,10 @@ Entry.NeobotPurple = {
     id: '5.5',
     name: 'neobot_purple',
     url: 'http://www.neobot.co.kr',
-    imageName: 'neobot.png',
+    imageName: 'neobot_purple.png',
     title: {
         ko: 'NEW 네오봇 Purple',
         en: 'NEW NEOBOT Purple',
-        uz: 'Neo SoCo'
     },
     LOCAL_MAP: ['IN1', 'IN2', 'IN3', 'IR', 'BAT'],
     REMOTE_MAP: ['OUT1', 'OUT2', 'OUT3', 'DCR', 'DCL', 'SND', 'FND', 'OPT'],
@@ -19,7 +18,7 @@ Entry.NeobotPurple = {
         Entry.hw.update();
     },
     monitorTemplate: {
-        imgPath: 'hw/neobot.png',
+        imgPath: 'hw/neobot_purple.png',
         width: 700,
         height: 700,
         listPorts: {
@@ -49,7 +48,7 @@ Entry.NeobotPurple.setLanguage = function() {
             template: {
                 // sensor
                 neobot_purple_sensor_value: '%1',
-                neobot_purple_sensor_convert_scale: '변환된 %1 값   범위: %2 ~ %3 변환: %4 ~ %5',
+                neobot_purple_sensor_convert_scale: '%1 %2 ~ %3 를 %4 ~ %5 으로 변환',
 
                 // decision
                 neobot_purple_decision_sensor_is_over: '%1 %2 %3',
@@ -63,7 +62,7 @@ Entry.NeobotPurple.setLanguage = function() {
                 neobot_purple_arg_led_duration: '%1',
                 neobot_purple_led_on: 'LED 켜기   %1 %2 %3 %4',
                 neobot_purple_output_led_off: '%1 LED 끄기 %2',
-                neobot_purple_led_brightness_with_sensor: '%1 센서로 %2 LED 밝기 조절하기 %3',
+                neobot_purple_led_brightness_with_sensor: '%1 로 %2 LED 제어 %3',
                 neobot_purple_color_led_on: '%1 컬러LED 켜기   R %2 G %3 B %4 %5',
 
                 // output
@@ -388,179 +387,7 @@ Entry.NeobotPurple.setLanguage = function() {
                 neobot_purple_direction_left: 'to the left',
                 neobot_purple_direction_right: 'to the right',
             },
-        }, 
-        uz: {
-            template: {
-                // sensor
-                neobot_purple_sensor_value: '%1', 
-                neobot_purple_sensor_convert_scale: "O'zgartirilgan %1 qiymat doirasi: %2 ~ %3 O'zgartirish: %4 ~ %5", 
-
-                // decision
-                neobot_purple_decision_sensor_is_over: '%1 %2 %3',
-                neobot_purple_decision_equal_with_sensor: '%1 rangi %2',
-                neobot_purple_decision_sensor_angle: '%1 gradusi %2 %3',
-
-                // remote
-                neobot_purple_remote_button: 'Teleboshqarishning tugumasi %1 ni bosgan',
-
-                // LED
-                neobot_purple_arg_led_duration: '%1',
-                neobot_purple_led_on: 'LED yoqish: %1 %2 %3 %4',
-                neobot_purple_output_led_off: "%1 LEDni o'chirish %2",
-                neobot_purple_led_brightness_with_sensor: "%1 sensoridan %2 LED yorug'likni o'zgartirish %3",
-                neobot_purple_color_led_on: '%1 rangli LEDni yoqish: R %2 G %3 B %4 %5',
-
-                // output
-                neobot_purple_set_output: '%1 ga %2 qiymatini chiqarish %3',
-
-                // motor
-                neobot_purple_robot: 'Robot %1 %2',
-                neobot_purple_motor_start: 'Motorni aylantirish %1 %2 %3 %4 %5',
-                neobot_purple_motor_stop: "%1 motorini to'xtatish %2",
-                neobot_purple_arg_motor_speed: '%1',
-                neobot_purple_arg_motor_duration: '%1',
-
-                // melody
-                neobot_purple_play_note_for: "Buzzer yangrash: %2 Oktava, %1 Tovush, %3 O'lchov %4",
-                neobot_purple_melody_play_with_sensor: '%1 sensoridan buzzerni yangrash %2',
-                neobot_purple_melody_stop: "Buzzerni to'xtatish %1",
-
-                // servo
-                get_servo_degree: '%1',
-                neobot_purple_servo_init: '%1 servo motorini nollashtirish %2',
-                neobot_purple_servo_rotate: 'Servo motorni aylantirish: %1 %2 %3 %4',
-                neobot_purple_servo_stop: "%1 servo motorini to'xtatish %2",
-                neobot_purple_servo_change_degree: "Servo motor gradusini o'zgartirish   %2 %3 %4 %1 %5",
-            },
-            Blocks: {
-                //for dropdown
-                neobot_purple_port_1: 'IN1',
-                neobot_purple_port_2: 'IN2',
-                neobot_purple_port_3: 'IN3',
-                neobot_purple_port_4: 'IN4',
-                neobot_purple_port_12: 'IN1 & IN2',
-                neobot_purple_port_bat: 'Batareya',
-                neobot_purple_port_remot: 'Teleboshqarish',
-                neobot_purple_color_white: 'Oq',
-                neobot_purple_color_red: 'Qizil',
-                neobot_purple_color_yellow: 'Sariq',
-                neobot_purple_color_green: 'Yasil',
-                neobot_purple_color_blue: "Ko'k",
-                neobot_purple_direction_forward: "Tog'ri",
-                neobot_purple_direction_backward: 'Orqa',
-                neobot_purple_sound_silent: 'Ovozsiz',
-                neobot_purple_sound_do: 'Do',
-                neobot_purple_sound_do_shop: 'Do#',
-                neobot_purple_sound_re: 'Re',
-                neobot_purple_sound_re_shop: 'Re#',
-                neobot_purple_sound_mi: 'Mi',
-                neobot_purple_sound_fa: 'Fa',
-                neobot_purple_sound_fa_shop: 'Fa#',
-                neobot_purple_sound_so: 'Sol',
-                neobot_purple_sound_so_shop: 'Sol#',
-                neobot_purple_sound_la: 'Lya',
-                neobot_purple_sound_la_shop: 'Lya#',
-                neobot_purple_sound_ti: 'Si',
-                neobot_purple_sound_half_note: 'Yarim',
-                neobot_purple_sound_quarter_note: 'Chorak',
-                neobot_purple_sound_eighth_note: '1/8',
-                neobot_purple_sound_sixteenth_note: '1/16',
-                neobot_purple_sensor_infrared: 'IR sensor',
-                neobot_purple_sensor_light: 'nur sensor',
-                neobot_purple_sensor_sound: 'ovoz sensor',
-                neobot_purple_compare_symbol1: '＝',
-                neobot_purple_compare_symbol2: '＞',
-                neobot_purple_compare_symbol3: '＜',
-                neobot_purple_compare_symbol4: '≥',
-                neobot_purple_compare_symbol5: '≤',
-                neobot_purple_remote_btn_a: 'A',
-                neobot_purple_remote_btn_b: 'B',
-                neobot_purple_remote_btn_c: 'C',
-                neobot_purple_remote_btn_d: 'D',
-                neobot_purple_remote_btn_1: '1',
-                neobot_purple_remote_btn_2: '2',
-                neobot_purple_remote_btn_3: '3',
-                neobot_purple_remote_btn_4: '4',
-                neobot_purple_remote_btn_up: '▲',
-                neobot_purple_remote_btn_down: '▼',
-                neobot_purple_remote_btn_left: '◀',
-                neobot_purple_remote_btn_right: '▶',
-                neobot_purple_duration_cont: 'Davom etish',
-                neobot_purple_duration_1s: '1 soniya',
-                neobot_purple_duration_2s: '2 soniya',
-                neobot_purple_duration_3s: '3 soniya',
-                neobot_purple_duration_4s: '4 soniya',
-                neobot_purple_duration_5s: '5 soniya',
-                neobot_purple_duration_6s: '6 soniya',
-                neobot_purple_duration_7s: '7 soniya',
-                neobot_purple_duration_8s: '8 soniya',
-                neobot_purple_duration_9s: '9 soniya',
-                neobot_purple_motor_both: 'Ikkala',
-                neobot_purple_motor_left: "Chap",
-                neobot_purple_motor_right: "O'ng",
-                neobot_purple_motor_move_forward: "to'g'riga yurish",
-                neobot_purple_motor_move_backward: "orqaga yurish",
-                neobot_purple_motor_move_left: 'chapga birilish',
-                neobot_purple_motor_move_right: "o'nga birilish",
-                neobot_purple_motor_move_stop: "to'xtatish",
-
-                neobot_purple_servo_dir_1: "To'g'ri tomoni",
-                neobot_purple_servo_dir_2: 'Qarish tomoni',
-                
-                neobot_purple_percent_10: '10% tezlik',
-                neobot_purple_percent_20: '20% tezlik',
-                neobot_purple_percent_30: '30% tezlik',
-                neobot_purple_percent_40: '40% tezlik',
-                neobot_purple_percent_50: '50% tezlik',
-                neobot_purple_percent_60: '60% tezlik',
-                neobot_purple_percent_70: '70% tezlik',
-                neobot_purple_percent_80: '80% tezlik',
-                neobot_purple_percent_90: '90% tezlik',
-                neobot_purple_percent_100: '100% tezlik',
-
-                neobot_purple_angle_0: '0 gradus',
-                neobot_purple_angle_5: '5 gradus',
-                neobot_purple_angle_10: '10 gradus',
-                neobot_purple_angle_15: '15 gradus',
-                neobot_purple_angle_20: '20 gradus',
-                neobot_purple_angle_25: '25 gradus',
-                neobot_purple_angle_30: '30 gradus',
-                neobot_purple_angle_35: '35 gradus',
-                neobot_purple_angle_40: '40 gradus',
-                neobot_purple_angle_45: '45 gradus',
-                neobot_purple_angle_50: '50 gradus',
-                neobot_purple_angle_55: '55 gradus',
-                neobot_purple_angle_60: '60 gradus',
-                neobot_purple_angle_65: '65 gradus',
-                neobot_purple_angle_70: '70 gradus',
-                neobot_purple_angle_75: '75 gradus',
-                neobot_purple_angle_80: '80 gradus',
-                neobot_purple_angle_85: '85 gradus',
-                neobot_purple_angle_90: '90 gradus',
-                neobot_purple_angle_95: '95 gradus',
-                neobot_purple_angle_100: '100 gradus',
-                neobot_purple_angle_105: '105 gradus',
-                neobot_purple_angle_110: '110 gradus',
-                neobot_purple_angle_115: '115 gradus',
-                neobot_purple_angle_120: '120 gradus',
-                neobot_purple_angle_125: '125 gradus',
-                neobot_purple_angle_130: '130 gradus',
-                neobot_purple_angle_135: '135 gradus',
-                neobot_purple_angle_140: '140 gradus',
-                neobot_purple_angle_145: '145 gradus',
-                neobot_purple_angle_150: '150 gradus',
-                neobot_purple_angle_155: '155 gradus',
-                neobot_purple_angle_160: '160 gradus',
-                neobot_purple_angle_165: '165 gradus',
-                neobot_purple_angle_170: '170 gradus',
-                neobot_purple_angle_175: '175 gradus',
-                neobot_purple_angle_180: '180 gradus',
-
-                neobot_purple_out_all: 'Hammasi',
-                neobot_purple_direction_left: 'Chap',
-                neobot_purple_direction_right: "O'ng",
-            },
-        },//
+        }, //
     };
 };
 
@@ -1145,7 +972,7 @@ Entry.NeobotPurple.getBlocks = function() {
                         Entry.console.print('==========================', 'speak');
                     }
 
-                    if ((duration != 'CONT' && duration != 'constantly') && Entry.parseNumber(duration) <= 0) {
+                    if ((duration != '계속' && duration != 'constantly') && Entry.parseNumber(duration) <= 0) {
                         return script.callReturn();
                     }
 
@@ -1157,7 +984,7 @@ Entry.NeobotPurple.getBlocks = function() {
                         Entry.hw.sendQueue[port] = value;
                     }
 
-                    if (duration == 'CONT' || duration == 'constantly') {
+                    if (duration == '계속' || duration == 'constantly') {
                         return script.callReturn();
                     }
 
@@ -1293,13 +1120,19 @@ Entry.NeobotPurple.getBlocks = function() {
             func: function(sprite, script) {
                 const inPort = script.getStringField('IN', script);
                 const outPort = script.getStringField('OUT', script);
-                const value = Entry.hw.portData[inPort];
+                let value = Entry.hw.portData[inPort];
+
+                // edited 210421, IN 값 0~100 을 0~255로 변경, 센서 100 이상은 최대값으로 처리함.
+                value = Math.max(value, 0);
+                value = Math.min(value, 100);
+                value = Math.ceil(value / 100 * 255);
 
                 if (Entry.NeobotPurple.log_to_console) {
                     Entry.console.print('=== neobot_purple_led_brightness_with_sensor ===', 'speak');
                     Entry.console.print('out port : ' + outPort, 'speak');
                     Entry.console.print('in port : ' + inPort, 'speak');
-                    Entry.console.print('sensor value : ' + value, 'speak');
+                    Entry.console.print('sensor value : ' + Entry.hw.portData[inPort], 'speak');
+                    Entry.console.print('output value : ' + value, 'speak');
                     Entry.console.print('==========================', 'speak');
                 }
 
@@ -1717,7 +1550,7 @@ Entry.NeobotPurple.getBlocks = function() {
                     const speed = script.getStringValue('SPEED', script);
                     const duration = script.getStringValue('DURATION', script);
 
-                    if (duration != 'CONT' && duration != 'constantly' && Entry.parseNumber(duration) <= 0) {
+                    if (duration != '계속' && duration != 'constantly' && Entry.parseNumber(duration) <= 0) {
                         return script.callReturn();
                     }
 
@@ -1748,23 +1581,16 @@ Entry.NeobotPurple.getBlocks = function() {
                         rightDirectionValue = 0x20;
                     }
 
+                    // edited 210421, 0~100 을 0~15로 변환, 100 이상은 최대값(15)으로 처리함.
                     let speedValue = 0;
-                    let maxSpeed;
                     if (Entry.Utils.isNumber(speed)) {
-                        maxSpeed = 100;
                         speedValue = Entry.parseNumber(speed);
                     } else {
-                        if (speed.indexOf('p') == 0) { // percent
-                            maxSpeed = 100;
-                            speedValue = Entry.parseNumber(speed.substring(1));
-                        } else { // IN
-                            maxSpeed = 255;
-                            speedValue = Entry.hw.portData[speed];
-                        }
+                        speedValue = Entry.hw.portData[speed];
                     }
                     speedValue = Math.max(speedValue, 0);
-                    speedValue = Math.min(speedValue, maxSpeed);
-                    speedValue = Math.round(speedValue / maxSpeed * 15);
+                    speedValue = Math.min(speedValue, 100);
+                    speedValue = Math.ceil(speedValue / 100 * 15);
 
                     const leftOutValue = leftDirectionValue + speedValue;
                     const rightOutValue = rightDirectionValue + speedValue;
@@ -1790,7 +1616,7 @@ Entry.NeobotPurple.getBlocks = function() {
                         Entry.hw.sendQueue['DCR'] = rightOutValue;
                     }
 
-                    if (duration == 'CONT' || duration == 'constantly') {
+                    if (duration == '계속' || duration == 'constantly') {
                         return script.callReturn();
                     }
 
@@ -2027,9 +1853,11 @@ Entry.NeobotPurple.getBlocks = function() {
             func: function(sprite, script) {
                 const input = script.getStringField('INPUT');
                 let value = Entry.hw.portData[input];
-                value = Math.round(value / 255 * 65);
+
+                // edited 210421, 0~100 을 0~65로 변환, 100 이상은 최대값으로 처리함.
                 value = Math.max(value, 0);
-                value = Math.min(value, 65);
+                value = Math.min(value, 100);
+                value = Math.ceil(value / 100 * 65);
 
                 if (Entry.NeobotPurple.log_to_console) {
                     Entry.console.print('=== neobot_purple_melody_play_with_sensor ===', 'speak');
@@ -2131,8 +1959,8 @@ Entry.NeobotPurple.getBlocks = function() {
                     }
 
                     let out1 = port == 'OUT1';
-                    let out2 = port == 'OUT1';
-                    let out3 = port == 'OUT1';
+                    let out2 = port == 'OUT2';
+                    let out3 = port == 'OUT3';
                     if (port == 'ALL') {
                         out1 = true;
                         out2 = true;
@@ -2202,19 +2030,19 @@ Entry.NeobotPurple.getBlocks = function() {
                         ['IN1', 'IN1'],
                         ['IN2', 'IN2'],
                         ['IN3', 'IN3'],
-                        ['0%', '0'],
-                        ['10%', '1'],
-                        ['20%', '2'],
-                        ['30%', '3'],
-                        ['40%', '4'],
-                        ['50%', '5'],
-                        ['60%', '6'],
-                        ['70%', '7'],
-                        ['80%', '8'],
-                        ['90%', '9'],
-                        ['100%', '10'],
+                        ['0%', 0],
+                        ['10%', 10],
+                        ['20%', 20],
+                        ['30%', 30],
+                        ['40%', 40],
+                        ['50%', 50],
+                        ['60%', 60],
+                        ['70%', 70],
+                        ['80%', 80],
+                        ['90%', 90],
+                        ['100%', 100],
                     ],
-                    value: '5',
+                    value: 50,
                     fontSize: 11,
                     bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
                     arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
@@ -2254,14 +2082,21 @@ Entry.NeobotPurple.getBlocks = function() {
                 let speedValue;
                 if (Entry.Utils.isNumber(speed)) {
                     speedValue = Entry.parseNumber(speed);
-                } else {  // 센서일 경우 convert 0 ~ 255 to 0 ~ 10
+                } else {
                     speedValue = Entry.hw.portData[speed];
-                    speedValue = Math.round(speedValue / 255 * 10);
-                    speedValue = Math.max(speedValue, 0);
-                    speedValue = Math.min(speedValue, 10);
                 }
 
-                const outValue = speedValue > 0 ? directionValue + speedValue : directionValue;
+                // edited 210421, 0~100 을 0~10 으로 변환
+                speedValue = Math.max(speedValue, 0);
+                speedValue = Math.min(speedValue, 100);
+                speedValue = Math.ceil(speedValue / 10);
+
+                let outValue = directionValue + speedValue;
+                if (outValue == directionValue) {
+                    outValue = 254;
+                } else {
+                    outValue = outValue - 1;
+                }
 
                 if (Entry.NeobotPurple.log_to_console) {
                     Entry.console.print('=== neobot_purple_servo_rotate ===');
@@ -2356,7 +2191,12 @@ Entry.NeobotPurple.getBlocks = function() {
                 },
                 {
                     type: 'Dropdown',
-                    options: [['OUT1', 'OUT1'], ['OUT2', 'OUT2'], ['OUT1&2', 'ALL']],
+                    options: [
+                        ['OUT1', 'OUT1'],
+                        ['OUT2', 'OUT2'],
+                        ['OUT3', 'OUT3'],
+                        [Lang.Blocks.neobot_purple_out_all, 'ALL'],
+                    ],
                     value: 'OUT1',
                     fontSize: 11,
                     bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
@@ -2379,19 +2219,19 @@ Entry.NeobotPurple.getBlocks = function() {
                         ['IN1', 'IN1'],
                         ['IN2', 'IN2'],
                         ['IN3', 'IN3'],
-                        ['0%', '0'],
-                        ['10%', '1'],
-                        ['20%', '2'],
-                        ['30%', '3'],
-                        ['40%', '4'],
-                        ['50%', '5'],
-                        ['60%', '6'],
-                        ['70%', '7'],
-                        ['80%', '8'],
-                        ['90%', '9'],
-                        ['100%', '10'],
+                        ['0%', 0],
+                        ['10%', 10],
+                        ['20%', 20],
+                        ['30%', 30],
+                        ['40%', 40],
+                        ['50%', 50],
+                        ['60%', 60],
+                        ['70%', 70],
+                        ['80%', 80],
+                        ['90%', 90],
+                        ['100%', 100],
                     ],
-                    value: '5',
+                    value: 50,
                     fontSize: 11,
                     bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
                     arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
@@ -2428,7 +2268,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 if (!script.isStart) {
                     const port = script.getStringField('PORT', script);
                     const direction = script.getNumberField('DIRECTION');
-                    const speed = script.getNumberField('SPEED');
+                    const speed = script.getStringValue('SPEED');
                     const degree = script.getStringValue('DEGREE');
 
                     let out1 = port == 'OUT1';
@@ -2447,26 +2287,30 @@ Entry.NeobotPurple.getBlocks = function() {
 
                     let speedValue;
                     if (Entry.Utils.isNumber(speed)) {
-                        speedValue = 240 + speed;
+                        speedValue = Entry.parseNumber(speed);
                     } else {
                         speedValue = Entry.hw.portData[speed];
-                        speedValue = Math.round(speedValue / 255 * 10) + 240;
                     }
+
+                    // edited 210421, 0~100 을 240~250 으로 변환
+                    speedValue = Math.max(speedValue, 0);
+                    speedValue = Math.min(speedValue, 100);
+                    speedValue = Math.ceil(speedValue / 10) + 240;
 
                     let degreeValue;
                     if (Entry.Utils.isNumber(degree)) {
                         degreeValue = Entry.parseNumber(degree);
-                        degreeValue = Math.max(degreeValue, 0);
-                        degreeValue = Math.min(degreeValue, 180);
                     } else {
                         if (degree == 'IN1' || degree == 'IN2' || degree == 'IN3') {
                             degreeValue = Entry.hw.portData[degree];
-                            degreeValue = Math.round(degreeValue / 255 * 180);
                         } else {
                             degreeValue = 0;
                         }
                     }
-                    degreeValue += 1;
+                    // edited 210421, 별도의 변환없이 그대로 사용함
+                    degreeValue = Math.max(degreeValue, 0);
+                    degreeValue = Math.min(degreeValue, 180);
+                    degreeValue = degreeValue + 1;
 
                     if (Entry.NeobotPurple.log_to_console) {
                         Entry.console.print('=== neobot_purple_servo_change_degree ===', 'speak');
@@ -2528,7 +2372,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 {
                     type: 'Dropdown',
                     options: [
-                        [Lang.Blocks.neobot_purple_duration_cont, 'CONT'],
+                        [Lang.Blocks.neobot_purple_duration_cont, '계속'],
                         [Lang.Blocks.neobot_purple_duration_1s, '1'],
                         [Lang.Blocks.neobot_purple_duration_2s, '2'],
                         [Lang.Blocks.neobot_purple_duration_3s, '3'],
@@ -2539,7 +2383,7 @@ Entry.NeobotPurple.getBlocks = function() {
                         [Lang.Blocks.neobot_purple_duration_8s, '8'],
                         [Lang.Blocks.neobot_purple_duration_9s, '9'],
                     ],
-                    value: 'CONT',
+                    value: '계속',
                     fontSize: 11,
                     bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
                     arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
@@ -2571,19 +2415,19 @@ Entry.NeobotPurple.getBlocks = function() {
                         ['IN1', 'IN1'],
                         ['IN2', 'IN2'],
                         ['IN3', 'IN3'],
-                        ['100%', 'p100'],
-                        ['90%', 'p90'],
-                        ['80%', 'p80'],
-                        ['70%', 'p70'],
-                        ['60%', 'p60'],
-                        ['50%', 'p50'],
-                        ['40%', 'p40'],
-                        ['30%', 'p30'],
-                        ['20%', 'p20'],
-                        ['10%', 'p10'],
-                        ['0%', 'p0'],
+                        ['100%', 100],
+                        ['90%', 90],
+                        ['80%', 80],
+                        ['70%', 70],
+                        ['60%', 60],
+                        ['50%', 50],
+                        ['40%', 40],
+                        ['30%', 30],
+                        ['20%', 20],
+                        ['10%', 10],
+                        ['0%', 0],
                     ],
-                    value: 'p100',
+                    value: 100,
                     fontSize: 11,
                     bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
                     arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
@@ -2612,7 +2456,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 {
                     type: 'Dropdown',
                     options: [
-                        [Lang.Blocks.neobot_purple_duration_cont, 'CONT'],
+                        [Lang.Blocks.neobot_purple_duration_cont, '계속'],
                         [Lang.Blocks.neobot_purple_duration_1s, '1'],
                         [Lang.Blocks.neobot_purple_duration_2s, '2'],
                         [Lang.Blocks.neobot_purple_duration_3s, '3'],
@@ -2623,7 +2467,7 @@ Entry.NeobotPurple.getBlocks = function() {
                         [Lang.Blocks.neobot_purple_duration_8s, '8'],
                         [Lang.Blocks.neobot_purple_duration_9s, '9'],
                     ],
-                    value: 'CONT',
+                    value: '계속',
                     fontSize: 11,
                     bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
                     arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
