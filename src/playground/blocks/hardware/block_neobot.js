@@ -2071,9 +2071,6 @@ Entry.Neobot.getBlocks = function() {
                 if (!script.isStart) {
                     var port = script.getStringField('PORT', script);
                     if (port == 'ALL') {
-                        Entry.hw.sendQueue['OUT1'] = 0xBA;
-                        Entry.hw.sendQueue['OUT2'] = 0xBA;
-
                         script.isStart = true;
                         script.timeFlag = 1;
 
