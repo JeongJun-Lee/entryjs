@@ -1,5 +1,5 @@
 /*
- * Convert code blocks of NeoSoco to protocal for upload to HW
+ * Convert code blocks of NeoSoco to protocol for upload to HW
  */
 'use strict';
 
@@ -45,6 +45,8 @@ Entry.BlockToNeoParser = class {
         }
 
         console.log(results);
+        if (!results.length) return results; // In case of only one block of when_start
+
         // Make one array before return
         results = results.reduce((prev, curr) => prev.concat(curr));
         results = [0xAA, 0xAA, 0xAA, 0x01, 0x01, 0x02].concat(results); // Add data start frame

@@ -312,12 +312,14 @@ export default class Hardware {
             const doc = ws.vimBoard.codeMirror.getValue(); // Get source code in editor
             uploadObj = { name: Entry.hw.hwModule ? Entry.hw.hwModule.name : '', frame: doc };
         }
-        if (uploadObj) {
+        if (uploadObj && uploadObj.frame.length) {
             Entry.propertyPanel.select('console');
             Entry.console.clear();
             Entry.console.print('Upload started.');
             if (this.hwModule.name != 'neobot_purple') { // Neobot don't return the upload result
                 this.timerId = window.setInterval(() => Entry.console.print('.'), 1000);
+            } else {
+                Entry.console.print('\nSince new firmware is uploded to NeoSoCo, if you want to control the NeoSoCo again by Entry, you have to make a reconnection by restarting NeoSoCo.');
             }
 
             if (this.socket && !this.socket.disconnected) {
