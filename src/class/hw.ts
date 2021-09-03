@@ -315,12 +315,8 @@ export default class Hardware {
         if (uploadObj && uploadObj.frame.length) {
             Entry.propertyPanel.select('console');
             Entry.console.clear();
-            Entry.console.print('Upload started.');
-            if (this.hwModule.name != 'neobot_purple') { // Neobot don't return the upload result
-                this.timerId = window.setInterval(() => Entry.console.print('.'), 1000);
-            } else {
-                Entry.console.print('\nSince new firmware is uploded to NeoSoCo, if you want to control the NeoSoCo again by Entry, you have to make a reconnection by restarting NeoSoCo.');
-            }
+            Entry.console.print('Upload started. Please wait...');
+            this.timerId = window.setInterval(() => Entry.console.print('.'), 1000);
 
             if (this.socket && !this.socket.disconnected) {
                 this._sendUploadMessage(uploadObj);
@@ -506,7 +502,10 @@ export default class Hardware {
                 Entry.console.print(recvData.upload);
                 window.clearInterval(this.timerId);
 
-                if (recvData.upload.includes('failed')) {
+                if (recvData.upload.includes('success')) {
+                    Entry.console.print('\nSince new firmware is uploded to HW, if you want to control the HW again by Entry, you have to make a reconnection with Entry by restarting HW.');
+                
+                } else if (this.hwModule.name.toLowerCase().includes('arduino') && recvData.upload.includes('failed')) {
                     // If compile fail, change mode to arduino code
                     if (Entry.getMainWS().getMode() != Entry.Workspace.MODE_ARBOARD) {
                         Entry.playground.toggleArButtonVisible();
