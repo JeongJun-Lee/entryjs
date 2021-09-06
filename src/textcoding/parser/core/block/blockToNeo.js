@@ -8,6 +8,7 @@ Entry.BlockToNeoParser = class {
         this._type = 'BlockToNeoParser';
         this._cmd = [];
         this._pramVal = [];
+        this._remote_btn = false;
     }
 
     Code(code, parseMode) {
@@ -307,7 +308,9 @@ Entry.BlockToNeoParser = class {
                 break;
 
             case 'neobot_purple_remote_button':
+                this._remote_btn = true;
                 value = Number(this._pramVal[0]);
+                value = value - 9; // Btn_1 should be 1. But value will be 10.
                 if (this.getParentBlk(block) === '_if' || this.getParentBlk(block) === 'if_else') {
                     cmd = [0x03, 0x01, value, 0x01, 0x00];
                 } else if (this.getParentBlk(block) === 'wait_until_true') {
@@ -611,7 +614,12 @@ Entry.BlockToNeoParser = class {
                 break;
             case '_if':
             case 'if_else':
-                cmd = [0x02, 0xFF, 0x00, 0x00, 0x00];
+                if (this._remote_btn) {
+                    cmd = [0x03, 0xFF, 0x00, 0x00, 0x00];
+                    this._remote_btn = false;  // init
+                } else {
+                    cmd = [0x02, 0xFF, 0x00, 0x00, 0x00];
+                }
                 break;
         }
 
@@ -624,7 +632,11 @@ Entry.BlockToNeoParser = class {
         let cmd = 0;
         switch (type) {
             case 'if_else':
-                cmd = [0x02, 0x00, 0x00, 0x00, 0x00];
+                if (this._remote_btn) {
+                    cmd = [0x03, 0x00, 0x00, 0x00, 0x00];
+                } else {
+                    cmd = [0x02, 0x00, 0x00, 0x00, 0x00];
+                }
                 break;
         }
 
