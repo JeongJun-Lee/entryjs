@@ -305,7 +305,7 @@ Entry.Playground = class Playground {
 
         if (!commentDisable) {
             const commentToggleButton = Entry.createElement('div')
-                .addClass('entryPlaygroundCommentButtonWorkspace showComment')
+                .addClass('entryPlaygroundCommentButtonWorkspace showComment enabled')
                 .appendTo(tabButtonView);
             commentToggleButton.setAttribute('alt', Lang.Blocks.show_all_comment);
             commentToggleButton.setAttribute('title', Lang.Blocks.show_all_comment);
@@ -313,6 +313,17 @@ Entry.Playground = class Playground {
             this.commentToggleButton_ = commentToggleButton;
             commentToggleButton.bindOnClick(() => {
                 this.toggleCommentButton();
+            });
+
+            const addCommentButton = Entry.createElement('div')
+                .addClass('entryPlaygroundCommentButtonWorkspace addComment enabled')
+                .appendTo(tabButtonView);
+            addCommentButton.setAttribute('alt', Lang.Blocks.add_comment);
+            addCommentButton.setAttribute('title', Lang.Blocks.add_comment);
+
+            this.addCommentButton_ = addCommentButton;
+            addCommentButton.bindOnClick(() => {
+                this.addComment();
             });
         }
 
@@ -593,15 +604,36 @@ Entry.Playground = class Playground {
         this.toggleCommentButtonVisible();
     }
 
+    addComment() {
+        if (!Entry.options.commentDisable && this.board) {
+            const { svg, scale } = this.board;
+            const boardCenterX = svg.clientWidth / 2 / scale;
+            const boardCenterY = svg.clientHeight / 2 / scale;
+
+            Entry.do(
+                'createComment',
+                {
+                    id: Entry.Utils.generateId(),
+                    x: Math.max(boardCenterX - 80, 0),
+                    y: Math.max(boardCenterY - 80, 0),
+                },
+                this.board
+            );
+        }
+    }
+
     toggleCommentButtonVisible() {
         const button = this.commentToggleButton_;
+        const addButton = this.addCommentButton_;
 
         if (this.board.isVisibleComment) {
-            button.addClass('showComment');
+            addButton.addClass('enabled');
+            button.addClass('enabled');
             button.setAttribute('alt', Lang.Blocks.show_all_comment);
             button.setAttribute('title', Lang.Blocks.show_all_comment);
         } else {
-            button.removeClass('showComment');
+            addButton.removeClass('enabled');
+            button.removeClass('enabled');
             button.setAttribute('alt', Lang.Blocks.hide_all_comment);
             button.setAttribute('title', Lang.Blocks.hide_all_comment);
         }
@@ -691,6 +723,15 @@ Entry.Playground = class Playground {
                 .appendTo(pictureAdd);
             innerPictureAdd.innerHTML = Lang.Workspace.picture_add;
             this._pictureAddButton = innerPictureAdd;
+
+            const innerDrawNewPicture = Entry.createElement('div', 'entryNewPictureInner')
+                .addClass('entryPlaygroundNewPictureInner')
+                .bindOnClick(() => {
+                    this.painter.newPicture();
+                })
+                .appendTo(pictureAdd);
+            innerDrawNewPicture.innerHTML = Lang.Workspace.draw_new;
+            this._drawNewPictureButton = innerDrawNewPicture;
 
             this.pictureListView_ = Entry.createElement('ul', 'entryPictureList')
                 .addClass('entryPlaygroundPictureList')
@@ -1202,6 +1243,8 @@ Entry.Playground = class Playground {
             }
         }
 
+        this.updateObjectTitle(object);
+
         const viewMode = this.viewMode_;
         if (viewMode === 'default') {
             this.changeViewMode('code');
@@ -1380,6 +1423,8 @@ Entry.Playground = class Playground {
             }
             Entry.dispatchEvent('pictureSelected', picture, removed);
         }
+
+        this.updateObjectTitle(this.object);
     }
 
     /**
@@ -2368,10 +2413,17 @@ Entry.Playground = class Playground {
         }
     }
 
+    updateObjectTitle(object) {
+        if (this.board) {
+            this.board.updateObjectTitle(object);
+        }
+    }
+
     destroy() {
         this._uploadButton && this._uploadButton.unBindOnClick();
         this._arToggleButton && this._arToggleButton.unBindOnClick();
         this.commentToggleButton_ && this.commentToggleButton_.unBindOnClick();
+        this.addCommentButton_ && this.addCommentButton_.unBindOnClick();
         this.backPackButton_ && this.backPackButton_.unBindOnClick();
         this.blockBackPackEvent && this.blockBackPackEvent.off();
         this.blockBackPackAreaEvent && this.blockBackPackAreaEvent.off();
