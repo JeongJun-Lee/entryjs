@@ -80,9 +80,22 @@ Entry.BlockToNeoParser = class {
                 if (Entry.TextCodingUtil.hasUnSupportedBlkInNeo(block)) {
                     this.throwErr('error', 'UnsupportedBlk', block);
                 } else {
-                    const val = this.Block(block);
+                    let val = 0;
+                    val = this.Block(block);
                     if (val) {
                         this._cmd.push(val);
+                    }
+                    // Since APP mode doen't support the duration param in the led block, handle it manually
+                    if (block.data.type == 'neobot_purple_led_on' && block.data.params[2] !== '-1') {
+                        val = [8, Number(block.data.params[2]), 0, 0, 0]; // wait_second
+                        val = this.addHeader(val);
+                        val.push(this.addCheckSum(val));
+                        this._cmd.push(val)
+
+                        val = [4, 255, 0, 0, 0]; // neobot_purple_output_led_off
+                        val = this.addHeader(val);
+                        val.push(this.addCheckSum(val));
+                        this._cmd.push(val)
                     }
                 }
 
@@ -310,7 +323,6 @@ Entry.BlockToNeoParser = class {
             case 'neobot_purple_remote_button':
                 this._remote_btn = true;
                 value = Number(this._pramVal[0]);
-                value = value - 9; // Btn_1 should be 1. But value will be 10.
                 if (this.getParentBlk(block) === '_if' || this.getParentBlk(block) === 'if_else') {
                     cmd = [0x03, 0x01, value, 0x01, 0x00];
                 } else if (this.getParentBlk(block) === 'wait_until_true') {
@@ -328,8 +340,8 @@ Entry.BlockToNeoParser = class {
                 bright = Number(this._pramVal[1]); // String to Number
                 cmd = [0x04, port, bright, 0x00, 0x01];
 
-                // duration is not actual parameter in led block, but for now, suppor it
-                if (this._pramVal[2] !== '계속') { // Not 계속
+                // duration is not actual parameter in led block, but for now, support it
+                if (this._pramVal[2] !== '-1') { // Not -1(계속)
                     duration = Number(this._pramVal[2]); // String to Number
                     if (isNaN(duration)) { // IN1~3, BAT, IR
                         this.throwErr('error', 'WrongInputVal', block);
@@ -414,7 +426,7 @@ Entry.BlockToNeoParser = class {
                     speed = speed + 100; // IN1~3 should 101~103
                 }
 
-                if (this._pramVal[3] === '계속') {
+                if (this._pramVal[3] === '-1') { // -1(계속)
                     duration = 0xFF;
                 } else {
                     duration = Number(this._pramVal[3]);
@@ -514,7 +526,7 @@ Entry.BlockToNeoParser = class {
                     this._pramVal[0] === 'BAT' ||
                     this._pramVal[0] === 'IR' ||
                     this._pramVal[0] === 'ALL' ||
-                    this._pramVal[0] === '계속'
+                    this._pramVal[0] === '-1' // -1(계속)
                 ) { 
                     this.throwErr('error', 'WrongInputVal', block);
                 }
@@ -541,17 +553,6 @@ Entry.BlockToNeoParser = class {
 
         cmd = this.addHeader(cmd);
         cmd.push(this.addCheckSum(cmd));
-
-        // This if part would be temporary by future upgrade
-        // Since the HW doen't support the duration param, handle it manually
-        if (block.type === 'neobot_purple_led_on' && duration) {
-            this._pramVal = duration;
-            const waitCmd = this.createDataFrame({type: 'wait_second'});
-            this._pramVal = ['ALL'];
-            const ledOffCmd = this.createDataFrame({type: 'neobot_purple_output_led_off'});
-            cmd = cmd.concat(waitCmd).concat(ledOffCmd);
-        }
-
         this._pramVal = 0; // init since it's used
         return cmd;
     }
