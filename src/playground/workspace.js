@@ -169,6 +169,9 @@ Entry.Workspace = class Workspace {
                     mode.runType = VIM.WORKSPACE_MODE;
                 } 
                 e.block && Entry.getMainWS() && Entry.getMainWS().board.activateBlock(e.block);
+            } finally {
+                this.oldMode = 1;
+                this.mode = 1;
             }
         };
 
