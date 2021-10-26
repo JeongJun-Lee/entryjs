@@ -322,7 +322,7 @@ Entry.ArduinoExt.getBlocks = function() {
             isNotFor: ['ArduinoExt'],
             func(sprite, script) {
                 let port = script.getValue('PORT', script);
-                return Entry.hw.getAnalogPortValue(port);
+                return Entry.hw.portData[`a${port}`];
             },
             syntax: {
                 js: [],
@@ -598,7 +598,6 @@ Entry.ArduinoExt.getBlocks = function() {
                 const { name } = hwModule;
                 if (name === 'ArduinoExt' || name === 'ArduinoNano') {
                     const port = script.getNumberValue('PORT', script);
-                    const DIGITAL = Entry.hw.portData.DIGITAL;
                     if (!Entry.hw.sendQueue.GET) {
                         Entry.hw.sendQueue.GET = {};
                     }
@@ -606,7 +605,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         port,
                         time: new Date().getTime(),
                     };
-                    return DIGITAL ? DIGITAL[port] || 0 : 0;
+                    return port ? Entry.hw.portData[port] : 0;
                 } else {
                     return Entry.block.arduino_get_digital_value.func(sprite, script);
                 }
