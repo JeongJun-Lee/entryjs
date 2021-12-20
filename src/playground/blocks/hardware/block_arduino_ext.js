@@ -42,6 +42,7 @@ Entry.ArduinoExt = {
         PULSEIN: 6,
         ULTRASONIC: 7,
         TIMER: 8,
+        STEPPER: 9,
     },
     toneTable: {
         '0': 0,
@@ -187,6 +188,7 @@ Entry.ArduinoExt.setLanguage = function() {
                 arduino_ext_set_tone: '디지털 %1 번 핀의 버저를 %2 %3 음으로 %4 초 연주하기 %5',
                 arduino_ext_set_servo: '디지털 %1 번 핀의 서보모터를 %2 의 각도로 정하기 %3',
                 arduino_ext_get_digital: '디지털 %1 번 센서값',
+                arduino_ext_set_stepper: '디지털 %1 %2 %3 %4 번 핀의 스텝모터를 %5 RPM으로 %6 스텝 이동하기 %7'
             },
         },
         en: {
@@ -199,6 +201,7 @@ Entry.ArduinoExt.setLanguage = function() {
                 arduino_ext_set_tone: 'Play tone pin %1 on note %2 octave %3 beat %4 %5',
                 arduino_ext_set_servo: 'Set servo pin %1 angle as %2 %3',
                 arduino_ext_get_digital: 'Digital %1 Sensor value',
+                arduino_ext_set_stepper: 'Set stepper pin %1 %2 %3 %4 RPM as %5 and steps as %6 %7'
             },
         },
         uz: {
@@ -208,9 +211,10 @@ Entry.ArduinoExt.setLanguage = function() {
                 arduino_ext_get_ultrasonic_value: "Ultrasonik sensor trig %1 eko %2 sensor qiymati",
                 arduino_ext_toggle_led: "Raqamli %1 pinini %2 %3",
                 arduino_ext_digital_pwm: "PWM %1 pinini %2 ga solzash %3",
-                arduino_ext_set_tone: "Raqamli %1 pinning buzzerni %2 %3 oktavada %4 soniya yangrash %5",
+                arduino_ext_set_tone: "Raqamli %1 pinni buzzerni %2 %3 oktavada %4 soniya yangrash %5",
                 arduino_ext_set_servo: "Raqamli %1 pinning servo motorini %2 gradusiga sozlash %3",
-                arduino_ext_get_digital: "Raqamli %1 pin sensor qiymati"
+                arduino_ext_get_digital: "Raqamli %1 pin sensor qiymati",
+                arduino_ext_set_stepper: "Raqamli %1 %2 %3 %4 pinning stepper motorini %5 RPMdan %6 qadam ko'chirish %7"
           },
       },
     };
@@ -225,6 +229,7 @@ Entry.ArduinoExt.blockMenuBlocks = [
     'arduino_ext_digital_pwm',
     'arduino_ext_set_servo',
     'arduino_ext_set_tone',
+    'arduino_ext_set_stepper'
 ];
 
 //region arduinoExt 아두이노 확장모드
@@ -1242,6 +1247,158 @@ Entry.ArduinoExt.getBlocks = function() {
                 ar: [{syntax: 'myServo.write(%1);'}]
             },
         },
+        arduino_ext_set_stepper: {
+            color: EntryStatic.colorSet.block.default.HARDWARE,
+            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            skeleton: 'basic',
+            statements: [],
+            params: [
+                {
+                    type: 'Block',
+                    accept: 'string',
+                    defaultType: 'number',
+                },
+                {
+                    type: 'Block',
+                    accept: 'string',
+                    defaultType: 'number',
+                },
+                {
+                    type: 'Block',
+                    accept: 'string',
+                    defaultType: 'number',
+                },
+                {
+                    type: 'Block',
+                    accept: 'string',
+                    defaultType: 'number',
+                },
+                {
+                    type: 'Block',
+                    accept: 'string',
+                    defaultType: 'number',
+                },
+                {
+                    type: 'Block',
+                    accept: 'string',
+                    defaultType: 'number',
+                },
+                {
+                    type: 'Indicator',
+                    img: 'block_icon/hardware_icon.svg',
+                    size: 12,
+                },
+            ],
+            events: {},
+            def: {
+                params: [
+                    {
+                        type: 'arduino_get_port_number',
+                        params: ['8'],
+                    },
+                    {
+                        type: 'arduino_get_port_number',
+                        params: ['10'],
+                    },
+                    {
+                        type: 'arduino_get_port_number',
+                        params: ['9'],
+                    },
+                    {
+                        type: 'arduino_get_port_number',
+                        params: ['11'],
+                    },
+                    {
+                        type: 'text',
+                        params: ['10'],
+                    },
+                    {
+                        type: 'text',
+                        params: ['2048'],
+                    },
+                    null,
+                ],
+                type: 'arduino_ext_set_stepper',
+            },
+            paramsKeyMap: {
+                PORT1: 0,
+                PORT2: 1,
+                PORT3: 2,
+                PORT4: 3,
+                SPEED: 4,
+                STEPS: 5,
+            },
+            class: 'ArduinoExt',
+            isNotFor: ['ArduinoExt'],
+            func(sprite, script) {
+                const sq = Entry.hw.sendQueue;
+                const port1 = script.getNumberValue('PORT1', script);
+                const port2 = script.getNumberValue('PORT2', script);
+                const port3 = script.getNumberValue('PORT3', script);
+                const port4 = script.getNumberValue('PORT4', script);
+
+                let speed = script.getNumberValue('SPEED', script);
+                speed = Math.min(20, speed);
+                speed = Math.max(0, speed);
+
+                let steps = script.getNumberValue('STEPS', script);
+                steps = Math.min(2048, steps);
+                steps = Math.max(-2048, steps);
+
+                if (!sq.SET) {
+                    sq.SET = {};
+                }
+                sq.SET['14'] = {
+                    type: Entry.ArduinoExt.sensorTypes.STEPPER,
+                    data: {
+                        port1,
+                        port2,
+                        port3,
+                        port4,
+                        speed,
+                        steps
+                    },
+                    time: new Date().getTime(),
+                };
+
+                return script.callReturn();
+            },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'Arduino.steppermotorWrite(%1, %2, %3, %4, %5, %6)',
+                        textParams: [
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                        ],
+                    },
+                ],
+                ar: [{syntax: 'myStepper.step(%1);'}]
+            },
+        }
     };
 };
 //endregion arduinoExt 아두이노 확장모드
