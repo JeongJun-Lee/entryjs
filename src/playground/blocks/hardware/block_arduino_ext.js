@@ -1,5 +1,7 @@
 'use strict';
 
+const { monitorTemplate } = require("./block_arduino");
+
 Entry.ArduinoExt = {
     id: '1.9',
     name: 'ArduinoExt',
@@ -21,6 +23,12 @@ Entry.ArduinoExt = {
                 Entry.hw.sendQueue.SET[key].data = 0;
                 Entry.hw.sendQueue.SET[key].time = new Date().getTime();
             });
+
+            // For legacy port writing
+            for (const val in monitorTemplate.listPorts) {
+                const cvt = Number(val);
+                if (!isNaN(cvt)) Entry.hw.sendQueue[cvt] = 0;
+            }
         }
         Entry.hw.update();
     },
@@ -34,6 +42,7 @@ Entry.ArduinoExt = {
         PULSEIN: 6,
         ULTRASONIC: 7,
         TIMER: 8,
+        STEPPER: 9,
     },
     toneTable: {
         '0': 0,
@@ -67,6 +76,104 @@ Entry.ArduinoExt = {
     highList: ['high', '1', 'on'],
     lowList: ['low', '0', 'off'],
     BlockState: {},
+    monitorTemplate: {
+        imgPath: 'hw/arduino.png',
+        width: 605,
+        height: 434,
+        listPorts: {
+            '2': {
+                name: `${Lang.Hw.port_en} 2 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            '3': {
+                name: `${Lang.Hw.port_en} 3 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            '4': {
+                name: `${Lang.Hw.port_en} 4 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            '5': {
+                name: `${Lang.Hw.port_en} 5 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            '6': {
+                name: `${Lang.Hw.port_en} 6 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            '7': {
+                name: `${Lang.Hw.port_en} 7 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            '8': {
+                name: `${Lang.Hw.port_en} 8 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            '9': {
+                name: `${Lang.Hw.port_en} 9 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            '10': {
+                name: `${Lang.Hw.port_en} 10 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            '11': {
+                name: `${Lang.Hw.port_en} 11 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            '12': {
+                name: `${Lang.Hw.port_en} 12 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            '13': {
+                name: `${Lang.Hw.port_en} 13 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            a0: {
+                name: `${Lang.Hw.port_en} A0 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            a1: {
+                name: `${Lang.Hw.port_en} A1 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            a2: {
+                name: `${Lang.Hw.port_en} A2 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            a3: {
+                name: `${Lang.Hw.port_en} A3 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            a4: {
+                name: `${Lang.Hw.port_en} A4 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+            a5: {
+                name: `${Lang.Hw.port_en} A5 ${Lang.Hw.port_ko}`,
+                type: 'input',
+                pos: { x: 0, y: 0 },
+            },
+        },
+        mode: 'both',
+  },
 };
 
 Entry.ArduinoExt.setLanguage = function() {
@@ -81,6 +188,7 @@ Entry.ArduinoExt.setLanguage = function() {
                 arduino_ext_set_tone: '디지털 %1 번 핀의 버저를 %2 %3 음으로 %4 초 연주하기 %5',
                 arduino_ext_set_servo: '디지털 %1 번 핀의 서보모터를 %2 의 각도로 정하기 %3',
                 arduino_ext_get_digital: '디지털 %1 번 센서값',
+                arduino_ext_set_stepper: '디지털 %1 %2 %3 %4 번 핀의 스텝모터를 %5 RPM으로 %6 스텝 이동하기 %7'
             },
         },
         en: {
@@ -93,8 +201,22 @@ Entry.ArduinoExt.setLanguage = function() {
                 arduino_ext_set_tone: 'Play tone pin %1 on note %2 octave %3 beat %4 %5',
                 arduino_ext_set_servo: 'Set servo pin %1 angle as %2 %3',
                 arduino_ext_get_digital: 'Digital %1 Sensor value',
+                arduino_ext_set_stepper: 'Set stepper pin %1 %2 %3 %4 RPM as %5 and steps as %6 %7'
             },
         },
+        uz: {
+          template: {
+                arduino_ext_get_analog_value: "Analog %1 pin sensor qiymati",
+                arduino_ext_get_analog_value_map: "%1ning doirasini %2 ~ %3 dan %4 ~ %5 ga o'zgartirgan qiymati",
+                arduino_ext_get_ultrasonic_value: "Ultrasonik sensor trig %1 eko %2 sensor qiymati",
+                arduino_ext_toggle_led: "Raqamli %1 pinini %2 %3",
+                arduino_ext_digital_pwm: "PWM %1 pinini %2 ga solzash %3",
+                arduino_ext_set_tone: "Raqamli %1 pinni buzzerni %2 %3 oktavada %4 soniya yangrash %5",
+                arduino_ext_set_servo: "Raqamli %1 pinning servo motorini %2 gradusiga sozlash %3",
+                arduino_ext_get_digital: "Raqamli %1 pin sensor qiymati",
+                arduino_ext_set_stepper: "Raqamli %1 %2 %3 %4 pinning stepper motorini %5 RPMdan %6 qadam ko'chirish %7"
+          },
+      },
     };
 };
 
@@ -107,6 +229,7 @@ Entry.ArduinoExt.blockMenuBlocks = [
     'arduino_ext_digital_pwm',
     'arduino_ext_set_servo',
     'arduino_ext_set_tone',
+    'arduino_ext_set_stepper'
 ];
 
 //region arduinoExt 아두이노 확장모드
@@ -204,11 +327,7 @@ Entry.ArduinoExt.getBlocks = function() {
             isNotFor: ['ArduinoExt'],
             func(sprite, script) {
                 let port = script.getValue('PORT', script);
-                const ANALOG = Entry.hw.portData.ANALOG;
-                if (port[0] === 'A') {
-                    port = port.substring(1);
-                }
-                return ANALOG ? ANALOG[port] || 0 : 0;
+                return Entry.hw.portData[`a${port}`];
             },
             syntax: {
                 js: [],
@@ -224,6 +343,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
+                ar: [{syntax: 'analogRead(%1)'}]
             },
         },
         arduino_ext_get_analog_value_map: {
@@ -370,6 +490,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
+                ar: [{syntax: 'map(%1, %2, %3, %4, %5)'}]
             },
         },
         arduino_ext_get_ultrasonic_value: {
@@ -447,6 +568,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
+                ar: [{syntax: 'distance()'}]
             },
         },
         arduino_ext_get_digital: {
@@ -481,7 +603,6 @@ Entry.ArduinoExt.getBlocks = function() {
                 const { name } = hwModule;
                 if (name === 'ArduinoExt' || name === 'ArduinoNano') {
                     const port = script.getNumberValue('PORT', script);
-                    const DIGITAL = Entry.hw.portData.DIGITAL;
                     if (!Entry.hw.sendQueue.GET) {
                         Entry.hw.sendQueue.GET = {};
                     }
@@ -489,7 +610,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         port,
                         time: new Date().getTime(),
                     };
-                    return DIGITAL ? DIGITAL[port] || 0 : 0;
+                    return port ? Entry.hw.portData[port] : 0;
                 } else {
                     return Entry.block.arduino_get_digital_value.func(sprite, script);
                 }
@@ -508,6 +629,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
+                ar: [{syntax: 'digitalRead(%1)'}]
             },
         },
         arduino_get_digital_toggle: {
@@ -624,6 +746,8 @@ Entry.ArduinoExt.getBlocks = function() {
                     data: value,
                     time: new Date().getTime(),
                 };
+                // For legacy port writing
+                Entry.hw.sendQueue[port] = value;
                 return script.callReturn();
             },
             syntax: {
@@ -643,6 +767,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
+                ar: [{syntax: 'digitalWrite(%1, %2);'}]
             },
         },
         arduino_ext_digital_pwm: {
@@ -720,6 +845,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
+                ar: [{syntax: 'analogWrite(%1, %2);'}]
             },
         },
         arduino_ext_tone_list: {
@@ -1041,6 +1167,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
+                ar: [{syntax: 'tone(%1, %2);'}]
             },
         },
         arduino_ext_set_servo: {
@@ -1117,8 +1244,161 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
+                ar: [{syntax: 'myServo.write(%1);'}]
             },
         },
+        arduino_ext_set_stepper: {
+            color: EntryStatic.colorSet.block.default.HARDWARE,
+            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            skeleton: 'basic',
+            statements: [],
+            params: [
+                {
+                    type: 'Block',
+                    accept: 'string',
+                    defaultType: 'number',
+                },
+                {
+                    type: 'Block',
+                    accept: 'string',
+                    defaultType: 'number',
+                },
+                {
+                    type: 'Block',
+                    accept: 'string',
+                    defaultType: 'number',
+                },
+                {
+                    type: 'Block',
+                    accept: 'string',
+                    defaultType: 'number',
+                },
+                {
+                    type: 'Block',
+                    accept: 'string',
+                    defaultType: 'number',
+                },
+                {
+                    type: 'Block',
+                    accept: 'string',
+                    defaultType: 'number',
+                },
+                {
+                    type: 'Indicator',
+                    img: 'block_icon/hardware_icon.svg',
+                    size: 12,
+                },
+            ],
+            events: {},
+            def: {
+                params: [
+                    {
+                        type: 'arduino_get_port_number',
+                        params: ['8'],
+                    },
+                    {
+                        type: 'arduino_get_port_number',
+                        params: ['10'],
+                    },
+                    {
+                        type: 'arduino_get_port_number',
+                        params: ['9'],
+                    },
+                    {
+                        type: 'arduino_get_port_number',
+                        params: ['11'],
+                    },
+                    {
+                        type: 'text',
+                        params: ['10'],
+                    },
+                    {
+                        type: 'text',
+                        params: ['2048'],
+                    },
+                    null,
+                ],
+                type: 'arduino_ext_set_stepper',
+            },
+            paramsKeyMap: {
+                PORT1: 0,
+                PORT2: 1,
+                PORT3: 2,
+                PORT4: 3,
+                SPEED: 4,
+                STEPS: 5,
+            },
+            class: 'ArduinoExt',
+            isNotFor: ['ArduinoExt'],
+            func(sprite, script) {
+                const sq = Entry.hw.sendQueue;
+                const port1 = script.getNumberValue('PORT1', script);
+                const port2 = script.getNumberValue('PORT2', script);
+                const port3 = script.getNumberValue('PORT3', script);
+                const port4 = script.getNumberValue('PORT4', script);
+
+                let speed = script.getNumberValue('SPEED', script);
+                speed = Math.min(20, speed);
+                speed = Math.max(0, speed);
+
+                let steps = script.getNumberValue('STEPS', script);
+                steps = Math.min(2048, steps);
+                steps = Math.max(-2048, steps);
+
+                if (!sq.SET) {
+                    sq.SET = {};
+                }
+                sq.SET['14'] = {
+                    type: Entry.ArduinoExt.sensorTypes.STEPPER,
+                    data: {
+                        port1,
+                        port2,
+                        port3,
+                        port4,
+                        speed,
+                        steps
+                    },
+                    time: new Date().getTime(),
+                };
+
+                return script.callReturn();
+            },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'Arduino.steppermotorWrite(%1, %2, %3, %4, %5, %6)',
+                        textParams: [
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                        ],
+                    },
+                ],
+                ar: [{syntax: 'myStepper.step(%1);'}]
+            },
+        }
     };
 };
 //endregion arduinoExt 아두이노 확장모드
