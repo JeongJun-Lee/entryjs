@@ -143,18 +143,23 @@ Entry.BlockToArParser = class {
             block._schema.class === 'variable' ||
             block.type === 'arduino_ext_set_servo' ||
             block.type === 'arduino_ext_set_stepper' ||
-            block.type === 'arduino_ext_get_ultrasonic_value'
+            block.type === 'arduino_ext_get_ultrasonic_value' ||
+            block.type === 'arduino_ext_get_temp' ||
+            block.type === 'arduino_ext_get_humi'
         )) {
-            this.insertIntoGlobal(block.type); 
+            this.insertIntoGlobal(block.type);
         }
 
         this.insertIntoSetup(); // Frist, Setup the pin mode in case of Digital
 
         // UerFunc for Ultrasonic after loop()
-        if (block && block.type === 'arduino_ext_get_ultrasonic_value') {
+        if (block && (block.type === 'arduino_ext_get_ultrasonic_value'
+            || block.type === 'arduino_ext_get_temp'
+            || block.type === 'arduino_ext_get_humi'
+        )) {
             this.AddUserFunc(stat);
 
-        } else {   
+        } else {
             // In the setup();
             if (!this._isInRepeat) { // If the block is Not in the repeat, locate it in the setup();
                 let idx = this._source.indexOf('}\n'); // At the end of the setup()
@@ -177,9 +182,11 @@ Entry.BlockToArParser = class {
     insertIntoGlobal(blockType) {
         let stat = '';
         if (blockType === 'arduino_ext_set_servo') {
-            stat = '#include <Servo.h>\nServo myServo;\n'
+            stat = '#include <Servo.h>\nServo myServo;\n';
         } else if (blockType === 'arduino_ext_set_stepper') {
-            stat = '#include <Stepper.h>\n'
+            stat = '#include <Stepper.h>\n';
+        } else if (blockType === 'arduino_ext_get_temp' || blockType === 'arduino_ext_get_humi') {
+            stat = `#include <DHT.h>\nDHT dht(${this._pinNum}, DHT11);\n`;
         } else if (blockType === 'arduino_ext_get_ultrasonic_value') {
             stat = `int trig = ${this._pinNum};\nint echo = ${this._pinNum2};\n`;
         } else { // variable
@@ -202,6 +209,9 @@ Entry.BlockToArParser = class {
         let pinStat = '';
         switch (this._funcName) {
             case 'digitalRead': pinStat = `pinMode(${this._pinNum}, INPUT);`; break;
+            case 'dht.readTemperature':
+            case 'dht.readHumidity':
+                pinStat = 'dht.begin();'; break;
             case 'analogWrite': 
             case 'digitalWrite': 
                 pinStat = `pinMode(${this._pinNum}, OUTPUT);`; break;
@@ -559,6 +569,19 @@ Entry.BlockToArParser = class {
                 this.errChkPinNum(this._pinNum, block);
                 value = this._pramVal[5]; 
                 stat = stat.replace('%1', value);
+                break;
+
+            case 'arduino_ext_get_temp':
+            case 'arduino_ext_get_humi':
+                if (block.type == 'arduino_ext_get_temp') { 
+                    this._funcName = 'dht.readTemperature';
+                } else {
+                    this._funcName = 'dht.readHumidity';
+                }
+                stat = block._schema.syntax.ar[0].syntax;
+                this._pinNum = Number(this._pramVal[0]); // Arr to Number
+                this.errChkPinNum(this._pinNum, block);
+                this.insertIntoSrc('', block);
                 break;
 
             case 'set_variable':
