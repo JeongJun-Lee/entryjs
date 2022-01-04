@@ -212,8 +212,9 @@ Entry.BlockToArParser = class {
             case 'dht.readTemperature':
             case 'dht.readHumidity':
                 pinStat = 'dht.begin();'; break;
-            case 'analogWrite': 
-            case 'digitalWrite': 
+            case 'analogWrite':
+            case 'digitalWrite':
+            case 'tone':
                 pinStat = `pinMode(${this._pinNum}, OUTPUT);`; break;
             case 'myServo.write': pinStat = `myServo.attach(${this._pinNum});`; break;
             case 'myStepper.step': pinStat = `Stepper myStepper(2048, ${this._pinNum}, ${this._pinNum2}, ${this._pinNum3}, ${this._pinNum4});\n\tmyStepper.setSpeed(${this._pramVal[4]});`; break;
@@ -490,7 +491,7 @@ Entry.BlockToArParser = class {
                 stat = stat.replace('%5', this._pramVal[4]);
                 break;
 
-            case 'arduino_ext_set_tone': //tone
+            case 'arduino_ext_set_tone': // tone
                 const octave_tone_hz = [
                     [0, 32.7, 34.6, 36.7, 38.9, 41.2, 43.7, 46.2, 49.0, 51.9, 55.0, 58.3, 61.7], // 1octave
                     [0, 65.4, 69.3, 73.4, 77.8, 82.4, 87.3, 92.5, 98.0, 103.8, 110.0, 116.5, 123.5],
@@ -502,7 +503,8 @@ Entry.BlockToArParser = class {
                 const charToIdx = {
                     '0': 0, C: 1, CS: 2, D: 3, DS: 4, E: 5, F: 6, FS: 7, G:8, GS: 9, A: 10, AS: 11, B: 12
                 }
-                stat = block._schema.syntax.ar[0].syntax; 
+                stat = block._schema.syntax.ar[0].syntax;
+                this._funcName = stat.split('(')[0];
                 this._pinNum = Number(this._pramVal[0]); // Arr to Number
                 this.errChkPinNum(this._pinNum, block);
                 value2 = this._pramVal[1]; // tone
