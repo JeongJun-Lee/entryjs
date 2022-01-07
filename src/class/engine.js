@@ -1005,11 +1005,25 @@ Entry.Engine = class Engine {
                     popup.window_.appendChild(Entry.targetChecker.getStatusView()[0]);
                 }
             }
+
+            if (window.top !== window.self) {
+                window.top.addEventListener('mouseup', this.copyEvent);
+                window.top.addEventListener('mousemove', this.copyEvent);
+            }
         } else {
+            if (window.top !== window.self) {
+                window.top.removeEventListener('mouseup', this.copyEvent);
+                window.top.removeEventListener('mousemove', this.copyEvent);
+            }
             this.popup.remove();
             this.popup = null;
         }
         Entry.windowResized.notify();
+    }
+
+    copyEvent(event) {
+        const eventClone = new event.constructor(event.type, event);
+        window.self.dispatchEvent(eventClone);
     }
 
     closeFullScreen() {
