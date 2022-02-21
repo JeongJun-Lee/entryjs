@@ -152,7 +152,7 @@ Entry.BlockToArParser = class {
 
         this.insertIntoSetup(); // Frist, Setup the pin mode in case of Digital
 
-        // UerFunc for Ultrasonic after loop()
+        // UserFunc for Ultrasonic after loop()
         if (block && (block.type === 'arduino_ext_get_ultrasonic_value'
             || block.type === 'arduino_ext_get_temp'
             || block.type === 'arduino_ext_get_humi'
@@ -311,13 +311,14 @@ Entry.BlockToArParser = class {
             if (block.type === 'get_variable') {
                 this.insertIntoGlobal(block.type); 
             } 
-            return val[0]; 
-            
+            return val[0];
+
         } else if (
             block.type === '_if' ||
             block.type === 'if_else' 
         ) {
-            return val.pop(); // Just return the value gotten by specific block with _if
+            return `if (${val.pop()}) {`;
+
         } else {
             return this.createSource(block);
         }
@@ -383,7 +384,7 @@ Entry.BlockToArParser = class {
 
                 stat = `delay(${value*1000});`;
                 break;
-                
+
             case 'boolean_basic_operator':
                 value = Number(this._pramVal[0]); // String to Number
                 if (isNaN(value)) { // In case the value is not a number
@@ -399,10 +400,10 @@ Entry.BlockToArParser = class {
                         operator = ' == ';
                         break;
                     case 'NOT_EQUAL':
-                        operator =  ' != ';
+                        operator = ' != ';
                         break;
                     case 'GREATER':
-                        operator =  ' > ';
+                        operator = ' > ';
                         break;
                     case 'LESS':
                         operator = ' < ';
@@ -416,7 +417,22 @@ Entry.BlockToArParser = class {
                 }
 
                 stat = value + operator + value2;
-                stat = `if (${stat}) {`;
+                break;
+
+            case 'boolean_not':
+                stat = '!' + this._pramVal[0];
+                break;
+
+            case 'boolean_and_or':
+                switch (this._pramVal[1]) {
+                    case 'AND':
+                        operator = ' && ';
+                        break;
+                    case 'OR':
+                        operator = ' || ';
+                        break;
+                }
+                stat = this._pramVal[0] + operator + this._pramVal[2];
                 break;
 
             case 'arduino_toggle_led': // digitalWrite
@@ -458,7 +474,6 @@ Entry.BlockToArParser = class {
                 this._pinNum = Number(this._pramVal[0]); // Arr to Number
                 this.errChkPinNum(this._pinNum, block);
                 
-                stat = `if (${stat}) {`;
                 stat = stat.replace('%1', this._pinNum);
                 break;
 

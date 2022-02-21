@@ -612,6 +612,20 @@ module.exports = {
                             ],
                         },
                     ],
+                    ar: [
+                        {
+                            syntax: '!%2',
+                            template: '!%2',
+                            blockType: 'param',
+                            textParams: [
+                                undefined,
+                                {
+                                    type: 'Block',
+                                    accept: 'Boolean',
+                                },
+                            ],
+                        },
+                    ],
                 },
             },
         };

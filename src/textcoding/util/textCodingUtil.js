@@ -583,6 +583,8 @@ class TextCodingUtil {
             || blockType === 'arduino_ext_octave_list'
             || blockType === 'arduino_ext_tone_list'
             || blockType === 'boolean_basic_operator'
+            || blockType === 'boolean_and_or'
+            || blockType === 'boolean_not'
             || blockType === 'set_variable'
             || blockType === 'change_variable'
             || blockType === 'get_variable'
