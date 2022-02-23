@@ -388,6 +388,9 @@ Entry.Parser = function(mode, type, cm, syntax) {
                             case 'UnsupportedBlk':
                                 Entry.toast.alert(Lang.TextCoding.title_converting, Lang.TextCoding.alert_not_hw_supported_block);
                                 break;
+                            case 'UnsupportedBlkInFunc':
+                                Entry.toast.alert(Lang.TextCoding.title_converting, Lang.TextCoding.alert_not_hw_supported_block_in_func);
+                                break;    
                             case 'TooManyStart':
                                 Entry.toast.alert(Lang.TextCoding.title_converting, Lang.TextCoding.alert_too_many_start_block);
                                 break;

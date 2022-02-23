@@ -6,6 +6,9 @@
 Entry.BlockToArParser = class {
     constructor() {
         this._type = 'BlockToArParser';
+        this._funcParamMap = new Entry.Map();
+        this.funcDefMap = {};
+        this.funcSyntax = '';
         this.init();
     }
 
@@ -20,6 +23,7 @@ Entry.BlockToArParser = class {
         this._pinNum4 = -1;
         this._pramVal = [];
         this._isInRepeat = false;
+        this._hasRootFunc = false;
     }
 
     Code(code, parseMode) {
@@ -125,8 +129,7 @@ Entry.BlockToArParser = class {
     // If possilbe, find at early stage
     isUnsupportedBlkInTopLvl(blocks) {
         // Check variable error
-        const err = Entry.TextCodingUtil.validateVariableAndListToPython() ||
-                        Entry.TextCodingUtil.validateFunctionToPython();
+        const err = Entry.TextCodingUtil.validateVariableAndListToPython();
         if (err) {
             this.throwErr('error', err.message);
         }
@@ -138,7 +141,7 @@ Entry.BlockToArParser = class {
         });
     }
 
-    insertIntoSrc(stat, block) {
+    insertIntoSrc(stat, block, addFunc) {
         if (block && (
             block._schema.class === 'variable' ||
             block.type === 'arduino_ext_set_servo' ||
@@ -152,10 +155,11 @@ Entry.BlockToArParser = class {
 
         this.insertIntoSetup(); // Frist, Setup the pin mode in case of Digital
 
-        // UserFunc for Ultrasonic after loop()
+        // Place UserFunc after loop()
         if (block && (block.type === 'arduino_ext_get_ultrasonic_value'
             || block.type === 'arduino_ext_get_temp'
             || block.type === 'arduino_ext_get_humi'
+            || (this.isFunc(block) && addFunc) // User defined function
         )) {
             this.AddUserFunc(stat);
 
@@ -177,6 +181,7 @@ Entry.BlockToArParser = class {
         this._pinNum2 = -1;
         this._pinNum3 = -1;
         this._pinNum4 = -1;
+        this.funcDefMap = {};
     }
 
     insertIntoGlobal(blockType) {
@@ -251,6 +256,7 @@ Entry.BlockToArParser = class {
                 val.includes('setup()') || 
                 val.includes('loop()') || 
                 val.includes('int distance()') ||  // ultrasonic
+                val.includes('void') || // user defined func doesn't have a return value
                 val === '}\n' // The end of the default func
             ) {
                 prevVal = val;
@@ -286,10 +292,32 @@ Entry.BlockToArParser = class {
 
         // One more check in low level
         if (Entry.TextCodingUtil.hasUnSupportedBlkInAr(block)) {
-            this.throwErr('error', 'UnsupportedBlk', block);
+            if (this._hasRootFunc) { // Unsupported block in the user defined func
+                this.throwErr('error', 'UnsupportedBlkInFunc', block);
+            } else {
+                this.throwErr('error', 'UnsupportedBlk', block);
+            }
         }
 
         !block._schema && block.loadSchema();
+
+        // User defined function
+        if (this.isFunc(block)) {
+            if (!this.funcDefMap[block.data.type]) {
+                this._rootFuncId = block.data.type;
+                this.funcDefMap[block.data.type] = this.makeFuncDef(block, this._hasRootFunc);
+                this._hasRootFunc = false;
+            }
+            if (this.isRegisteredFunc(block)) {
+                this.funcSyntax = this.makeFuncSyntax(block);
+            }
+        } 
+
+        // Currently Not supported if the func has a argument
+        if (this.funcSyntax.includes('%')) {
+            this.throwErr('error', 'UnsupportedBlk', block);
+        }
+
         const val = this.getValueFromParam(block);
         val.length && (this._pramVal = val);
 
@@ -614,6 +642,11 @@ Entry.BlockToArParser = class {
                 break;
         }
 
+        if (block.type.includes('func_')) { // User defined function
+            this.insertIntoSrc(this.funcDefMap[block.data.type], block, true);
+            stat = this.funcSyntax;
+        }
+
         return stat;
     }
 
@@ -668,5 +701,187 @@ Entry.BlockToArParser = class {
         if (value <= 0) { // min is 1
             this.throwErr('error', 'MinusInputVal', block);
         }
+    }
+
+    isFunc(block) {
+        if (!block || !block.data || !block.data.type) {
+            return false;
+        }
+
+        const tokens = block.data.type.split('_');
+        const prefix = tokens[0];
+
+        return prefix === 'func';
+    }
+
+    /**
+     * 워크스페이스에 실제로 등록되어있는 함수인지 확인한다.
+     * @param block
+     * @returns {boolean}
+     */
+    isRegisteredFunc(block) {
+        const tokens = block.data.type.split('_');
+        const funcId = tokens[1];
+        return !!Entry.variableContainer.functions_[funcId];
+    }
+
+    /**
+     * functionTemplate 에서 C++에서 표기될 함수를 만들어낸다.
+     * ex) 함수 %1 %2 %3 + %3 이 Indicator 인 경우 => 함수(%1, %2)
+     * @param funcBlock{Block} 함수 블록
+     * @return {string} C++ 함수 호출 syntax
+     */
+    makeFuncSyntax(funcBlock) {
+        let schemaTemplate = '';
+
+        if (funcBlock) {
+            if (funcBlock._schema) {
+                if (funcBlock._schema.template) {
+                    schemaTemplate = funcBlock._schema.template.trim();
+                }
+            } else if (this._hasRootFunc) {
+                const rootFunc = Entry.block[this._rootFuncId];
+                schemaTemplate = rootFunc.block.template;
+            }
+        }
+
+        const templateParams = schemaTemplate.trim().match(/%\d/gim);
+        templateParams.pop(); // pop() 이유는 맨 마지막 템플릿은 Indicator 로 판단할 것이기 때문이다.
+
+        return Entry.TextCodingUtil.getFunctionNameFromTemplate(schemaTemplate)
+            .trim()
+            .concat(`(${templateParams.join(',')});`);
+    }
+
+    makeFuncDef(funcBlock, isExpression) {
+        if (!this.isRegisteredFunc(funcBlock)) {
+            return;
+        }
+
+        let result = '';
+        const func = this.getFuncInfo(funcBlock);
+
+        if (func) {
+            result += func.name;
+        } else {
+            return;
+        }
+
+        let paramResult = '';
+        if (func.params && func.params.length !== 0) {
+            paramResult = func.params.join(', ').trim();
+        }
+        result = result
+            .concat('(')
+            .concat(paramResult)
+            .concat(')');
+
+        if (isExpression) {
+            // 선언된 함수 사용하는 블록의 경우
+            const expBlockComment = funcBlock.getCommentValue();
+            if (expBlockComment || expBlockComment === '') {
+                result += ` # ${expBlockComment}`;
+            }
+            return result;
+        } else {
+            // 함수 선언 중인 경우
+            this._hasRootFunc = true;
+
+            result = `void ${result}`;
+            result = result.concat(' {');
+            if (func.comment || func.comment === '') {
+                result += ` # ${func.comment}`;
+            }
+            result += '\n';
+
+            if (func.statements && func.statements.length) {
+                let stmtResult = '';
+                for (const s in func.statements) {
+                    const block = func.statements[s];
+
+                    if (this.getFuncInfo(block)) {
+                        stmtResult += this.makeFuncDef(block, true).concat('\n');
+                    } else {
+                        stmtResult += this.Block(block).concat('\n');
+                    }
+                }
+                result += Entry.TextCodingUtil.indent(stmtResult).concat('\n');
+            }
+            result = result.concat('}');
+
+            return result.trim();
+        }
+    }
+
+    getFuncInfo(funcBlock) {
+        const result = {};
+        const funcId = funcBlock.getFuncId();
+
+        const func = funcId && Entry.variableContainer.getFunction(funcId);
+        if (!func) {
+            return null;
+        }
+
+        const funcName = Entry.TextCodingUtil.getFunctionNameFromTemplate(func.block.template);
+
+        Entry.TextCodingUtil.initQueue();
+
+        const funcContents = func.content
+            .getEventMap('funcDef')[0]
+            .getThread()
+            .getBlocks();
+        const defBlock = funcContents.shift();
+
+        const funcComment = defBlock.getCommentValue();
+
+        Entry.TextCodingUtil.gatherFuncDefParam(defBlock.getParam(0));
+
+        const that = this;
+        const funcParams = [];
+
+        if (!this._hasRootFunc) {
+            const funcDefParams = [];
+            let param;
+            while ((param = Entry.TextCodingUtil._funcParamQ.dequeue())) {
+                funcDefParams.push(param);
+            }
+
+            funcDefParams.forEach((value, index) => {
+                if (/(string|boolean)Param/.test(value)) {
+                    index += 1;
+                    const name = `param${index}`;
+                    funcParams.push(name);
+                    that._funcParamMap.put(value, name);
+                }
+            });
+        } else {
+            funcBlock.params
+                .filter((p) => p instanceof Entry.Block)
+                .forEach((p) => {
+                    let paramText = that.Block(p);
+                    if (!paramText) {
+                        return;
+                    }
+                    paramText = that._funcParamMap.get(paramText) || paramText;
+                    funcParams.push(paramText);
+                });
+        }
+
+        Entry.TextCodingUtil.clearQueue();
+
+        if (funcName) {
+            result.name = funcName;
+        }
+        if (funcComment || funcComment === '') {
+            result.comment = funcComment;
+        }
+        if (funcParams.length !== 0) {
+            result.params = funcParams;
+        }
+        if (funcContents.length !== 0) {
+            result.statements = funcContents;
+        }
+
+        return result;
     }
 };

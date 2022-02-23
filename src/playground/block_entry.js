@@ -1503,7 +1503,7 @@ function getBlocks() {
 
                 Entry.callStackLength--;
             },
-            syntax: { js: [], py: [''] },
+            syntax: { js: [], py: [''], ar: [''] },
         },
         //endregion basic 기본블록
         //region basic 기본

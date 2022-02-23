@@ -588,6 +588,7 @@ class TextCodingUtil {
             || blockType === 'set_variable'
             || blockType === 'change_variable'
             || blockType === 'get_variable'
+            || blockType.includes('func_') // Functions
             || blockCategory === 'arduino' // HW blocks
             
         // Not acceptable blocks
@@ -598,7 +599,6 @@ class TextCodingUtil {
             || blockCategory === 'text'
             || blockCategory === 'sound'
             || blockCategory === 'calc'
-            // || blockCategory === 'func'
             || blockCategory === 'analysis'
             || blockCategory === 'ai_utilize'
             || blockCategory === 'expansion'

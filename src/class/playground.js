@@ -270,7 +270,13 @@ Entry.Playground = class Playground {
             option.textType = -1;
         }
         const expectedBoardType = option.boardType;
-        Entry.getMainWS().setMode(option);
+        try {
+            Entry.getMainWS().setMode(option);
+        } catch (e) { // When error in conversion, roll-back to toogleMode
+            this._arToggleVisible = !this._arToggleVisible;
+            return;
+        }
+
         const actualBoardType = Entry.getMainWS().getMode();
         if (expectedBoardType !== actualBoardType) { // If error, recover it to before
             this._arToggleVisible = !this._arToggleVisible;;
