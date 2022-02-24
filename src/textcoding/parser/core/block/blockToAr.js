@@ -153,8 +153,6 @@ Entry.BlockToArParser = class {
             this.insertIntoGlobal(block.type);
         }
 
-        this.insertIntoSetup(); // Frist, Setup the pin mode in case of Digital
-
         // Place UserFunc after loop()
         if (block && (block.type === 'arduino_ext_get_ultrasonic_value'
             || block.type === 'arduino_ext_get_temp'
@@ -647,6 +645,7 @@ Entry.BlockToArParser = class {
             stat = this.funcSyntax;
         }
 
+        this.insertIntoSetup(); // Frist, Setup the pin mode in case of Digital
         return stat;
     }
 
@@ -660,10 +659,14 @@ Entry.BlockToArParser = class {
         } else if (type === 'warn') {
             switch (msg) {
                 case 'ExcessiveInputVal':
-                    Entry.toast.success(Lang.TextCoding.title_converting, Lang.TextCoding.warn_exceed_max_value);
+                    if (this._hasRootFunc) {
+                        Entry.toast.success(Lang.TextCoding.title_converting, Lang.TextCoding.warn_exceed_max_value_in_func);
+                    } else {
+                        Entry.toast.success(Lang.TextCoding.title_converting, Lang.TextCoding.warn_exceed_max_value);
+                        block && Entry.getMainWS() && Entry.getMainWS().board.activateBlock(block);
+                    }
                     break;
             }
-            block && Entry.getMainWS() && Entry.getMainWS().board.activateBlock(block);
         }
     }
 
