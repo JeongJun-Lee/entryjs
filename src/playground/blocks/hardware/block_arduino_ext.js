@@ -660,37 +660,33 @@ Entry.ArduinoExt.getBlocks = function() {
                 params: [
                     {
                         type: 'arduino_get_port_number',
-                        params: [2],
+                        params: ['2'],
                     },
                 ],
                 type: 'arduino_ext_get_temp',
             },
             paramsKeyMap: {
-                TEMP: 0,
+                PORT: 0,
             },
             class: 'ArduinoExtGet',
             isNotFor: ['ArduinoExt'],
             func(sprite, script) {
-                const { hwModule = {} } = Entry.hw;
-                const { name } = hwModule;
-                if (name === 'ArduinoExt' || name === 'ArduinoNano') {
-                    const temp = script.getNumberValue('TEMP', script);
+                const port = script.getNumberValue('PORT', script);
 
-                    if (!Entry.hw.sendQueue.SET) {
-                        Entry.hw.sendQueue.SET = {};
-                    }
-                    delete Entry.hw.sendQueue.SET[temp];
-
-                    if (!Entry.hw.sendQueue.GET) {
-                        Entry.hw.sendQueue.GET = {};
-                    }
-                    
-                    Entry.hw.sendQueue.GET[Entry.ArduinoExt.sensorTypes.DHTTEMP] = {
-                        port: temp,
-                        time: new Date().getTime(),
-                    };
-                    return Entry.hw.portData.DHTTEMP || 0;
+                if (!Entry.hw.sendQueue.SET) {
+                    Entry.hw.sendQueue.SET = {};
                 }
+                delete Entry.hw.sendQueue.SET[port];
+
+                if (!Entry.hw.sendQueue.GET) {
+                    Entry.hw.sendQueue.GET = {};
+                }
+                
+                Entry.hw.sendQueue.GET[Entry.ArduinoExt.sensorTypes.DHTTEMP] = {
+                    port: port,
+                    time: new Date().getTime(),
+                };
+                return Entry.hw.portData.DHTTEMP || 0;
             },
             syntax: {
                 js: [],
@@ -727,37 +723,33 @@ Entry.ArduinoExt.getBlocks = function() {
                 params: [
                     {
                         type: 'arduino_get_port_number',
-                        params: [2],
+                        params: ['2'],
                     },
                 ],
                 type: 'arduino_ext_get_humi',
             },
             paramsKeyMap: {
-                HUMI: 0,
+                PORT: 0,
             },
             class: 'ArduinoExtGet',
             isNotFor: ['ArduinoExt'],
             func(sprite, script) {
-                const { hwModule = {} } = Entry.hw;
-                const { name } = hwModule;
-                if (name === 'ArduinoExt' || name === 'ArduinoNano') {
-                    const humi = script.getNumberValue('HUMI', script);
+                const port = script.getNumberValue('PORT', script);
 
-                    if (!Entry.hw.sendQueue.SET) {
-                        Entry.hw.sendQueue.SET = {};
-                    }
-                    delete Entry.hw.sendQueue.SET[humi];
-
-                    if (!Entry.hw.sendQueue.GET) {
-                        Entry.hw.sendQueue.GET = {};
-                    }
-                    
-                    Entry.hw.sendQueue.GET[Entry.ArduinoExt.sensorTypes.DHTHUMI] = {
-                        port: humi,
-                        time: new Date().getTime(),
-                    };
-                    return Entry.hw.portData.DHTHUMI || 0;
+                if (!Entry.hw.sendQueue.SET) {
+                    Entry.hw.sendQueue.SET = {};
                 }
+                delete Entry.hw.sendQueue.SET[port];
+
+                if (!Entry.hw.sendQueue.GET) {
+                    Entry.hw.sendQueue.GET = {};
+                }
+                
+                Entry.hw.sendQueue.GET[Entry.ArduinoExt.sensorTypes.DHTHUMI] = {
+                    port: port,
+                    time: new Date().getTime(),
+                };
+                return Entry.hw.portData.DHTHUMI || 0;
             },
             syntax: {
                 js: [],
