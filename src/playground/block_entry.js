@@ -329,6 +329,7 @@ function getBlocks() {
             class: 'arduino_default_noti',
             isNotFor: ['arduinoDisconnected'],
             events: {},
+            syntax: { js: [], py: [''] },
         },
         arduino_noti: {
             skeleton: 'basic_text',
@@ -348,6 +349,7 @@ function getBlocks() {
             class: 'arduino_default_noti',
             isNotFor: ['arduinoDisconnected'],
             events: {},
+            syntax: { js: [], py: [''] },
         },
         arduino_download_connector: {
             skeleton: 'clickable_text',
@@ -374,7 +376,9 @@ function getBlocks() {
                     },
                 ],
             },
+            syntax: { js: [], py: [''] },
         },
+        // At Uzbek offline version, don't show this menu
         // download_guide: {
         //     skeleton: 'clickable_text',
         //     skeletonOptions: {
@@ -400,6 +404,7 @@ function getBlocks() {
         //             },
         //         ],
         //     },
+        //     syntax: { js: [], py: [''] },
         // },
         arduino_download_source: {
             skeleton: 'clickable_text',
@@ -426,6 +431,7 @@ function getBlocks() {
                     },
                 ],
             },
+            syntax: { js: [], py: [''] },
         },
         arduino_connected: {
             skeleton: 'basic_button',
@@ -456,6 +462,7 @@ function getBlocks() {
                 },
             ],
             events: {},
+            syntax: { js: [], py: [''] },
         },
         arduino_reconnect: {
             skeleton: 'basic_button',
@@ -477,6 +484,7 @@ function getBlocks() {
                     },
                 ],
             },
+            syntax: { js: [], py: [''] },
         },
         robot_reconnect: {
             skeleton: 'basic_button',
@@ -498,6 +506,7 @@ function getBlocks() {
                     },
                 ],
             },
+            syntax: { js: [], py: [''] },
         },
         arduino_open: {
             skeleton: 'basic_button',
@@ -520,6 +529,7 @@ function getBlocks() {
                     },
                 ],
             },
+            syntax: { js: [], py: [''] },
         },
         arduino_cloud_pc_open: {
             skeleton: 'basic_button',
@@ -542,6 +552,7 @@ function getBlocks() {
                     },
                 ],
             },
+            syntax: { js: [], py: [''] },
         },
         //endregion hardware 하드웨어 기본
         //region basic 기본블록
@@ -1492,7 +1503,7 @@ function getBlocks() {
 
                 Entry.callStackLength--;
             },
-            syntax: { js: [], py: [''] },
+            syntax: { js: [], py: [''], ar: [''] },
         },
         //endregion basic 기본블록
         //region basic 기본
