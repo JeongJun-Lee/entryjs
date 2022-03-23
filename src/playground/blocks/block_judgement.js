@@ -257,6 +257,67 @@ module.exports = {
                     ],
                 },
             },
+            is_included_in_string: {
+                color: EntryStatic.colorSet.block.default.JUDGE,
+                outerLine: EntryStatic.colorSet.block.darken.JUDGE,
+                skeleton: 'basic_boolean_field',
+                statements: [],
+                params: [
+                    {
+                        type: 'Block',
+                        accept: 'string',
+                    },
+                    {
+                        type: 'Text',
+                        text: Lang.Blocks.VARIABLE_is_included_in_list_2,
+                        color: 'white',
+                    },
+                    {
+                        type: 'Block',
+                        accept: 'string',
+                    },
+                    {
+                        type: 'Text',
+                        text: Lang.Blocks.VARIABLE_is_included_in_list_3,
+                        color: 'white',
+                    },
+                ],
+                events: {},
+                def: {
+                    params: [
+                        {
+                            type: 'text',
+                            params: [Lang.Blocks.hi_entry],
+                        },
+                        null,
+                        {
+                            type: 'text',
+                            params: [Lang.Blocks.entry],
+                        },
+                        null,
+                    ],
+                    type: 'is_included_in_string',
+                },
+                paramsKeyMap: {
+                    VALUE1: 0,
+                    VALUE2: 2,
+                },
+                class: 'boolean_type',
+                isNotFor: ['python_disable'],
+                func(sprite, script) {
+                    const value1 = script.getStringValue('VALUE1', script);
+                    const value2 = script.getStringValue('VALUE2', script);
+
+                    if (typeof value1 !== 'string' || typeof value2 !== 'string') {
+                        return false;
+                    }
+                    return value1.includes(value2);
+                },
+                syntax: {
+                    js: [],
+                    py: [],
+                },
+            },
             is_type: {
                 color: EntryStatic.colorSet.block.default.JUDGE,
                 outerLine: EntryStatic.colorSet.block.darken.JUDGE,
