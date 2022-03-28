@@ -476,6 +476,7 @@ Entry.Workspace = class Workspace {
                     return;
                 }
             }
+
             const mainWorksapceMode = Entry.playground.mainWorkspace.getMode();
             const playgroundMode = Entry.playground.getViewMode();
             const isBlockCodeView =
@@ -560,7 +561,7 @@ Entry.Workspace = class Workspace {
                     ) {
                         (function(block) {
                             block.copyToClipboard();
-                            block.destroy(true, true);
+                            Entry.do('destroyBlock', block);
                             blockView.getBoard().setSelectedBlock(null);
                         })(blockView.block);
                     }
