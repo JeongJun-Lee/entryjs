@@ -1024,6 +1024,9 @@ Entry.Engine = class Engine {
     copyEvent(event) {
         const eventClone = new event.constructor(event.type, event);
         window.self.dispatchEvent(eventClone);
+        if (GEHelper.isWebGL && ['mousemove', 'pointermove'].includes(event.type)) {
+            window.document.dispatchEvent(eventClone);
+        }
     }
 
     closeFullScreen() {
