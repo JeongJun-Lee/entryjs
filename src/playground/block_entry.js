@@ -1840,6 +1840,77 @@ function getBlocks() {
             },
             syntax: { js: [], py: [''] },
         },
+        function_value: {
+            skeleton: 'basic_string_field',
+            color: EntryStatic.colorSet.block.default.FUNC,
+            outerLine: EntryStatic.colorSet.block.darken.FUNC,
+            params: [],
+            events: {
+                dataAdd: [
+                    function(block) {
+                        const vc = Entry.variableContainer;
+                        if (vc) {
+                            vc.addRef('_functionRefs', block);
+                        }
+                    },
+                ],
+                dataDestroy: [
+                    function(block) {
+                        const vc = Entry.variableContainer;
+                        if (vc) {
+                            vc.removeRef('_functionRefs', block);
+                        }
+                    },
+                ],
+                dblclick: [
+                    function(blockView) {
+                        const mode = blockView.getBoard().workspace.getMode();
+                        if (mode !== Entry.Workspace.MODE_BOARD) {
+                            return;
+                        }
+                        if (Entry.type !== 'workspace') {
+                            return;
+                        }
+                        const block = blockView.block;
+                        const id = block.getFuncId();
+                        Entry.do('funcEditStart', id);
+                    },
+                ],
+            },
+            func(entity) {
+                if (!this.initiated) {
+                    this.initiated = true;
+                    Entry.callStackLength++;
+
+                    if (Entry.callStackLength > Entry.Executor.MAXIMUM_CALLSTACK) {
+                        Entry.toast.alert(
+                            Lang.Workspace.RecursiveCallWarningTitle,
+                            Lang.Workspace.RecursiveCallWarningContent
+                        );
+                        throw new Error();
+                    }
+
+                    const func = Entry.variableContainer.getFunction(this.block.getFuncId());
+                    this.funcCode = func.content;
+                    this.funcExecutor = this.funcCode.raiseEvent('funcDef', entity)[0];
+                    this.funcExecutor.register.params = this.getParams();
+                    this.funcExecutor.register.paramMap = func.paramMap;
+                    this.funcExecutor.parentExecutor = this.executor;
+                    this.funcExecutor.isFuncExecutor = true;
+                }
+                this.funcExecutor.execute();
+                if (!this.funcExecutor.isEnd()) {
+                    this.funcCode.removeExecutor(this.funcExecutor);
+                    return Entry.STATIC.BREAK;
+                }
+
+                console.log('this.funcExecutor.value', this.funcExecutor.result);
+                Entry.callStackLength--;
+
+                return this.funcExecutor.result;
+            },
+            syntax: { js: [], py: [''] },
+        },
         //endregion basic 기본블록
         //region basic 기본
         change_to_nth_shape: {
