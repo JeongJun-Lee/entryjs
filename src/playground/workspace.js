@@ -561,7 +561,7 @@ Entry.Workspace = class Workspace {
                     ) {
                         (function(block) {
                             block.copyToClipboard();
-                            Entry.do('destroyBlock', block);
+                            Entry.do('destroyBlockBelow', block);
                             blockView.getBoard().setSelectedBlock(null);
                         })(blockView.block);
                     }
