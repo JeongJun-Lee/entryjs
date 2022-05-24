@@ -1448,13 +1448,13 @@ Entry.Board = class Board {
             const nameText = name.elem('text');
             nameText.addClass('entryBoardObjectName');
             nameText.attr({ x: 44, y: 26, fill: '#6b6b6b' });
-            nameText.style.font = '10px NanumGothicOTFBold';
-            nameText.innerHTML = object.name;
+            nameText.style.font = '12px NanumGothicOTFBold';
+            nameText.textContent = object.name;
             this.svgObjectTitle.name = nameText;
         }
 
         this.svgObjectTitle.thumbnail.attr({ href: object.thumbUrl });
-        this.svgObjectTitle.name.innerHTML = object.name;
+        this.svgObjectTitle.name.textContent = object.name;
     }
 
     clearObjectTitle() {
