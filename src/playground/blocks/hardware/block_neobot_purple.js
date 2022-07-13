@@ -8,6 +8,7 @@ Entry.NeobotPurple = {
     title: {
         ko: 'NEW 네오봇 Purple',
         en: 'NEW NEOBOT Purple',
+        uz: 'Neo SoCo'
     },
     LOCAL_MAP: ['IN1', 'IN2', 'IN3', 'IR', 'BAT'],
     REMOTE_MAP: ['OUT1', 'OUT2', 'OUT3', 'DCR', 'DCL', 'SND', 'FND', 'OPT'],
@@ -28,14 +29,14 @@ Entry.NeobotPurple = {
             FND: { name: 'FND', type: 'output', pos: { x: 0, y: 0 } },
         },
         ports: {
-            IN1: { name: 'IN1', type: 'input', pos: { x: 270, y: 200 } },
-            IN2: { name: 'IN2', type: 'input', pos: { x: 325, y: 200 } },
-            IN3: { name: 'IN3', type: 'input', pos: { x: 325, y: 500 } },
-            DCL: { name: 'L-Motor', type: 'output', pos: { x: 270, y: 500 } },
-            DCR: { name: 'R-Motor', type: 'output', pos: { x: 435, y: 500 } },
-            OUT1: { name: 'OUT1', type: 'output', pos: { x: 380, y: 200 } },
-            OUT2: { name: 'OUT2', type: 'output', pos: { x: 435, y: 200 } },
-            OUT3: { name: 'OUT3', type: 'output', pos: { x: 380, y: 500 } },
+            IN1: { name: 'IN1', type: 'input', pos: { x: 270, y: 170 } },
+            IN2: { name: 'IN2', type: 'input', pos: { x: 325, y: 170 } },
+            IN3: { name: 'IN3', type: 'input', pos: { x: 325, y: 530 } },
+            DCL: { name: 'L-Motor', type: 'output', pos: { x: 270, y: 530 } },
+            DCR: { name: 'R-Motor', type: 'output', pos: { x: 435, y: 530 } },
+            OUT1: { name: 'OUT1', type: 'output', pos: { x: 380, y: 170 } },
+            OUT2: { name: 'OUT2', type: 'output', pos: { x: 435, y: 170 } },
+            OUT3: { name: 'OUT3', type: 'output', pos: { x: 380, y: 530 } },
         },
         mode: 'both',
     },
@@ -59,7 +60,7 @@ Entry.NeobotPurple.setLanguage = function() {
                 neobot_purple_remote_button: '리모컨 버튼 %1 을 누름',
 
                 // LED
-                neobot_purple_arg_led_duration: '%1',
+                // neobot_purple_arg_led_duration: '%1',
                 neobot_purple_led_on: 'LED 켜기   %1 %2 %3 %4',
                 neobot_purple_output_led_off: '%1 LED 끄기 %2',
                 neobot_purple_led_brightness_with_sensor: '%1 로 %2 LED 제어 %3',
@@ -72,8 +73,8 @@ Entry.NeobotPurple.setLanguage = function() {
                 neobot_purple_robot: '로봇 %1 %2',
                 neobot_purple_motor_start: '모터 회전하기   %1 %2 %3 %4 %5',
                 neobot_purple_motor_stop: '%1 모터 멈추기 %2',
-                neobot_purple_arg_motor_speed: '%1',
-                neobot_purple_arg_motor_duration: '%1',
+                // neobot_purple_arg_motor_speed: '%1',
+                // neobot_purple_arg_motor_duration: '%1',
 
                 // melody
                 neobot_purple_play_note_for: '버저 울리기   옥타브: %2 음: %1 길이: %3 %4',
@@ -81,11 +82,11 @@ Entry.NeobotPurple.setLanguage = function() {
                 neobot_purple_melody_stop: '버저 멈추기 %1',
 
                 // servo
-                get_servo_degree: '%1',
+                // get_servo_degree: '%1',
                 neobot_purple_servo_init: '%1 서보모터 리셋 %2',
                 neobot_purple_servo_rotate: '서보모터 회전하기   %1 %2 %3 %4',
                 neobot_purple_servo_stop: '%1 서보모터 멈추기 %2',
-                neobot_purple_servo_change_degree: '서보모터 각도 바꾸기   %2 %3 %4 %1 %5',
+                neobot_purple_servo_change_degree: '서보모터 각도 바꾸기   %1 %2 %3 %4 %5',
             },
             Blocks: {
                 //for dropdown
@@ -232,7 +233,7 @@ Entry.NeobotPurple.setLanguage = function() {
                 neobot_purple_remote_button: 'pressing button %1 of remote controller',
 
                 // LED
-                neobot_purple_arg_led_duration: '%1',
+                // neobot_purple_arg_led_duration: '%1',
                 neobot_purple_led_on: 'Turn on the LED    %1 %2 %3 %4',
                 neobot_purple_output_led_off: 'Turn off the %1 LED %2',
                 neobot_purple_led_brightness_with_sensor: 'Control %2 LED\'s brightness with %1 sensor %3',
@@ -245,8 +246,8 @@ Entry.NeobotPurple.setLanguage = function() {
                 neobot_purple_robot: 'Robot %1 %2',
                 neobot_purple_motor_start: 'Motor operation   %1 %2 %3 %4 %5',
                 neobot_purple_motor_stop: 'Stop the %1 motor(s) %2',
-                neobot_purple_arg_motor_speed: '%1',
-                neobot_purple_arg_motor_duration: '%1',
+                // neobot_purple_arg_motor_speed: '%1',
+                // neobot_purple_arg_motor_duration: '%1',
 
                 // melody
                 neobot_purple_play_note_for: 'Buzzer   octave: %1 scale: %2 note: %3 %4',
@@ -387,6 +388,178 @@ Entry.NeobotPurple.setLanguage = function() {
                 neobot_purple_direction_left: 'to the left',
                 neobot_purple_direction_right: 'to the right',
             },
+        },
+        uz: {
+            template: {
+                // sensor
+                neobot_purple_sensor_value: '%1', 
+                neobot_purple_sensor_convert_scale: "%1 %2 ~ %3ni %4 ~ %5ga o'zgartirish", 
+
+                // decision
+                neobot_purple_decision_sensor_is_over: '%1 %2 %3',
+                neobot_purple_decision_equal_with_sensor: '%1 rangi %2',
+                neobot_purple_decision_sensor_angle: '%1 gradusi %2 %3',
+
+                // remote
+                neobot_purple_remote_button: 'Teleboshqarishning tugumasi %1 ni bosgan',
+
+                // LED
+                // neobot_purple_arg_led_duration: '%1',
+                neobot_purple_led_on: 'LED yoqish: %1 %2 %3 %4',
+                neobot_purple_output_led_off: "%1 LEDni o'chirish %2",
+                neobot_purple_led_brightness_with_sensor: "%1 dan %2 LEDni boshqarish %3",
+                neobot_purple_color_led_on: '%1 rangli LEDni yoqish: R %2 G %3 B %4 %5',
+
+                // output
+                neobot_purple_set_output: '%1 ga %2 qiymatini chiqarish %3',
+
+                // motor
+                neobot_purple_robot: 'Robot %1 %2',
+                neobot_purple_motor_start: 'Motorni aylantirish: %1 %2 %3 %4 %5',
+                neobot_purple_motor_stop: "%1 motorini to'xtatish %2",
+                // neobot_purple_arg_motor_speed: '%1',
+                // neobot_purple_arg_motor_duration: '%1',
+
+                // melody
+                neobot_purple_play_note_for: "Buzzer yangrash: %2 Oktava, %1 Tovush, %3 O'lchov %4",
+                neobot_purple_melody_play_with_sensor: '%1 sensoridan buzzerni yangrash %2',
+                neobot_purple_melody_stop: "Buzzerni to'xtatish %1",
+
+                // servo
+                // get_servo_degree: '%1',
+                neobot_purple_servo_init: '%1 servo motorini nollashtirish %2',
+                neobot_purple_servo_rotate: 'Servo motorni aylantirish: %1 %2 %3 %4',
+                neobot_purple_servo_stop: "%1 servo motorini to'xtatish %2",
+                neobot_purple_servo_change_degree: "Servo motor gradusini o'zgartirish: %2 %3 %4 %1 %5",
+            },
+            Blocks: {
+                //for dropdown
+                neobot_purple_port_1: 'IN1',
+                neobot_purple_port_2: 'IN2',
+                neobot_purple_port_3: 'IN3',
+                neobot_purple_port_4: 'IN4',
+                neobot_purple_port_12: 'IN1 & IN2',
+                neobot_purple_port_bat: 'Batareya',
+                neobot_purple_port_remot: 'Teleboshqarish',
+                neobot_purple_color_white: 'Oq',
+                neobot_purple_color_red: 'Qizil',
+                neobot_purple_color_yellow: 'Sariq',
+                neobot_purple_color_green: 'Yasil',
+                neobot_purple_color_blue: "Ko'k",
+                neobot_purple_direction_forward: "Tog'ri",
+                neobot_purple_direction_backward: 'Orqa',
+                neobot_purple_sound_silent: 'Ovozsiz',
+                neobot_purple_sound_do: 'Do',
+                neobot_purple_sound_do_shop: 'Do#',
+                neobot_purple_sound_re: 'Re',
+                neobot_purple_sound_re_shop: 'Re#',
+                neobot_purple_sound_mi: 'Mi',
+                neobot_purple_sound_fa: 'Fa',
+                neobot_purple_sound_fa_shop: 'Fa#',
+                neobot_purple_sound_so: 'Sol',
+                neobot_purple_sound_so_shop: 'Sol#',
+                neobot_purple_sound_la: 'Lya',
+                neobot_purple_sound_la_shop: 'Lya#',
+                neobot_purple_sound_ti: 'Si',
+                neobot_purple_sound_half_note: 'Yarim',
+                neobot_purple_sound_quarter_note: 'Chorak',
+                neobot_purple_sound_eighth_note: '1/8',
+                neobot_purple_sound_sixteenth_note: '1/16',
+                neobot_purple_sensor_infrared: 'IR sensor',
+                neobot_purple_sensor_light: 'nur sensor',
+                neobot_purple_sensor_sound: 'ovoz sensor',
+                neobot_purple_compare_symbol1: '＝',
+                neobot_purple_compare_symbol2: '＞',
+                neobot_purple_compare_symbol3: '＜',
+                neobot_purple_compare_symbol4: '≥',
+                neobot_purple_compare_symbol5: '≤',
+                neobot_purple_remote_btn_a: 'A',
+                neobot_purple_remote_btn_b: 'B',
+                neobot_purple_remote_btn_c: 'C',
+                neobot_purple_remote_btn_d: 'D',
+                neobot_purple_remote_btn_1: '1',
+                neobot_purple_remote_btn_2: '2',
+                neobot_purple_remote_btn_3: '3',
+                neobot_purple_remote_btn_4: '4',
+                neobot_purple_remote_btn_up: '▲',
+                neobot_purple_remote_btn_down: '▼',
+                neobot_purple_remote_btn_left: '◀',
+                neobot_purple_remote_btn_right: '▶',
+                neobot_purple_duration_cont: 'Davom etish',
+                neobot_purple_duration_1s: '1 soniya',
+                neobot_purple_duration_2s: '2 soniya',
+                neobot_purple_duration_3s: '3 soniya',
+                neobot_purple_duration_4s: '4 soniya',
+                neobot_purple_duration_5s: '5 soniya',
+                neobot_purple_duration_6s: '6 soniya',
+                neobot_purple_duration_7s: '7 soniya',
+                neobot_purple_duration_8s: '8 soniya',
+                neobot_purple_duration_9s: '9 soniya',
+                neobot_purple_motor_both: 'Ikkala',
+                neobot_purple_motor_left: "Chap",
+                neobot_purple_motor_right: "O'ng",
+                neobot_purple_motor_move_forward: "to'g'riga yurish",
+                neobot_purple_motor_move_backward: "orqaga yurish",
+                neobot_purple_motor_move_left: 'chapga birilish',
+                neobot_purple_motor_move_right: "o'nga birilish",
+                neobot_purple_motor_move_stop: "to'xtatish",
+
+                neobot_purple_servo_dir_1: "To'g'ri tomoni",
+                neobot_purple_servo_dir_2: 'Qarish tomoni',
+                
+                neobot_purple_percent_10: '10% tezlik',
+                neobot_purple_percent_20: '20% tezlik',
+                neobot_purple_percent_30: '30% tezlik',
+                neobot_purple_percent_40: '40% tezlik',
+                neobot_purple_percent_50: '50% tezlik',
+                neobot_purple_percent_60: '60% tezlik',
+                neobot_purple_percent_70: '70% tezlik',
+                neobot_purple_percent_80: '80% tezlik',
+                neobot_purple_percent_90: '90% tezlik',
+                neobot_purple_percent_100: '100% tezlik',
+
+                neobot_purple_angle_0: '0 gradus',
+                neobot_purple_angle_5: '5 gradus',
+                neobot_purple_angle_10: '10 gradus',
+                neobot_purple_angle_15: '15 gradus',
+                neobot_purple_angle_20: '20 gradus',
+                neobot_purple_angle_25: '25 gradus',
+                neobot_purple_angle_30: '30 gradus',
+                neobot_purple_angle_35: '35 gradus',
+                neobot_purple_angle_40: '40 gradus',
+                neobot_purple_angle_45: '45 gradus',
+                neobot_purple_angle_50: '50 gradus',
+                neobot_purple_angle_55: '55 gradus',
+                neobot_purple_angle_60: '60 gradus',
+                neobot_purple_angle_65: '65 gradus',
+                neobot_purple_angle_70: '70 gradus',
+                neobot_purple_angle_75: '75 gradus',
+                neobot_purple_angle_80: '80 gradus',
+                neobot_purple_angle_85: '85 gradus',
+                neobot_purple_angle_90: '90 gradus',
+                neobot_purple_angle_95: '95 gradus',
+                neobot_purple_angle_100: '100 gradus',
+                neobot_purple_angle_105: '105 gradus',
+                neobot_purple_angle_110: '110 gradus',
+                neobot_purple_angle_115: '115 gradus',
+                neobot_purple_angle_120: '120 gradus',
+                neobot_purple_angle_125: '125 gradus',
+                neobot_purple_angle_130: '130 gradus',
+                neobot_purple_angle_135: '135 gradus',
+                neobot_purple_angle_140: '140 gradus',
+                neobot_purple_angle_145: '145 gradus',
+                neobot_purple_angle_150: '150 gradus',
+                neobot_purple_angle_155: '155 gradus',
+                neobot_purple_angle_160: '160 gradus',
+                neobot_purple_angle_165: '165 gradus',
+                neobot_purple_angle_170: '170 gradus',
+                neobot_purple_angle_175: '175 gradus',
+                neobot_purple_angle_180: '180 gradus',
+
+                neobot_purple_out_all: 'Hammasi',
+                neobot_purple_direction_left: 'Chap',
+                neobot_purple_direction_right: "O'ng",
+            },
         }, //
     };
 };
@@ -471,6 +644,32 @@ Entry.NeobotPurple.getBlocks = function() {
                 var port = script.getStringField('PORT');
                 return Entry.hw.portData[port];
             },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'Neobot_purple.get_value(%1)',
+                        blockType: 'param',
+                        textParams: [
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    [Lang.Blocks.neobot_purple_port_1, 'IN1'],
+                                    [Lang.Blocks.neobot_purple_port_2, 'IN2'],
+                                    [Lang.Blocks.neobot_purple_port_3, 'IN3'],
+                                    [Lang.Blocks.neobot_purple_port_remot, 'IR'],
+                                    [Lang.Blocks.neobot_purple_port_bat, 'BAT'],
+                                ],
+                                value: 'IN1',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue,
+                            }
+                        ]
+                    }
+                ]
+            }
         },
 
         neobot_purple_sensor_convert_scale: {
@@ -569,6 +768,46 @@ Entry.NeobotPurple.getBlocks = function() {
 
                 return Math.round(value);
             },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'Neobot_purple.convert_scale(%1, %2, %3 %4, %5)',
+                        blockType: 'param',
+                        textParams: [
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    [Lang.Blocks.neobot_purple_port_1, 'IN1'],
+                                    [Lang.Blocks.neobot_purple_port_2, 'IN2'],
+                                    [Lang.Blocks.neobot_purple_port_3, 'IN3'],
+                                ],
+                                value: 'IN1',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue,
+                            },
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                        ]
+                    }
+                ]
+            }
         },
 
         /*************************
@@ -665,6 +904,50 @@ Entry.NeobotPurple.getBlocks = function() {
                 }
                 return false;
             },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'Neobot_purple.compare_value(%1, %2, %3)',
+                        blockType: 'param',
+                        textParams: [
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    [Lang.Blocks.neobot_purple_port_1, 'IN1'],
+                                    [Lang.Blocks.neobot_purple_port_2, 'IN2'],
+                                    [Lang.Blocks.neobot_purple_port_3, 'IN3'],
+                                    [Lang.Blocks.neobot_purple_port_12, 'IN12'],
+                                ],
+                                value: 'IN1',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue,
+                            },
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    [Lang.Blocks.neobot_purple_compare_symbol1, '='],
+                                    [Lang.Blocks.neobot_purple_compare_symbol2, '>'],
+                                    [Lang.Blocks.neobot_purple_compare_symbol3, '<'],
+                                    [Lang.Blocks.neobot_purple_compare_symbol4, '>='],
+                                    [Lang.Blocks.neobot_purple_compare_symbol5, '<='],
+                                ],
+                                value: '>',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue,
+                            },
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                        ]
+                    }
+                ]
+            }
         },
 
         neobot_purple_decision_equal_with_sensor: {
@@ -689,13 +972,13 @@ Entry.NeobotPurple.getBlocks = function() {
                 {
                     type: 'Dropdown',
                     options: [
-                        [Lang.Blocks.neobot_purple_color_white, 0],
-                        [Lang.Blocks.neobot_purple_color_red, 1],
-                        [Lang.Blocks.neobot_purple_color_yellow, 2],
-                        [Lang.Blocks.neobot_purple_color_green, 3],
-                        [Lang.Blocks.neobot_purple_color_blue, 4],
+                        [Lang.Blocks.neobot_purple_color_white, 'white'],
+                        [Lang.Blocks.neobot_purple_color_red, 'red'],
+                        [Lang.Blocks.neobot_purple_color_yellow, 'yellow'],
+                        [Lang.Blocks.neobot_purple_color_green, 'green'],
+                        [Lang.Blocks.neobot_purple_color_blue, 'blue'],
                     ],
-                    value: '0',
+                    value: 'white',
                     fontSize: 11,
                     bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
                     arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
@@ -718,23 +1001,62 @@ Entry.NeobotPurple.getBlocks = function() {
                 var color = script.getNumberField('COLOR');
 
                 if (sensor >= 10 && sensor <= 50) {
-                    if (color == 0) return true;
+                    if (color == 'white') return true;
                     else return false;
                 } else if (sensor >= 51 && sensor <= 90) {
-                    if (color == 1) return true;
+                    if (color == 'red') return true;
                     else return false;
                 } else if (sensor >= 91 && sensor <= 130) {
-                    if (color == 2) return true;
+                    if (color == 'yellow') return true;
                     else return false;
                 } else if (sensor >= 131 && sensor <= 170) {
-                    if (color == 3) return true;
+                    if (color == 'green') return true;
                     else return false;
                 } else if (sensor >= 171 && sensor <= 210) {
-                    if (color == 4) return true;
+                    if (color == 'blue') return true;
                     else return false;
                 }
                 return false;
             },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'Neobot_purple.color_value(%1, %2)',
+                        blockType: 'param',
+                        textParams: [
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    [Lang.Blocks.neobot_purple_port_1, 'IN1'],
+                                    [Lang.Blocks.neobot_purple_port_2, 'IN2'],
+                                    [Lang.Blocks.neobot_purple_port_3, 'IN3'],
+                                ],
+                                value: 'IN1',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue,
+                            },
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    [Lang.Blocks.neobot_purple_color_white, 'white'],
+                                    [Lang.Blocks.neobot_purple_color_red, 'red'],
+                                    [Lang.Blocks.neobot_purple_color_yellow, 'yellow'],
+                                    [Lang.Blocks.neobot_purple_color_green, 'green'],
+                                    [Lang.Blocks.neobot_purple_color_blue, 'blue'],
+                                ],
+                                value: 'white',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue,
+                            },
+                        ]
+                    }
+                ]
+            }
         },
 
         neobot_purple_decision_sensor_angle: {
@@ -835,6 +1157,74 @@ Entry.NeobotPurple.getBlocks = function() {
                 }
                 return false;
             },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'Neobot_purple.angle_compare(%1, %2, %3)',
+                        blockType: 'param',
+                        textParams: [
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    [Lang.Blocks.neobot_purple_port_1, 'IN1'],
+                                    [Lang.Blocks.neobot_purple_port_2, 'IN2'],
+                                    [Lang.Blocks.neobot_purple_port_3, 'IN3'],
+                                ],
+                                value: 'IN1',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue,
+                            },
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    [Lang.Blocks.neobot_purple_compare_symbol1, '='],
+                                    [Lang.Blocks.neobot_purple_compare_symbol2, '>'],
+                                    [Lang.Blocks.neobot_purple_compare_symbol3, '<'],
+                                    [Lang.Blocks.neobot_purple_compare_symbol4, '>='],
+                                    [Lang.Blocks.neobot_purple_compare_symbol5, '<='],
+                                ],
+                                value: '>',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue,
+                            },
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    [Lang.Blocks.neobot_purple_angle_0, '0'],
+                                    [Lang.Blocks.neobot_purple_angle_10, '10'],
+                                    [Lang.Blocks.neobot_purple_angle_20, '20'],
+                                    [Lang.Blocks.neobot_purple_angle_30, '30'],
+                                    [Lang.Blocks.neobot_purple_angle_40, '40'],
+                                    [Lang.Blocks.neobot_purple_angle_50, '50'],
+                                    [Lang.Blocks.neobot_purple_angle_60, '60'],
+                                    [Lang.Blocks.neobot_purple_angle_70, '70'],
+                                    [Lang.Blocks.neobot_purple_angle_80, '80'],
+                                    [Lang.Blocks.neobot_purple_angle_90, '90'],
+                                    [Lang.Blocks.neobot_purple_angle_100, '100'],
+                                    [Lang.Blocks.neobot_purple_angle_110, '110'],
+                                    [Lang.Blocks.neobot_purple_angle_120, '120'],
+                                    [Lang.Blocks.neobot_purple_angle_130, '130'],
+                                    [Lang.Blocks.neobot_purple_angle_140, '140'],
+                                    [Lang.Blocks.neobot_purple_angle_150, '150'],
+                                    [Lang.Blocks.neobot_purple_angle_160, '160'],
+                                    [Lang.Blocks.neobot_purple_angle_170, '170'],
+                                    [Lang.Blocks.neobot_purple_angle_180, '180'],
+                                ],
+                                value: '90',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue,
+                            }
+                        ]
+                    }
+                ]
+            }
         },
 
         /*************************
@@ -850,16 +1240,16 @@ Entry.NeobotPurple.getBlocks = function() {
                 {
                     type: 'Dropdown',
                     options: [
-                        [Lang.Blocks.neobot_purple_remote_btn_1, '10'],
-                        [Lang.Blocks.neobot_purple_remote_btn_2, '11'],
-                        [Lang.Blocks.neobot_purple_remote_btn_3, '12'],
-                        [Lang.Blocks.neobot_purple_remote_btn_4, '13'],
-                        [Lang.Blocks.neobot_purple_remote_btn_up, '1'],
-                        [Lang.Blocks.neobot_purple_remote_btn_down, '2'],
-                        [Lang.Blocks.neobot_purple_remote_btn_left, '3'],
-                        [Lang.Blocks.neobot_purple_remote_btn_right, '4'],
+                        [Lang.Blocks.neobot_purple_remote_btn_1, '1'],
+                        [Lang.Blocks.neobot_purple_remote_btn_2, '2'],
+                        [Lang.Blocks.neobot_purple_remote_btn_3, '3'],
+                        [Lang.Blocks.neobot_purple_remote_btn_4, '4'],
+                        [Lang.Blocks.neobot_purple_remote_btn_up, 'up'],
+                        [Lang.Blocks.neobot_purple_remote_btn_down, 'down'],
+                        [Lang.Blocks.neobot_purple_remote_btn_left, 'left'],
+                        [Lang.Blocks.neobot_purple_remote_btn_right, 'right'],
                     ],
-                    value: '10',
+                    value: '1',
                     fontSize: 11,
                     bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
                     arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
@@ -876,14 +1266,54 @@ Entry.NeobotPurple.getBlocks = function() {
             class: 'neobot_purple_remote',
             isNotFor: ['neobot_purple'],
             func: function(sprite, script) {
-                var key = script.getNumberField('KEY');
+                var key_cvt = {
+                    'up': 1,
+                    'down': 2,
+                    'left': 3,
+                    'right': 4,
+                    '1': 10,
+                    '2': 11,
+                    '3': 12,
+                    '4': 13,
+                };
+                var key = key_cvt[script.getStringValue('KEY', script)];
                 var value = Entry.hw.portData['IR'];
+                
                 if (key == value) {
                     return true;
                 } else {
                     return false;
                 }
             },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'Neobot_purple.remote_button(%1)',
+                        blockType: 'param',
+                        textParams: [
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    [Lang.Blocks.neobot_purple_remote_btn_1, '1'],
+                                    [Lang.Blocks.neobot_purple_remote_btn_2, '2'],
+                                    [Lang.Blocks.neobot_purple_remote_btn_3, '3'],
+                                    [Lang.Blocks.neobot_purple_remote_btn_4, '4'],
+                                    [Lang.Blocks.neobot_purple_remote_btn_up, 'up'],
+                                    [Lang.Blocks.neobot_purple_remote_btn_down, 'down'],
+                                    [Lang.Blocks.neobot_purple_remote_btn_left, 'left'],
+                                    [Lang.Blocks.neobot_purple_remote_btn_right, 'right'],
+                                ],
+                                value: '1',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue,
+                            }
+                        ]
+                    }
+                ]
+            }
         },
 
         /*************************
@@ -911,26 +1341,45 @@ Entry.NeobotPurple.getBlocks = function() {
                 {
                     type: 'Dropdown',
                     options: [
-                        ['100%', '255'],
-                        ['90%', '230'],
-                        ['80%', '204'],
-                        ['70%', '179'],
-                        ['60%', '153'],
-                        ['50%', '128'],
-                        ['40%', '102'],
-                        ['30%', '77'],
-                        ['20%', '51'],
-                        ['10%', '26'],
+                        ['100%', '100'],
+                        ['90%', '90'],
+                        ['80%', '80'],
+                        ['70%', '70'],
+                        ['60%', '60'],
+                        ['50%', '50'],
+                        ['40%', '40'],
+                        ['30%', '30'],
+                        ['20%', '20'],
+                        ['10%', '10'],
                     ],
-                    value: '255',
+                    value: '100',
                     fontSize: 11,
                     bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
                     arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
                 },
+                // {
+                //     type: 'Block',
+                //     accept: 'string',
+                //     defaultType: 'number',
+                // },
                 {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
+                    type: 'Dropdown',
+                    options: [
+                        [Lang.Blocks.neobot_purple_duration_cont, '-1'],
+                        [Lang.Blocks.neobot_purple_duration_1s, '1'],
+                        [Lang.Blocks.neobot_purple_duration_2s, '2'],
+                        [Lang.Blocks.neobot_purple_duration_3s, '3'],
+                        [Lang.Blocks.neobot_purple_duration_4s, '4'],
+                        [Lang.Blocks.neobot_purple_duration_5s, '5'],
+                        [Lang.Blocks.neobot_purple_duration_6s, '6'],
+                        [Lang.Blocks.neobot_purple_duration_7s, '7'],
+                        [Lang.Blocks.neobot_purple_duration_8s, '8'],
+                        [Lang.Blocks.neobot_purple_duration_9s, '9'],
+                    ],
+                    value: '-1',
+                    fontSize: 11,
+                    bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                    arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
                 },
                 {
                     type: 'Indicator',
@@ -942,12 +1391,12 @@ Entry.NeobotPurple.getBlocks = function() {
             def: {
                 params: [
                     null,
-                    null,
-                    {
-                        type: 'neobot_purple_arg_led_duration',
-                        id: 'm311',
-                    },
-                    null,
+                    // null,
+                    // {
+                    //     type: 'neobot_purple_arg_led_duration',
+                    //     id: 'm311',
+                    // },
+                    // null,
                 ],
                 type: 'neobot_purple_led_on',
             },
@@ -959,9 +1408,22 @@ Entry.NeobotPurple.getBlocks = function() {
             class: 'neobot_purple_led',
             isNotFor: ['neobot_purple'],
             func: function(sprite, script) {
+                let bright_cvt = {
+                    100: 255,
+                    90: 230,
+                    80: 204,
+                    70: 179,
+                    60: 153,
+                    50: 128,
+                    40: 102,
+                    30: 77,
+                    20: 51,
+                    10: 26,
+                };
+
                 if (!script.isStart) {
                     const port = script.getStringField('PORT', script);
-                    const value = script.getNumberField('VALUE', script);
+                    const value = bright_cvt[script.getNumberField('VALUE', script)];
                     const duration = script.getStringValue('DURATION', script);
 
                     if (Entry.NeobotPurple.log_to_console) {
@@ -972,7 +1434,7 @@ Entry.NeobotPurple.getBlocks = function() {
                         Entry.console.print('==========================', 'speak');
                     }
 
-                    if ((duration != '계속' && duration != 'constantly') && Entry.parseNumber(duration) <= 0) {
+                    if ((Entry.parseNumber(duration) == 0)) { // To block a short flash
                         return script.callReturn();
                     }
 
@@ -984,7 +1446,7 @@ Entry.NeobotPurple.getBlocks = function() {
                         Entry.hw.sendQueue[port] = value;
                     }
 
-                    if (duration == '계속' || duration == 'constantly') {
+                    if (Entry.parseNumber(duration) < 0) {
                         return script.callReturn();
                     }
 
@@ -1011,6 +1473,76 @@ Entry.NeobotPurple.getBlocks = function() {
                     Entry.engine.isContinue = false;
                     return script.callReturn();
                 }
+            },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'Neobot_purple.led_on(%1, %2, %3)',
+                        blockType: 'param',
+                        textParams: [
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    ['OUT1', 'OUT1'],
+                                    ['OUT2', 'OUT2'],
+                                    ['OUT3', 'OUT3'],
+                                    [Lang.Blocks.neobot_purple_out_all, 'ALL'],
+                                ],
+                                value: 'OUT1',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue,
+                            },
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    ['100%', '100'],
+                                    ['90%', '90'],
+                                    ['80%', '80'],
+                                    ['70%', '70'],
+                                    ['60%', '60'],
+                                    ['50%', '50'],
+                                    ['40%', '40'],
+                                    ['30%', '30'],
+                                    ['20%', '20'],
+                                    ['10%', '10'],
+                                ],
+                                value: '100',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue,
+                            },
+                            // {
+                            //     type: 'Block',
+                            //     accept: 'string',
+                            //     defaultType: 'number',
+                            // },
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    [Lang.Blocks.neobot_purple_duration_cont, '-1'],
+                                    [Lang.Blocks.neobot_purple_duration_1s, '1'],
+                                    [Lang.Blocks.neobot_purple_duration_2s, '2'],
+                                    [Lang.Blocks.neobot_purple_duration_3s, '3'],
+                                    [Lang.Blocks.neobot_purple_duration_4s, '4'],
+                                    [Lang.Blocks.neobot_purple_duration_5s, '5'],
+                                    [Lang.Blocks.neobot_purple_duration_6s, '6'],
+                                    [Lang.Blocks.neobot_purple_duration_7s, '7'],
+                                    [Lang.Blocks.neobot_purple_duration_8s, '8'],
+                                    [Lang.Blocks.neobot_purple_duration_9s, '9'],
+                                ],
+                                value: '-1',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringOrNumberByValue,
+                            },
+                        ]
+                    }
+                ]
             },
         },
 
@@ -1066,6 +1598,31 @@ Entry.NeobotPurple.getBlocks = function() {
                     Entry.hw.sendQueue[port] = 0;
                 }
                 return script.callReturn();
+            },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'Neobot_purple.led_off(%1)',
+                        blockType: 'param',
+                        textParams: [
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    ['OUT1', 'OUT1'],
+                                    ['OUT2', 'OUT2'],
+                                    ['OUT3', 'OUT3'],
+                                    [Lang.Blocks.neobot_purple_out_all, 'ALL'],
+                                ],
+                                value: 'OUT1',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue,
+                            },
+                        ]
+                    }
+                ]
             },
         },
 
@@ -1144,6 +1701,44 @@ Entry.NeobotPurple.getBlocks = function() {
                     Entry.hw.sendQueue[outPort] = value;
                 }
                 return script.callReturn();
+            },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'Neobot_purple.led_by_port(%1, %2)',
+                        blockType: 'param',
+                        textParams: [
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    ['IN1', 'IN1'],
+                                    ['IN2', 'IN2'],
+                                    ['IN3', 'IN3'],
+                                ],
+                                value: 'IN1',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue,
+                            },
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    ['OUT1', 'OUT1'],
+                                    ['OUT2', 'OUT2'],
+                                    ['OUT3', 'OUT3'],
+                                    [Lang.Blocks.neobot_purple_out_all, 'ALL'],
+                                ],
+                                value: 'OUT1',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue,
+                            },
+                        ]
+                    }
+                ]
             },
         },
 
@@ -1309,6 +1904,43 @@ Entry.NeobotPurple.getBlocks = function() {
                     return script.callReturn();
                 }
             },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'Neobot_purple.color_led_on(%1, %2, %3, %4)',
+                        blockType: 'param',
+                        textParams: [
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    ['OUT1', 'OUT1'],
+                                    ['OUT2', 'OUT2'],
+                                    ['OUT3', 'OUT3'],
+                                    [Lang.Blocks.neobot_purple_out_all, 'ALL'],
+                                ],
+                                value: 'OUT1',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue,
+                            },
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                        ]
+                    }
+                ]
+            },
         },
 
         /*************************
@@ -1386,6 +2018,35 @@ Entry.NeobotPurple.getBlocks = function() {
                 }
                 return script.callReturn();
             },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'Neobot_purple.set_value(%1, %2)',
+                        blockType: 'param',
+                        textParams: [
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    ['OUT1', 'OUT1'],
+                                    ['OUT2', 'OUT2'],
+                                    ['OUT3', 'OUT3'],
+                                    [Lang.Blocks.neobot_purple_out_all, 'ALL'],
+                                ],
+                                value: 'OUT1',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue,
+                            },
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                        ]
+                    }
+                ]
+            },
         },
 
         /*************************
@@ -1400,13 +2061,13 @@ Entry.NeobotPurple.getBlocks = function() {
                 {
                     type: 'Dropdown',
                     options: [
-                        [Lang.Blocks.neobot_purple_motor_move_forward, '1'],
-                        [Lang.Blocks.neobot_purple_motor_move_backward, '2'],
-                        [Lang.Blocks.neobot_purple_motor_move_left, '3'],
-                        [Lang.Blocks.neobot_purple_motor_move_right, '4'],
-                        [Lang.Blocks.neobot_purple_motor_move_stop, '5'],
+                        [Lang.Blocks.neobot_purple_motor_move_forward, 'forward'],
+                        [Lang.Blocks.neobot_purple_motor_move_backward, 'backward'],
+                        [Lang.Blocks.neobot_purple_motor_move_left, 'left'],
+                        [Lang.Blocks.neobot_purple_motor_move_right, 'right'],
+                        [Lang.Blocks.neobot_purple_motor_move_stop, 'stop'],
                     ],
-                    value: '1',
+                    value: 'forward',
                     fontSize: 11,
                     bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
                     arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
@@ -1431,27 +2092,27 @@ Entry.NeobotPurple.getBlocks = function() {
             class: 'neobot_purple_motor',
             isNotFor: ['neobot_purple'],
             func: function(sprite, script) {
-                const move = script.getNumberField('MOVE');
+                const move = script.getStringField('MOVE');
                 let leftValue;
                 let rightValue;
                 switch (move) {
-                    case 1:
+                    case 'forward':
                         leftValue = 0x10 + 10;
                         rightValue = 0x10 + 10;
                         break;
-                    case 2:
+                    case 'backward':
                         leftValue = 0x20 + 10;
                         rightValue = 0x20 + 10;
                         break;
-                    case 3:
+                    case 'left':
                         leftValue = 0x20 + 5;
                         rightValue = 0x10 + 5;
                         break;
-                    case 4:
+                    case 'right':
                         leftValue = 0x10 + 5;
                         rightValue = 0x20 + 5;
                         break;
-                    case 5:
+                    case 'stop':
                         leftValue = 0;
                         rightValue = 0;
                         break;
@@ -1469,6 +2130,32 @@ Entry.NeobotPurple.getBlocks = function() {
                 Entry.hw.sendQueue['DCR'] = rightValue;
                 return script.callReturn();
             },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'Neobot_purple.motor_turn(%1)',
+                        blockType: 'param',
+                        textParams: [
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    [Lang.Blocks.neobot_purple_motor_move_forward, 'forward'],
+                                    [Lang.Blocks.neobot_purple_motor_move_backward, 'backward'],
+                                    [Lang.Blocks.neobot_purple_motor_move_left, 'left'],
+                                    [Lang.Blocks.neobot_purple_motor_move_right, 'right'],
+                                    [Lang.Blocks.neobot_purple_motor_move_stop, 'stop'],
+                                ],
+                                value: 'forward',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue,
+                            },
+                        ]
+                    }
+                ]
+            },
         },
 
         neobot_purple_motor_start: {
@@ -1480,11 +2167,11 @@ Entry.NeobotPurple.getBlocks = function() {
                 {
                     type: 'Dropdown',
                     options: [
-                        [Lang.Blocks.neobot_purple_motor_both, '1'],
-                        [Lang.Blocks.neobot_purple_motor_left, '2'],
-                        [Lang.Blocks.neobot_purple_motor_right, '3'],
+                        [Lang.Blocks.neobot_purple_motor_both, 'both'],
+                        [Lang.Blocks.neobot_purple_motor_left, 'left'],
+                        [Lang.Blocks.neobot_purple_motor_right, 'right'],
                     ],
-                    value: '1',
+                    value: 'both',
                     fontSize: 11,
                     bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
                     arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
@@ -1492,26 +2179,67 @@ Entry.NeobotPurple.getBlocks = function() {
                 {
                     type: 'Dropdown',
                     options: [
-                        [Lang.Blocks.neobot_purple_direction_forward, '1'],
-                        [Lang.Blocks.neobot_purple_direction_backward, '2'],
-                        [Lang.Blocks.neobot_purple_direction_left, '3'],
-                        [Lang.Blocks.neobot_purple_direction_right, '4'],
+                        [Lang.Blocks.neobot_purple_direction_forward, 'forward'],
+                        [Lang.Blocks.neobot_purple_direction_backward, 'backward'],
+                        [Lang.Blocks.neobot_purple_direction_left, 'left'],
+                        [Lang.Blocks.neobot_purple_direction_right, 'right'],
                     ],
-                    value: '1',
+                    value: 'forward',
                     fontSize: 11,
                     bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
                     arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
                 },
                 {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
+                    type: 'Dropdown',
+                    options: [
+                        ['IN1', 'IN1'],
+                        ['IN2', 'IN2'],
+                        ['IN3', 'IN3'],
+                        ['100%', '100'],
+                        ['90%', '90'],
+                        ['80%', '80'],
+                        ['70%', '70'],
+                        ['60%', '60'],
+                        ['50%', '50'],
+                        ['40%', '40'],
+                        ['30%', '30'],
+                        ['20%', '20'],
+                        ['10%', '10'],
+                    ],
+                    value: '100',
+                    fontSize: 11,
+                    bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                    arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
                 },
                 {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
+                    type: 'Dropdown',
+                    options: [
+                        [Lang.Blocks.neobot_purple_duration_cont, '-1'],
+                        [Lang.Blocks.neobot_purple_duration_1s, '1'],
+                        [Lang.Blocks.neobot_purple_duration_2s, '2'],
+                        [Lang.Blocks.neobot_purple_duration_3s, '3'],
+                        [Lang.Blocks.neobot_purple_duration_4s, '4'],
+                        [Lang.Blocks.neobot_purple_duration_5s, '5'],
+                        [Lang.Blocks.neobot_purple_duration_6s, '6'],
+                        [Lang.Blocks.neobot_purple_duration_7s, '7'],
+                        [Lang.Blocks.neobot_purple_duration_8s, '8'],
+                        [Lang.Blocks.neobot_purple_duration_9s, '9'],
+                    ],
+                    value: '-1',
+                    fontSize: 11,
+                    bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                    arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
                 },
+                // {
+                //     type: 'Block',
+                //     accept: 'string',
+                //     defaultType: 'number',
+                // },
+                // {
+                //     type: 'Block',
+                //     accept: 'string',
+                //     defaultType: 'number',
+                // },
                 {
                     type: 'Indicator',
                     img: 'block_icon/hardware_icon.svg',
@@ -1522,16 +2250,16 @@ Entry.NeobotPurple.getBlocks = function() {
             def: {
                 params: [
                     null,
-                    null,
-                    {
-                        type: 'neobot_purple_arg_motor_speed',
-                        id: 'm411',
-                    },
-                    {
-                        type: 'neobot_purple_arg_motor_duration',
-                        id: 'm412',
-                    },
-                    null,
+                    // null,
+                    // {
+                    //     type: 'neobot_purple_arg_motor_speed',
+                    //     id: 'm411',
+                    // },
+                    // {
+                    //     type: 'neobot_purple_arg_motor_duration',
+                    //     id: 'm412',
+                    // },
+                    // null,
                 ],
                 type: 'neobot_purple_motor_start',
             },
@@ -1550,16 +2278,16 @@ Entry.NeobotPurple.getBlocks = function() {
                     const speed = script.getStringValue('SPEED', script);
                     const duration = script.getStringValue('DURATION', script);
 
-                    if (duration != '계속' && duration != 'constantly' && Entry.parseNumber(duration) <= 0) {
+                    if (Entry.parseNumber(duration) == 0) {
                         return script.callReturn();
                     }
 
                     let moveLeft = false;
                     let moveRight = false;
-                    if (motor == 1) {
+                    if (motor == 'both') {
                         moveLeft = true;
                         moveRight = true;
-                    } else if (motor == 2) {
+                    } else if (motor == 'left') {
                         moveLeft = true;
                     } else {
                         moveRight = true;
@@ -1567,13 +2295,13 @@ Entry.NeobotPurple.getBlocks = function() {
 
                     let leftDirectionValue;
                     let rightDirectionValue;
-                    if (direction == 1) {
+                    if (direction == 'forward') {
                         leftDirectionValue = 0x10;
                         rightDirectionValue = 0x10;
-                    } else if (direction == 2) {
+                    } else if (direction == 'backward') {
                         leftDirectionValue = 0x20;
                         rightDirectionValue = 0x20;
-                    } else if (direction == 3) {
+                    } else if (direction == 'left') {
                         leftDirectionValue = 0x20;
                         rightDirectionValue = 0x10;
                     } else {
@@ -1616,7 +2344,7 @@ Entry.NeobotPurple.getBlocks = function() {
                         Entry.hw.sendQueue['DCR'] = rightOutValue;
                     }
 
-                    if (duration == '계속' || duration == 'constantly') {
+                    if (duration < 0) {
                         return script.callReturn();
                     }
 
@@ -1639,6 +2367,97 @@ Entry.NeobotPurple.getBlocks = function() {
                     return script.callReturn();
                 }
             },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'Neobot_purple.motor_rotate(%1, %2, %3, %4)',
+                        blockType: 'param',
+                        textParams: [
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    [Lang.Blocks.neobot_purple_motor_both, 'both'],
+                                    [Lang.Blocks.neobot_purple_motor_left, 'left'],
+                                    [Lang.Blocks.neobot_purple_motor_right, 'right'],
+                                ],
+                                value: 'both',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue,
+                            },
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    [Lang.Blocks.neobot_purple_direction_forward, 'forward'],
+                                    [Lang.Blocks.neobot_purple_direction_backward, 'backward'],
+                                    [Lang.Blocks.neobot_purple_direction_left, 'left'],
+                                    [Lang.Blocks.neobot_purple_direction_right, 'right'],
+                                ],
+                                value: 'forward',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue,
+                            },
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    ['IN1', 'IN1'],
+                                    ['IN2', 'IN2'],
+                                    ['IN3', 'IN3'],
+                                    ['100%', '100'],
+                                    ['90%', '90'],
+                                    ['80%', '80'],
+                                    ['70%', '70'],
+                                    ['60%', '60'],
+                                    ['50%', '50'],
+                                    ['40%', '40'],
+                                    ['30%', '30'],
+                                    ['20%', '20'],
+                                    ['10%', '10'],
+                                ],
+                                value: '100',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue,
+                            },
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    [Lang.Blocks.neobot_purple_duration_cont, '-1'],
+                                    [Lang.Blocks.neobot_purple_duration_1s, '1'],
+                                    [Lang.Blocks.neobot_purple_duration_2s, '2'],
+                                    [Lang.Blocks.neobot_purple_duration_3s, '3'],
+                                    [Lang.Blocks.neobot_purple_duration_4s, '4'],
+                                    [Lang.Blocks.neobot_purple_duration_5s, '5'],
+                                    [Lang.Blocks.neobot_purple_duration_6s, '6'],
+                                    [Lang.Blocks.neobot_purple_duration_7s, '7'],
+                                    [Lang.Blocks.neobot_purple_duration_8s, '8'],
+                                    [Lang.Blocks.neobot_purple_duration_9s, '9'],
+                                ],
+                                value: '-1',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringOrNumberByValue,
+                            },
+                            // {
+                            //     type: 'Block',
+                            //     accept: 'string',
+                            //     defaultType: 'number',
+                            // },
+                            // {
+                            //     type: 'Block',
+                            //     accept: 'string',
+                            //     defaultType: 'number',
+                            // },
+                        ]
+                    }
+                ]
+            },
         },
 
         neobot_purple_motor_stop: {
@@ -1650,11 +2469,11 @@ Entry.NeobotPurple.getBlocks = function() {
                 {
                     type: 'Dropdown',
                     options: [
-                        [Lang.Blocks.neobot_purple_motor_both, '1'],
-                        [Lang.Blocks.neobot_purple_motor_left, '2'],
-                        [Lang.Blocks.neobot_purple_motor_right, '3'],
+                        [Lang.Blocks.neobot_purple_motor_both, 'both'],
+                        [Lang.Blocks.neobot_purple_motor_left, 'left'],
+                        [Lang.Blocks.neobot_purple_motor_right, 'right'],
                     ],
-                    value: '1',
+                    value: 'both',
                     fontSize: 11,
                     bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
                     arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
@@ -1678,7 +2497,7 @@ Entry.NeobotPurple.getBlocks = function() {
             class: 'neobot_purple_motor',
             isNotFor: ['neobot_purple'],
             func: function(sprite, script) {
-                const motor = script.getNumberField('MOTOR');
+                const motor = script.getStringField('MOTOR');
 
                 if (Entry.NeobotPurple.log_to_console) {
                     Entry.console.print('=== neobot_purple_motor_stop ===', 'speak');
@@ -1686,15 +2505,39 @@ Entry.NeobotPurple.getBlocks = function() {
                     Entry.console.print('==========================', 'speak');
                 }
 
-                if (motor == 1) {
+                if (motor == 'both') {
                     Entry.hw.sendQueue['DCL'] = 0;
                     Entry.hw.sendQueue['DCR'] = 0;
-                } else if (motor == 2) {
+                } else if (motor == 'left') {
                     Entry.hw.sendQueue['DCL'] = 0;
                 } else {
                     Entry.hw.sendQueue['DCR'] = 0;
                 }
                 return script.callReturn();
+            },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'Neobot_purple.motor_stop(%1)',
+                        blockType: 'param',
+                        textParams: [
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    [Lang.Blocks.neobot_purple_motor_both, 'both'],
+                                    [Lang.Blocks.neobot_purple_motor_left, 'left'],
+                                    [Lang.Blocks.neobot_purple_motor_right, 'right'],
+                                ],
+                                value: 'both',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue,
+                            },
+                        ]
+                    }
+                ]
             },
         },
 
@@ -1711,18 +2554,18 @@ Entry.NeobotPurple.getBlocks = function() {
                     type: 'Dropdown',
                     options: [
                         [Lang.Blocks.neobot_purple_sound_silent, '0'],
-                        [Lang.Blocks.neobot_purple_sound_do, '1'],
-                        [Lang.Blocks.neobot_purple_sound_do_shop, '2'],
-                        [Lang.Blocks.neobot_purple_sound_re, '3'],
-                        [Lang.Blocks.neobot_purple_sound_re_shop, '4'],
-                        [Lang.Blocks.neobot_purple_sound_mi, '5'],
-                        [Lang.Blocks.neobot_purple_sound_fa, '6'],
-                        [Lang.Blocks.neobot_purple_sound_fa_shop, '7'],
-                        [Lang.Blocks.neobot_purple_sound_so, '8'],
-                        [Lang.Blocks.neobot_purple_sound_so_shop, '9'],
-                        [Lang.Blocks.neobot_purple_sound_la, '10'],
-                        [Lang.Blocks.neobot_purple_sound_la_shop, '11'],
-                        [Lang.Blocks.neobot_purple_sound_ti, '12'],
+                        [Lang.Blocks.neobot_purple_sound_do, 'c'],
+                        [Lang.Blocks.neobot_purple_sound_do_shop, 'c#'],
+                        [Lang.Blocks.neobot_purple_sound_re, 'd'],
+                        [Lang.Blocks.neobot_purple_sound_re_shop, 'd#'],
+                        [Lang.Blocks.neobot_purple_sound_mi, 'e'],
+                        [Lang.Blocks.neobot_purple_sound_fa, 'f'],
+                        [Lang.Blocks.neobot_purple_sound_fa_shop, 'f#'],
+                        [Lang.Blocks.neobot_purple_sound_so, 'g'],
+                        [Lang.Blocks.neobot_purple_sound_so_shop, 'g#'],
+                        [Lang.Blocks.neobot_purple_sound_la, 'a'],
+                        [Lang.Blocks.neobot_purple_sound_la_shop, 'a#'],
+                        [Lang.Blocks.neobot_purple_sound_ti, 'b'],
                     ],
                     value: '0',
                     fontSize: 11,
@@ -1732,12 +2575,12 @@ Entry.NeobotPurple.getBlocks = function() {
                 {
                     type: 'Dropdown',
                     options: [
-                        ['1', '0'],
-                        ['2', '1'],
-                        ['3', '2'],
-                        ['4', '3'],
-                        ['5', '4'],
-                        ['6', '5'],
+                        ['1', '1'],
+                        ['2', '2'],
+                        ['3', '3'],
+                        ['4', '4'],
+                        ['5', '5'],
+                        ['6', '6'],
                     ],
                     value: '0',
                     fontSize: 11,
@@ -1765,7 +2608,7 @@ Entry.NeobotPurple.getBlocks = function() {
             ],
             events: {},
             def: {
-                params: ['1', '2', '4', null],
+                params: ['c', '3', '4', null],
                 type: 'neobot_purple_play_note_for',
             },
             paramsKeyMap: {
@@ -1777,8 +2620,30 @@ Entry.NeobotPurple.getBlocks = function() {
             isNotFor: ['neobot_purple'],
             func: function(sprite, script) {
                 if (!script.isStart) {
-                    const note = script.getNumberField('NOTE', script);
-                    const octave = script.getNumberField('OCTAVE', script);
+                    let octave_cvt = {
+                        '1': 0,
+                        '2': 1,
+                        '3': 2,
+                        '4': 3,
+                        '5': 4,
+                        '6': 5,
+                    };
+                    let note_cvt = {
+                        'c': 1,
+                        'c#': 2,
+                        'd': 3,
+                        'd#': 4,
+                        'e': 5,
+                        'f': 6,
+                        'f#': 7,
+                        'g': 8,
+                        'g#': 9,
+                        'a': 10,
+                        'a#': 11,
+                        'b': 12,
+                    };
+                    const note = note_cvt[script.getStringField('NOTE', script)];
+                    const octave = octave_cvt[script.getStringField('OCTAVE', script)];
                     const duration = script.getNumberField('DURATION', script);
                     let value = note > 0 ? note + 12 * octave : 0;
 
@@ -1811,6 +2676,70 @@ Entry.NeobotPurple.getBlocks = function() {
                     Entry.engine.isContinue = false;
                     return script.callReturn();
                 }
+            },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'Neobot_purple.buzzer(%2, %1, %3)',
+                        blockType: 'param',
+                        textParams: [
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    [Lang.Blocks.neobot_purple_sound_silent, '0'],
+                                    [Lang.Blocks.neobot_purple_sound_do, 'c'],
+                                    [Lang.Blocks.neobot_purple_sound_do_shop, 'c#'],
+                                    [Lang.Blocks.neobot_purple_sound_re, 'd'],
+                                    [Lang.Blocks.neobot_purple_sound_re_shop, 'd#'],
+                                    [Lang.Blocks.neobot_purple_sound_mi, 'e'],
+                                    [Lang.Blocks.neobot_purple_sound_fa, 'f'],
+                                    [Lang.Blocks.neobot_purple_sound_fa_shop, 'f#'],
+                                    [Lang.Blocks.neobot_purple_sound_so, 'g'],
+                                    [Lang.Blocks.neobot_purple_sound_so_shop, 'g#'],
+                                    [Lang.Blocks.neobot_purple_sound_la, 'a'],
+                                    [Lang.Blocks.neobot_purple_sound_la_shop, 'a#'],
+                                    [Lang.Blocks.neobot_purple_sound_ti, 'b'],
+                                ],
+                                value: 'c',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue,
+                            },
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    ['1', '1'],
+                                    ['2', '2'],
+                                    ['3', '3'],
+                                    ['4', '4'],
+                                    ['5', '5'],
+                                    ['6', '6'],
+                                ],
+                                value: '3',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue,
+                            },
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    [Lang.Blocks.neobot_purple_sound_half_note, '2'],
+                                    [Lang.Blocks.neobot_purple_sound_quarter_note, '4'],
+                                    [Lang.Blocks.neobot_purple_sound_eighth_note, '8'],
+                                    [Lang.Blocks.neobot_purple_sound_sixteenth_note, '16'],
+                                ],
+                                value: '4',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue,
+                            },
+                        ]
+                    }
+                ]
             },
         },
 
@@ -1869,6 +2798,30 @@ Entry.NeobotPurple.getBlocks = function() {
                 Entry.hw.sendQueue['SND'] = value;
                 return script.callReturn();
             },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'Neobot_purple.buzzer_by_port(%1)',
+                        blockType: 'param',
+                        textParams: [
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    [Lang.Blocks.neobot_purple_port_1, 'IN1'],
+                                    [Lang.Blocks.neobot_purple_port_2, 'IN2'],
+                                    [Lang.Blocks.neobot_purple_port_3, 'IN3'],
+                                ],
+                                value: 'IN1',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue
+                            },
+                        ]
+                    }
+                ]
+            },
         },
 
         neobot_purple_melody_stop: {
@@ -1902,6 +2855,14 @@ Entry.NeobotPurple.getBlocks = function() {
 
                 Entry.hw.sendQueue['SND'] = 0;
                 return script.callReturn();
+            },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'Neobot_purple.buzzer_stop()'
+                    }
+                ]
             },
         },
 
@@ -1979,7 +2940,9 @@ Entry.NeobotPurple.getBlocks = function() {
                         if (out2) Entry.hw.sendQueue['OUT2'] = initValue;
                         if (out3) Entry.hw.sendQueue['OUT3'] = initValue;
                         if (Entry.NeobotPurple.log_to_console) Entry.console.print('neobot_purple_servo_init : ' + initValue, 'speak');
-                        script.timeFlag = 0;
+                        setTimeout(function() {
+                            script.timeFlag = 0;
+                        }, 100);
                     }, 200);
 
                     return script;
@@ -1991,6 +2954,31 @@ Entry.NeobotPurple.getBlocks = function() {
                     Entry.engine.isContinue = false;
                     return script.callReturn();
                 }
+            },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'Neobot_purple.servo_init(%1)',
+                        blockType: 'param',
+                        textParams: [
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    ['OUT1', 'OUT1'],
+                                    ['OUT2', 'OUT2'],
+                                    ['OUT3', 'OUT3'],
+                                    [Lang.Blocks.neobot_purple_out_all, 'ALL'],
+                                ],
+                                value: 'OUT1',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue
+                            },
+                        ]
+                    }
+                ]
             },
         },
 
@@ -2016,10 +3004,10 @@ Entry.NeobotPurple.getBlocks = function() {
                 {
                     type: 'Dropdown',
                     options: [
-                        [Lang.Blocks.neobot_purple_servo_dir_1, '1'],
-                        [Lang.Blocks.neobot_purple_servo_dir_2, '2'],
+                        [Lang.Blocks.neobot_purple_servo_dir_1, 'forward'],
+                        [Lang.Blocks.neobot_purple_servo_dir_2, 'backward'],
                     ],
-                    value: '1',
+                    value: 'forward',
                     fontSize: 11,
                     bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
                     arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
@@ -2071,8 +3059,12 @@ Entry.NeobotPurple.getBlocks = function() {
             class: 'neobot_purple_servo',
             isNotFor: ['neobot_purple'],
             func: function(sprite, script) {
+                let dir_cvt = {
+                    'forward': 1,
+                    'backward': 2,
+                };
                 const port = script.getStringField('PORT', script);
-                const direction = script.getNumberField('DIRECTION');
+                const direction = dir_cvt[script.getStringField('DIRECTION')];
                 const speed = script.getStringField('SPEED');
 
                 let directionValue = 192; // 정방향
@@ -2117,6 +3109,67 @@ Entry.NeobotPurple.getBlocks = function() {
                     Entry.hw.sendQueue[port] = outValue;
                 }
                 return script.callReturn();
+            },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'Neobot_purple.servo_rotate(%1, %2, %3)',
+                        blockType: 'param',
+                        textParams: [
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    ['OUT1', 'OUT1'],
+                                    ['OUT2', 'OUT2'],
+                                    ['OUT3', 'OUT3'],
+                                    [Lang.Blocks.neobot_purple_out_all, 'ALL'],
+                                ],
+                                value: 'OUT1',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue
+                            },
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    [Lang.Blocks.neobot_purple_servo_dir_1, 'forward'],
+                                    [Lang.Blocks.neobot_purple_servo_dir_2, 'backward'],
+                                ],
+                                value: 'forward',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue
+                            },
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    ['IN1', 'IN1'],
+                                    ['IN2', 'IN2'],
+                                    ['IN3', 'IN3'],
+                                    ['0%', 0],
+                                    ['10%', 10],
+                                    ['20%', 20],
+                                    ['30%', 30],
+                                    ['40%', 40],
+                                    ['50%', 50],
+                                    ['60%', 60],
+                                    ['70%', 70],
+                                    ['80%', 80],
+                                    ['90%', 90],
+                                    ['100%', 100],
+                                ],
+                                value: 50,
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue
+                            },
+                        ]
+                    }
+                ]
             },
         },
         neobot_purple_servo_stop: {
@@ -2177,6 +3230,31 @@ Entry.NeobotPurple.getBlocks = function() {
                 }
                 return script.callReturn();
             },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'Neobot_purple.servo_stop(%1)',
+                        blockType: 'param',
+                        textParams: [
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    ['OUT1', 'OUT1'],
+                                    ['OUT2', 'OUT2'],
+                                    ['OUT3', 'OUT3'],
+                                    [Lang.Blocks.neobot_purple_out_all, 'ALL'],
+                                ],
+                                value: 'OUT1',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue,
+                            },
+                        ]
+                    }
+                ]
+            },
         },
 
         neobot_purple_servo_change_degree: {
@@ -2185,10 +3263,10 @@ Entry.NeobotPurple.getBlocks = function() {
             skeleton: 'basic',
             statements: [],
             params: [
-                {
-                    type: 'Block',
-                    accept: 'string',
-                },
+                // {
+                //     type: 'Block',
+                //     accept: 'string',
+                // },
                 {
                     type: 'Dropdown',
                     options: [
@@ -2205,10 +3283,10 @@ Entry.NeobotPurple.getBlocks = function() {
                 {
                     type: 'Dropdown',
                     options: [
-                        [Lang.Blocks.neobot_purple_servo_dir_1, '1'],
-                        [Lang.Blocks.neobot_purple_servo_dir_2, '2'],
+                        [Lang.Blocks.neobot_purple_servo_dir_1, 'forward'],
+                        [Lang.Blocks.neobot_purple_servo_dir_2, 'backward'],
                     ],
-                    value: '1',
+                    value: 'forward',
                     fontSize: 11,
                     bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
                     arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
@@ -2237,6 +3315,55 @@ Entry.NeobotPurple.getBlocks = function() {
                     arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
                 },
                 {
+                    type: 'Dropdown',
+                    options: [
+                        [Lang.Blocks.neobot_purple_port_1, 'IN1'],
+                        [Lang.Blocks.neobot_purple_port_2, 'IN2'],
+                        [Lang.Blocks.neobot_purple_port_3, 'IN3'],
+                        [Lang.Blocks.neobot_purple_angle_0, '0'],
+                        [Lang.Blocks.neobot_purple_angle_5, '5'],
+                        [Lang.Blocks.neobot_purple_angle_10, '10'],
+                        [Lang.Blocks.neobot_purple_angle_15, '15'],
+                        [Lang.Blocks.neobot_purple_angle_20, '20'],
+                        [Lang.Blocks.neobot_purple_angle_25, '25'],
+                        [Lang.Blocks.neobot_purple_angle_30, '30'],
+                        [Lang.Blocks.neobot_purple_angle_35, '35'],
+                        [Lang.Blocks.neobot_purple_angle_40, '40'],
+                        [Lang.Blocks.neobot_purple_angle_45, '45'],
+                        [Lang.Blocks.neobot_purple_angle_50, '50'],
+                        [Lang.Blocks.neobot_purple_angle_55, '55'],
+                        [Lang.Blocks.neobot_purple_angle_60, '60'],
+                        [Lang.Blocks.neobot_purple_angle_65, '65'],
+                        [Lang.Blocks.neobot_purple_angle_70, '70'],
+                        [Lang.Blocks.neobot_purple_angle_75, '75'],
+                        [Lang.Blocks.neobot_purple_angle_80, '80'],
+                        [Lang.Blocks.neobot_purple_angle_85, '85'],
+                        [Lang.Blocks.neobot_purple_angle_90, '90'],
+                        [Lang.Blocks.neobot_purple_angle_95, '95'],
+                        [Lang.Blocks.neobot_purple_angle_100, '100'],
+                        [Lang.Blocks.neobot_purple_angle_105, '105'],
+                        [Lang.Blocks.neobot_purple_angle_110, '110'],
+                        [Lang.Blocks.neobot_purple_angle_115, '115'],
+                        [Lang.Blocks.neobot_purple_angle_120, '120'],
+                        [Lang.Blocks.neobot_purple_angle_125, '125'],
+                        [Lang.Blocks.neobot_purple_angle_130, '130'],
+                        [Lang.Blocks.neobot_purple_angle_135, '135'],
+                        [Lang.Blocks.neobot_purple_angle_140, '140'],
+                        [Lang.Blocks.neobot_purple_angle_145, '145'],
+                        [Lang.Blocks.neobot_purple_angle_150, '150'],
+                        [Lang.Blocks.neobot_purple_angle_155, '155'],
+                        [Lang.Blocks.neobot_purple_angle_160, '160'],
+                        [Lang.Blocks.neobot_purple_angle_165, '165'],
+                        [Lang.Blocks.neobot_purple_angle_170, '170'],
+                        [Lang.Blocks.neobot_purple_angle_175, '175'],
+                        [Lang.Blocks.neobot_purple_angle_180, '180'],
+                    ],
+                    value: '90',
+                    fontSize: 11,
+                    bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                    arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                },
+                {
                     type: 'Indicator',
                     img: 'block_icon/hardware_icon.svg',
                     size: 12,
@@ -2245,29 +3372,33 @@ Entry.NeobotPurple.getBlocks = function() {
             events: {},
             def: {
                 params: [
-                    {
-                        type: 'get_servo_degree',
-                        id: 'm211',
-                    },
-                    null,
-                    null,
-                    null,
+                    // {
+                    //     type: 'get_servo_degree',
+                    //     id: 'm211',
+                    // },
+                    // null,
+                    // null,
+                    // null,
                     null,
                 ],
                 type: 'neobot_purple_servo_change_degree',
             },
             paramsKeyMap: {
-                DEGREE: 0,
-                PORT: 1,
-                DIRECTION: 2,
-                SPEED: 3,
+                DEGREE: 3,
+                PORT: 0,
+                DIRECTION: 1,
+                SPEED: 2,
             },
             class: 'neobot_purple_servo',
             isNotFor: ['neobot_purple'],
             func: function(sprite, script) {
                 if (!script.isStart) {
+                    let dir_cvt = {
+                        'forward': 1,
+                        'backward': 2,
+                    };
                     const port = script.getStringField('PORT', script);
-                    const direction = script.getNumberField('DIRECTION');
+                    const direction = dir_cvt[script.getStringValue('DIRECTION')];
                     const speed = script.getStringValue('SPEED');
                     const degree = script.getStringValue('DEGREE');
 
@@ -2358,204 +3489,319 @@ Entry.NeobotPurple.getBlocks = function() {
                     return script.callReturn();
                 }
             },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'Neobot_purple.servo_rotate_by_degree(%1, %2, %3, %4)',
+                        blockType: 'param',
+                        textParams: [
+                            // {
+                            //     type: 'Block',
+                            //     accept: 'string',
+                            // },
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    ['OUT1', 'OUT1'],
+                                    ['OUT2', 'OUT2'],
+                                    ['OUT3', 'OUT3'],
+                                    [Lang.Blocks.neobot_purple_out_all, 'ALL'],
+                                ],
+                                value: 'OUT1',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue
+                            },
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    [Lang.Blocks.neobot_purple_servo_dir_1, 'forward'],
+                                    [Lang.Blocks.neobot_purple_servo_dir_2, 'backward'],
+                                ],
+                                value: 'forward',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue
+                            },
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    ['IN1', 'IN1'],
+                                    ['IN2', 'IN2'],
+                                    ['IN3', 'IN3'],
+                                    ['0%', 0],
+                                    ['10%', 10],
+                                    ['20%', 20],
+                                    ['30%', 30],
+                                    ['40%', 40],
+                                    ['50%', 50],
+                                    ['60%', 60],
+                                    ['70%', 70],
+                                    ['80%', 80],
+                                    ['90%', 90],
+                                    ['100%', 100],
+                                ],
+                                value: 50,
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue
+                            },
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    [Lang.Blocks.neobot_purple_port_1, 'IN1'],
+                                    [Lang.Blocks.neobot_purple_port_2, 'IN2'],
+                                    [Lang.Blocks.neobot_purple_port_3, 'IN3'],
+                                    [Lang.Blocks.neobot_purple_angle_0, '0'],
+                                    [Lang.Blocks.neobot_purple_angle_5, '5'],
+                                    [Lang.Blocks.neobot_purple_angle_10, '10'],
+                                    [Lang.Blocks.neobot_purple_angle_15, '15'],
+                                    [Lang.Blocks.neobot_purple_angle_20, '20'],
+                                    [Lang.Blocks.neobot_purple_angle_25, '25'],
+                                    [Lang.Blocks.neobot_purple_angle_30, '30'],
+                                    [Lang.Blocks.neobot_purple_angle_35, '35'],
+                                    [Lang.Blocks.neobot_purple_angle_40, '40'],
+                                    [Lang.Blocks.neobot_purple_angle_45, '45'],
+                                    [Lang.Blocks.neobot_purple_angle_50, '50'],
+                                    [Lang.Blocks.neobot_purple_angle_55, '55'],
+                                    [Lang.Blocks.neobot_purple_angle_60, '60'],
+                                    [Lang.Blocks.neobot_purple_angle_65, '65'],
+                                    [Lang.Blocks.neobot_purple_angle_70, '70'],
+                                    [Lang.Blocks.neobot_purple_angle_75, '75'],
+                                    [Lang.Blocks.neobot_purple_angle_80, '80'],
+                                    [Lang.Blocks.neobot_purple_angle_85, '85'],
+                                    [Lang.Blocks.neobot_purple_angle_90, '90'],
+                                    [Lang.Blocks.neobot_purple_angle_95, '95'],
+                                    [Lang.Blocks.neobot_purple_angle_100, '100'],
+                                    [Lang.Blocks.neobot_purple_angle_105, '105'],
+                                    [Lang.Blocks.neobot_purple_angle_110, '110'],
+                                    [Lang.Blocks.neobot_purple_angle_115, '115'],
+                                    [Lang.Blocks.neobot_purple_angle_120, '120'],
+                                    [Lang.Blocks.neobot_purple_angle_125, '125'],
+                                    [Lang.Blocks.neobot_purple_angle_130, '130'],
+                                    [Lang.Blocks.neobot_purple_angle_135, '135'],
+                                    [Lang.Blocks.neobot_purple_angle_140, '140'],
+                                    [Lang.Blocks.neobot_purple_angle_145, '145'],
+                                    [Lang.Blocks.neobot_purple_angle_150, '150'],
+                                    [Lang.Blocks.neobot_purple_angle_155, '155'],
+                                    [Lang.Blocks.neobot_purple_angle_160, '160'],
+                                    [Lang.Blocks.neobot_purple_angle_165, '165'],
+                                    [Lang.Blocks.neobot_purple_angle_170, '170'],
+                                    [Lang.Blocks.neobot_purple_angle_175, '175'],
+                                    [Lang.Blocks.neobot_purple_angle_180, '180'],
+                                ],
+                                value: '90',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter: Entry.block.converters.returnStringValue
+                            },
+                        ]
+                    }
+                ]
+            },
         },
 
         /*****************
          * ARG Blocks
          *****************/
-        neobot_purple_arg_led_duration: {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            skeleton: 'basic_string_field',
-            statements: [],
-            params: [
-                {
-                    type: 'Dropdown',
-                    options: [
-                        [Lang.Blocks.neobot_purple_duration_cont, '계속'],
-                        [Lang.Blocks.neobot_purple_duration_1s, '1'],
-                        [Lang.Blocks.neobot_purple_duration_2s, '2'],
-                        [Lang.Blocks.neobot_purple_duration_3s, '3'],
-                        [Lang.Blocks.neobot_purple_duration_4s, '4'],
-                        [Lang.Blocks.neobot_purple_duration_5s, '5'],
-                        [Lang.Blocks.neobot_purple_duration_6s, '6'],
-                        [Lang.Blocks.neobot_purple_duration_7s, '7'],
-                        [Lang.Blocks.neobot_purple_duration_8s, '8'],
-                        [Lang.Blocks.neobot_purple_duration_9s, '9'],
-                    ],
-                    value: '계속',
-                    fontSize: 11,
-                    bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
-                    arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
-                },
-            ],
-            events: {},
-            def: {
-                params: [null],
-            },
-            paramsKeyMap: {
-                VALUE: 0,
-            },
-            class: 'neobot_purple_led',
-            isNotFor: ['neobot_purple'],
-            func: function(sprite, script) {
-                return script.getStringField('VALUE');
-            },
-        },
+        // neobot_purple_arg_led_duration: {
+        //     color: EntryStatic.colorSet.block.default.HARDWARE,
+        //     outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+        //     skeleton: 'basic_string_field',
+        //     statements: [],
+        //     params: [
+        //         {
+        //             type: 'Dropdown',
+        //             options: [
+        //                 [Lang.Blocks.neobot_purple_duration_cont, '계속'],
+        //                 [Lang.Blocks.neobot_purple_duration_1s, '1'],
+        //                 [Lang.Blocks.neobot_purple_duration_2s, '2'],
+        //                 [Lang.Blocks.neobot_purple_duration_3s, '3'],
+        //                 [Lang.Blocks.neobot_purple_duration_4s, '4'],
+        //                 [Lang.Blocks.neobot_purple_duration_5s, '5'],
+        //                 [Lang.Blocks.neobot_purple_duration_6s, '6'],
+        //                 [Lang.Blocks.neobot_purple_duration_7s, '7'],
+        //                 [Lang.Blocks.neobot_purple_duration_8s, '8'],
+        //                 [Lang.Blocks.neobot_purple_duration_9s, '9'],
+        //             ],
+        //             value: '계속',
+        //             fontSize: 11,
+        //             bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+        //             arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+        //         },
+        //     ],
+        //     events: {},
+        //     def: {
+        //         params: [null],
+        //     },
+        //     paramsKeyMap: {
+        //         VALUE: 0,
+        //     },
+        //     class: 'neobot_purple_led',
+        //     isNotFor: ['neobot_purple'],
+        //     func: function(sprite, script) {
+        //         return script.getStringField('VALUE');
+        //     },
+        // },
 
-        neobot_purple_arg_motor_speed: {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            skeleton: 'basic_string_field',
-            statements: [],
-            params: [
-                {
-                    type: 'Dropdown',
-                    options: [
-                        ['IN1', 'IN1'],
-                        ['IN2', 'IN2'],
-                        ['IN3', 'IN3'],
-                        ['100%', 100],
-                        ['90%', 90],
-                        ['80%', 80],
-                        ['70%', 70],
-                        ['60%', 60],
-                        ['50%', 50],
-                        ['40%', 40],
-                        ['30%', 30],
-                        ['20%', 20],
-                        ['10%', 10],
-                        ['0%', 0],
-                    ],
-                    value: 100,
-                    fontSize: 11,
-                    bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
-                    arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
-                },
-            ],
-            events: {},
-            def: {
-                params: [null],
-            },
-            paramsKeyMap: {
-                VALUE: 0,
-            },
-            class: 'neobot_purple_motor',
-            isNotFor: ['neobot_purple'],
-            func: function(sprite, script) {
-                return script.getStringField('VALUE');
-            },
-        },
+        // neobot_purple_arg_motor_speed: {
+        //     color: EntryStatic.colorSet.block.default.HARDWARE,
+        //     outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+        //     skeleton: 'basic_string_field',
+        //     statements: [],
+        //     params: [
+        //         {
+        //             type: 'Dropdown',
+        //             options: [
+        //                 ['IN1', 'IN1'],
+        //                 ['IN2', 'IN2'],
+        //                 ['IN3', 'IN3'],
+        //                 ['100%', 100],
+        //                 ['90%', 90],
+        //                 ['80%', 80],
+        //                 ['70%', 70],
+        //                 ['60%', 60],
+        //                 ['50%', 50],
+        //                 ['40%', 40],
+        //                 ['30%', 30],
+        //                 ['20%', 20],
+        //                 ['10%', 10],
+        //                 ['0%', 0],
+        //             ],
+        //             value: 100,
+        //             fontSize: 11,
+        //             bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+        //             arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+        //         },
+        //     ],
+        //     events: {},
+        //     def: {
+        //         params: [null],
+        //     },
+        //     paramsKeyMap: {
+        //         VALUE: 0,
+        //     },
+        //     class: 'neobot_purple_motor',
+        //     isNotFor: ['neobot_purple'],
+        //     func: function(sprite, script) {
+        //         return script.getStringField('VALUE');
+        //     },
+        // },
 
-        neobot_purple_arg_motor_duration: {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            skeleton: 'basic_string_field',
-            statements: [],
-            params: [
-                {
-                    type: 'Dropdown',
-                    options: [
-                        [Lang.Blocks.neobot_purple_duration_cont, '계속'],
-                        [Lang.Blocks.neobot_purple_duration_1s, '1'],
-                        [Lang.Blocks.neobot_purple_duration_2s, '2'],
-                        [Lang.Blocks.neobot_purple_duration_3s, '3'],
-                        [Lang.Blocks.neobot_purple_duration_4s, '4'],
-                        [Lang.Blocks.neobot_purple_duration_5s, '5'],
-                        [Lang.Blocks.neobot_purple_duration_6s, '6'],
-                        [Lang.Blocks.neobot_purple_duration_7s, '7'],
-                        [Lang.Blocks.neobot_purple_duration_8s, '8'],
-                        [Lang.Blocks.neobot_purple_duration_9s, '9'],
-                    ],
-                    value: '계속',
-                    fontSize: 11,
-                    bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
-                    arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
-                },
-            ],
-            events: {},
-            def: {
-                params: [null],
-            },
-            paramsKeyMap: {
-                VALUE: 0,
-            },
-            class: 'neobot_purple_motor',
-            isNotFor: ['neobot_purple'],
-            func: function(sprite, script) {
-                return script.getStringField('VALUE');
-            },
-        },
+        // neobot_purple_arg_motor_duration: {
+        //     color: EntryStatic.colorSet.block.default.HARDWARE,
+        //     outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+        //     skeleton: 'basic_string_field',
+        //     statements: [],
+        //     params: [
+        //         {
+        //             type: 'Dropdown',
+        //             options: [
+        //                 [Lang.Blocks.neobot_purple_duration_cont, '계속'],
+        //                 [Lang.Blocks.neobot_purple_duration_1s, '1'],
+        //                 [Lang.Blocks.neobot_purple_duration_2s, '2'],
+        //                 [Lang.Blocks.neobot_purple_duration_3s, '3'],
+        //                 [Lang.Blocks.neobot_purple_duration_4s, '4'],
+        //                 [Lang.Blocks.neobot_purple_duration_5s, '5'],
+        //                 [Lang.Blocks.neobot_purple_duration_6s, '6'],
+        //                 [Lang.Blocks.neobot_purple_duration_7s, '7'],
+        //                 [Lang.Blocks.neobot_purple_duration_8s, '8'],
+        //                 [Lang.Blocks.neobot_purple_duration_9s, '9'],
+        //             ],
+        //             value: '계속',
+        //             fontSize: 11,
+        //             bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+        //             arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+        //         },
+        //     ],
+        //     events: {},
+        //     def: {
+        //         params: [null],
+        //     },
+        //     paramsKeyMap: {
+        //         VALUE: 0,
+        //     },
+        //     class: 'neobot_purple_motor',
+        //     isNotFor: ['neobot_purple'],
+        //     func: function(sprite, script) {
+        //         return script.getStringField('VALUE');
+        //     },
+        // },
 
-        get_servo_degree: {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            skeleton: 'basic_string_field',
-            statements: [],
-            params: [
-                {
-                    type: 'Dropdown',
-                    options: [
-                        [Lang.Blocks.neobot_purple_port_1, 'IN1'],
-                        [Lang.Blocks.neobot_purple_port_2, 'IN2'],
-                        [Lang.Blocks.neobot_purple_port_3, 'IN3'],
-                        [Lang.Blocks.neobot_purple_angle_0, '0'],
-                        [Lang.Blocks.neobot_purple_angle_5, '5'],
-                        [Lang.Blocks.neobot_purple_angle_10, '10'],
-                        [Lang.Blocks.neobot_purple_angle_15, '15'],
-                        [Lang.Blocks.neobot_purple_angle_20, '20'],
-                        [Lang.Blocks.neobot_purple_angle_25, '25'],
-                        [Lang.Blocks.neobot_purple_angle_30, '30'],
-                        [Lang.Blocks.neobot_purple_angle_35, '35'],
-                        [Lang.Blocks.neobot_purple_angle_40, '40'],
-                        [Lang.Blocks.neobot_purple_angle_45, '45'],
-                        [Lang.Blocks.neobot_purple_angle_50, '50'],
-                        [Lang.Blocks.neobot_purple_angle_55, '55'],
-                        [Lang.Blocks.neobot_purple_angle_60, '60'],
-                        [Lang.Blocks.neobot_purple_angle_65, '65'],
-                        [Lang.Blocks.neobot_purple_angle_70, '70'],
-                        [Lang.Blocks.neobot_purple_angle_75, '75'],
-                        [Lang.Blocks.neobot_purple_angle_80, '80'],
-                        [Lang.Blocks.neobot_purple_angle_85, '85'],
-                        [Lang.Blocks.neobot_purple_angle_90, '90'],
-                        [Lang.Blocks.neobot_purple_angle_95, '95'],
-                        [Lang.Blocks.neobot_purple_angle_100, '100'],
-                        [Lang.Blocks.neobot_purple_angle_105, '105'],
-                        [Lang.Blocks.neobot_purple_angle_110, '110'],
-                        [Lang.Blocks.neobot_purple_angle_115, '115'],
-                        [Lang.Blocks.neobot_purple_angle_120, '120'],
-                        [Lang.Blocks.neobot_purple_angle_125, '125'],
-                        [Lang.Blocks.neobot_purple_angle_130, '130'],
-                        [Lang.Blocks.neobot_purple_angle_135, '135'],
-                        [Lang.Blocks.neobot_purple_angle_140, '140'],
-                        [Lang.Blocks.neobot_purple_angle_145, '145'],
-                        [Lang.Blocks.neobot_purple_angle_150, '150'],
-                        [Lang.Blocks.neobot_purple_angle_155, '155'],
-                        [Lang.Blocks.neobot_purple_angle_160, '160'],
-                        [Lang.Blocks.neobot_purple_angle_165, '165'],
-                        [Lang.Blocks.neobot_purple_angle_170, '170'],
-                        [Lang.Blocks.neobot_purple_angle_175, '175'],
-                        [Lang.Blocks.neobot_purple_angle_180, '180'],
-                    ],
-                    value: '90',
-                    fontSize: 11,
-                    bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
-                    arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
-                },
-            ],
-            events: {},
-            def: {
-                params: [null],
-            },
-            paramsKeyMap: {
-                VALUE: 0,
-            },
-            class: 'neobot_purple_servo',
-            isNotFor: ['neobot_purple'],
-            func: function(sprite, script) {
-                return script.getStringField('VALUE');
-            },
-        },
+        // get_servo_degree: {
+        //     color: EntryStatic.colorSet.block.default.HARDWARE,
+        //     outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+        //     skeleton: 'basic_string_field',
+        //     statements: [],
+        //     params: [
+        //         {
+        //             type: 'Dropdown',
+        //             options: [
+        //                 [Lang.Blocks.neobot_purple_port_1, 'IN1'],
+        //                 [Lang.Blocks.neobot_purple_port_2, 'IN2'],
+        //                 [Lang.Blocks.neobot_purple_port_3, 'IN3'],
+        //                 [Lang.Blocks.neobot_purple_angle_0, '0'],
+        //                 [Lang.Blocks.neobot_purple_angle_5, '5'],
+        //                 [Lang.Blocks.neobot_purple_angle_10, '10'],
+        //                 [Lang.Blocks.neobot_purple_angle_15, '15'],
+        //                 [Lang.Blocks.neobot_purple_angle_20, '20'],
+        //                 [Lang.Blocks.neobot_purple_angle_25, '25'],
+        //                 [Lang.Blocks.neobot_purple_angle_30, '30'],
+        //                 [Lang.Blocks.neobot_purple_angle_35, '35'],
+        //                 [Lang.Blocks.neobot_purple_angle_40, '40'],
+        //                 [Lang.Blocks.neobot_purple_angle_45, '45'],
+        //                 [Lang.Blocks.neobot_purple_angle_50, '50'],
+        //                 [Lang.Blocks.neobot_purple_angle_55, '55'],
+        //                 [Lang.Blocks.neobot_purple_angle_60, '60'],
+        //                 [Lang.Blocks.neobot_purple_angle_65, '65'],
+        //                 [Lang.Blocks.neobot_purple_angle_70, '70'],
+        //                 [Lang.Blocks.neobot_purple_angle_75, '75'],
+        //                 [Lang.Blocks.neobot_purple_angle_80, '80'],
+        //                 [Lang.Blocks.neobot_purple_angle_85, '85'],
+        //                 [Lang.Blocks.neobot_purple_angle_90, '90'],
+        //                 [Lang.Blocks.neobot_purple_angle_95, '95'],
+        //                 [Lang.Blocks.neobot_purple_angle_100, '100'],
+        //                 [Lang.Blocks.neobot_purple_angle_105, '105'],
+        //                 [Lang.Blocks.neobot_purple_angle_110, '110'],
+        //                 [Lang.Blocks.neobot_purple_angle_115, '115'],
+        //                 [Lang.Blocks.neobot_purple_angle_120, '120'],
+        //                 [Lang.Blocks.neobot_purple_angle_125, '125'],
+        //                 [Lang.Blocks.neobot_purple_angle_130, '130'],
+        //                 [Lang.Blocks.neobot_purple_angle_135, '135'],
+        //                 [Lang.Blocks.neobot_purple_angle_140, '140'],
+        //                 [Lang.Blocks.neobot_purple_angle_145, '145'],
+        //                 [Lang.Blocks.neobot_purple_angle_150, '150'],
+        //                 [Lang.Blocks.neobot_purple_angle_155, '155'],
+        //                 [Lang.Blocks.neobot_purple_angle_160, '160'],
+        //                 [Lang.Blocks.neobot_purple_angle_165, '165'],
+        //                 [Lang.Blocks.neobot_purple_angle_170, '170'],
+        //                 [Lang.Blocks.neobot_purple_angle_175, '175'],
+        //                 [Lang.Blocks.neobot_purple_angle_180, '180'],
+        //             ],
+        //             value: '90',
+        //             fontSize: 11,
+        //             bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+        //             arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+        //         },
+        //     ],
+        //     events: {},
+        //     def: {
+        //         params: [null],
+        //     },
+        //     paramsKeyMap: {
+        //         VALUE: 0,
+        //     },
+        //     class: 'neobot_purple_servo',
+        //     isNotFor: ['neobot_purple'],
+        //     func: function(sprite, script) {
+        //         return script.getStringField('VALUE');
+        //     },
+        // },
     };
 };
 
