@@ -1737,7 +1737,7 @@ function getBlocks() {
                     },
                 ],
             },
-            func(entity) {
+            async func(entity) {
                 if (!this.initiated) {
                     this.initiated = true;
                     Entry.callStackLength++;
@@ -1758,12 +1758,16 @@ function getBlocks() {
                     this.funcExecutor.parentExecutor = this.executor;
                     this.funcExecutor.isFuncExecutor = true;
                 }
-                this.funcExecutor.execute();
-                if (!this.funcExecutor.isEnd()) {
-                    this.funcCode.removeExecutor(this.funcExecutor);
-                    return Entry.STATIC.BREAK;
+                const { promises } = await this.funcExecutor.execute();
+                if (promises.length) {
+                    await Promise.all(promises);
                 }
 
+                if (!this.funcExecutor.isEnd()) {
+                    return Entry.STATIC.CONTINUE;
+                }
+
+                this.funcCode.removeExecutor(this.funcExecutor);
                 Entry.callStackLength--;
             },
             syntax: { js: [], py: [''], ar: [''] },
