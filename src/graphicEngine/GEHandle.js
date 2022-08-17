@@ -193,8 +193,8 @@ export const GEHandle = function(canvas) {
 
         //rotate knob
         const rotateKnob = GEHelper.newSpriteWithCallback(`${Entry.mediaFilePath}stage/rotate.png`);
-        rotateKnob.scaleX = 0.4;
-        rotateKnob.scaleY = 0.4;
+        rotateKnob.scaleX = 0.3;
+        rotateKnob.scaleY = 0.3;
         rotateKnob.regX = 25;
         rotateKnob.regY = 125;
         rotateKnob.mouseEnabled = true;
@@ -232,17 +232,17 @@ export const GEHandle = function(canvas) {
                 .closePath()
                 .dr(-2, -32 + arrowLength, 4, 25);
         } else {
-            const arrowLength = 7;
+            const arrowLength = 2;
             directionArrow.graphics
-                .ss(4, 1, 1)
+                .ss(3, 1, 1)
                 .s(this.arrowColor)
                 .f(this.arrowColor)
                 .dc(0, 0, this.DHANDLE_RADIUS)
                 .mt(0, 0)
-                .lt(0, -40 + arrowLength)
-                .lt(7, -32 + arrowLength)
-                .lt(-7, -32 + arrowLength)
-                .lt(0, -40 + arrowLength)
+                .lt(0, -30 + arrowLength)
+                .lt(4, -22 + arrowLength)
+                .lt(-4, -22 + arrowLength)
+                .lt(0, -30 + arrowLength)
                 .es();
         }
 
@@ -265,8 +265,8 @@ export const GEHandle = function(canvas) {
         const centerPoint = GEHelper.newGraphic();
         centerPoint.mouseEnabled = true;
         GEDragHelper.handleDrag(centerPoint);
-        centerPoint.scaleX = 1.52;
-        centerPoint.scaleY = 1.52;
+        centerPoint.scaleX = 1.1;
+        centerPoint.scaleY = 1.1;
         centerPoint.graphics
             .ss(3.5, 2, 0)
             .s('#FFFFFF')
@@ -294,8 +294,8 @@ export const GEHandle = function(canvas) {
             const knob = GEHelper.newGraphic();
             knob.mouseEnabled = true;
             GEDragHelper.handleDrag(knob);
-            knob.scaleX = 1.52;
-            knob.scaleY = 1.52;
+            knob.scaleX = 1.0;
+            knob.scaleY = 1.0;
             knob.graphics
                 .ss(0.2, 0, 0)
                 .s('#d8d8d8')
