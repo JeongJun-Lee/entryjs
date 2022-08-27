@@ -180,6 +180,7 @@ ctx.onmessage = async function(e: {
                         outputStride: 16,
                         inputResolution: dimension,
                         multiplier: 0.5,
+                        modelUrl: weightsUrl+"/posenet/model-stride16.json"
                     })
                     .then((mobileNetLoaded: any) => {
                         mobileNet = mobileNetLoaded;
@@ -189,6 +190,7 @@ ctx.onmessage = async function(e: {
                 cocoSsd
                     .load({
                         base: 'lite_mobilenet_v2',
+                        modelUrl: weightsUrl+"/coco-ssd/model.json"
                     })
                     .then((cocoLoaded: any) => {
                         coco = cocoLoaded;
