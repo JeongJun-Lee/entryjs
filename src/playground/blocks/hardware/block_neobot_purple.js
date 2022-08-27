@@ -2,7 +2,7 @@
 
 Entry.NeobotPurple = {
     id: '5.5',
-    name: 'neobot_purple',
+    name: 'neosoco',
     url: 'http://www.neobot.co.kr',
     imageName: 'neobot_purple.png',
     title: {
@@ -648,7 +648,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Neobot_purple.get_value(%1)',
+                        syntax: 'Neosoco.get_value(%1)',
                         blockType: 'param',
                         textParams: [
                             {
@@ -772,7 +772,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Neobot_purple.convert_scale(%1, %2, %3 %4, %5)',
+                        syntax: 'Neosoco.convert_scale(%1, %2, %3 %4, %5)',
                         blockType: 'param',
                         textParams: [
                             {
@@ -908,7 +908,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Neobot_purple.compare_value(%1, %2, %3)',
+                        syntax: 'Neosoco.compare_value(%1, %2, %3)',
                         blockType: 'param',
                         textParams: [
                             {
@@ -1022,7 +1022,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Neobot_purple.color_value(%1, %2)',
+                        syntax: 'Neosoco.check_color(%1, %2)',
                         blockType: 'param',
                         textParams: [
                             {
@@ -1161,7 +1161,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Neobot_purple.angle_compare(%1, %2, %3)',
+                        syntax: 'Neosoco.compare_angle(%1, %2, %3)',
                         blockType: 'param',
                         textParams: [
                             {
@@ -1289,7 +1289,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Neobot_purple.remote_button(%1)',
+                        syntax: 'Neosoco.remote_button(%1)',
                         blockType: 'param',
                         textParams: [
                             {
@@ -1478,7 +1478,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Neobot_purple.led_on(%1, %2, %3)',
+                        syntax: 'Neosoco.led_on(%1, %2, %3)',
                         blockType: 'param',
                         textParams: [
                             {
@@ -1603,7 +1603,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Neobot_purple.led_off(%1)',
+                        syntax: 'Neosoco.led_off(%1)',
                         blockType: 'param',
                         textParams: [
                             {
@@ -1706,7 +1706,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Neobot_purple.led_by_port(%1, %2)',
+                        syntax: 'Neosoco.led_by_port(%1, %2)',
                         blockType: 'param',
                         textParams: [
                             {
@@ -1908,7 +1908,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Neobot_purple.color_led_on(%1, %2, %3, %4)',
+                        syntax: 'Neosoco.color_led_on(%1, %2, %3, %4)',
                         blockType: 'param',
                         textParams: [
                             {
@@ -2022,7 +2022,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Neobot_purple.set_value(%1, %2)',
+                        syntax: 'Neosoco.set_value(%1, %2)',
                         blockType: 'param',
                         textParams: [
                             {
@@ -2134,7 +2134,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Neobot_purple.motor_turn(%1)',
+                        syntax: 'Neosoco.motor_move(%1)',
                         blockType: 'param',
                         textParams: [
                             {
@@ -2371,7 +2371,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Neobot_purple.motor_rotate(%1, %2, %3, %4)',
+                        syntax: 'Neosoco.motor_rotate(%1, %2, %3, %4)',
                         blockType: 'param',
                         textParams: [
                             {
@@ -2519,7 +2519,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Neobot_purple.motor_stop(%1)',
+                        syntax: 'Neosoco.motor_stop(%1)',
                         blockType: 'param',
                         textParams: [
                             {
@@ -2681,7 +2681,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Neobot_purple.buzzer(%2, %1, %3)',
+                        syntax: 'Neosoco.buzzer(%2, %1, %3)',
                         blockType: 'param',
                         textParams: [
                             {
@@ -2802,7 +2802,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Neobot_purple.buzzer_by_port(%1)',
+                        syntax: 'Neosoco.buzzer_by_port(%1)',
                         blockType: 'param',
                         textParams: [
                             {
@@ -2860,7 +2860,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Neobot_purple.buzzer_stop()'
+                        syntax: 'Neosoco.buzzer_stop()'
                     }
                 ]
             },
@@ -2959,7 +2959,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Neobot_purple.servo_init(%1)',
+                        syntax: 'Neosoco.servo_reset_degree(%1)',
                         blockType: 'param',
                         textParams: [
                             {
@@ -3114,7 +3114,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Neobot_purple.servo_rotate(%1, %2, %3)',
+                        syntax: 'Neosoco.servo_rotate(%1, %2, %3)',
                         blockType: 'param',
                         textParams: [
                             {
@@ -3234,7 +3234,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Neobot_purple.servo_stop(%1)',
+                        syntax: 'Neosoco.servo_stop(%1)',
                         blockType: 'param',
                         textParams: [
                             {
@@ -3493,7 +3493,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Neobot_purple.servo_rotate_by_degree(%1, %2, %3, %4)',
+                        syntax: 'Neosoco.servo_rotate_by_degree(%1, %2, %3, %4)',
                         blockType: 'param',
                         textParams: [
                             // {
