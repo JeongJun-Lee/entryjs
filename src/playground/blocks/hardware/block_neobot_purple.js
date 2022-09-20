@@ -639,7 +639,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 PORT: 0,
             },
             class: 'neobot_purple_sensor',
-            isNotFor: ['neobot_purple'],
+            isNotFor: ['neosoco'],
             func: function(sprite, script) {
                 var port = script.getStringField('PORT');
                 return Entry.hw.portData[port];
@@ -739,7 +739,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 MAX: 4,
             },
             class: 'neobot_purple_sensor',
-            isNotFor: ['neobot_purple'],
+            isNotFor: ['neosoco'],
             func: function(sprite, script) {
                 var port = script.getStringField('PORT');
                 var value = Entry.hw.portData[port];
@@ -863,7 +863,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 VALUE: 2,
             },
             class: 'neobot_purple_decision',
-            isNotFor: ['neobot_purple'],
+            isNotFor: ['neosoco'],
             func: function(sprite, script) {
                 const sensorTemp = script.getStringField('SENSOR');
                 const symbol = script.getStringField('SYMBOL');
@@ -994,7 +994,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 COLOR: 1,
             },
             class: 'neobot_purple_decision',
-            isNotFor: ['neobot_purple'],
+            isNotFor: ['neosoco'],
             func: function(sprite, script) {
                 var sensorTemp = script.getStringField('SENSOR');
                 var sensor = Entry.hw.portData[sensorTemp];
@@ -1132,7 +1132,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 VALUE: 2,
             },
             class: 'neobot_purple_decision',
-            isNotFor: ['neobot_purple'],
+            isNotFor: ['neosoco'],
             func: function(sprite, script) {
                 var sensorTemp = script.getStringField('SENSOR');
                 var sensor = Entry.hw.portData[sensorTemp];
@@ -1264,7 +1264,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 KEY: 0,
             },
             class: 'neobot_purple_remote',
-            isNotFor: ['neobot_purple'],
+            isNotFor: ['neosoco'],
             func: function(sprite, script) {
                 var key_cvt = {
                     'up': 1,
@@ -1406,7 +1406,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 DURATION: 2,
             },
             class: 'neobot_purple_led',
-            isNotFor: ['neobot_purple'],
+            isNotFor: ['neosoco'],
             func: function(sprite, script) {
                 let bright_cvt = {
                     100: 255,
@@ -1580,7 +1580,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 PORT: 0,
             },
             class: 'neobot_purple_led',
-            isNotFor: ['neobot_purple'],
+            isNotFor: ['neosoco'],
             func: function(sprite, script) {
                 const port = script.getStringField('PORT', script);
 
@@ -1673,7 +1673,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 OUT: 1,
             },
             class: 'neobot_purple_led',
-            isNotFor: ['neobot_purple'],
+            isNotFor: ['neosoco'],
             func: function(sprite, script) {
                 const inPort = script.getStringField('IN', script);
                 const outPort = script.getStringField('OUT', script);
@@ -1806,7 +1806,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 BLUE: 3,
             },
             class: 'neobot_purple_led',
-            isNotFor: ['neobot_purple'],
+            isNotFor: ['neosoco'],
             func: function(sprite, script) {
                 if (!script.isStart) {
                     const port = script.getStringField('PORT');
@@ -1992,7 +1992,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 VALUE: 1,
             },
             class: 'neobot_purple_output',
-            isNotFor: ['neobot_purple'],
+            isNotFor: ['neosoco'],
             func: function(sprite, script) {
                 var port = script.getStringField('PORT', script);
                 var value = script.getNumberValue('VALUE', script);
@@ -2090,7 +2090,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 MOVE: 0,
             },
             class: 'neobot_purple_motor',
-            isNotFor: ['neobot_purple'],
+            isNotFor: ['neosoco'],
             func: function(sprite, script) {
                 const move = script.getStringField('MOVE');
                 let leftValue;
@@ -2270,7 +2270,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 DURATION: 3,
             },
             class: 'neobot_purple_motor',
-            isNotFor: ['neobot_purple'],
+            isNotFor: ['neosoco'],
             func: function(sprite, script) {
                 if (!script.isStart) {
                     const motor = script.getStringField('MOTOR', script);
@@ -2495,7 +2495,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 MOTOR: 0,
             },
             class: 'neobot_purple_motor',
-            isNotFor: ['neobot_purple'],
+            isNotFor: ['neosoco'],
             func: function(sprite, script) {
                 const motor = script.getStringField('MOTOR');
 
@@ -2617,7 +2617,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 DURATION: 2,
             },
             class: 'neobot_purple_melody',
-            isNotFor: ['neobot_purple'],
+            isNotFor: ['neosoco'],
             func: function(sprite, script) {
                 if (!script.isStart) {
                     let octave_cvt = {
@@ -2778,7 +2778,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 INPUT: 0,
             },
             class: 'neobot_purple_melody',
-            isNotFor: ['neobot_purple'],
+            isNotFor: ['neosoco'],
             func: function(sprite, script) {
                 const input = script.getStringField('INPUT');
                 let value = Entry.hw.portData[input];
@@ -2845,7 +2845,7 @@ Entry.NeobotPurple.getBlocks = function() {
             },
             paramsKeyMap: {},
             class: 'neobot_purple_melody',
-            isNotFor: ['neobot_purple'],
+            isNotFor: ['neosoco'],
             func: function(sprite, script) {
                 if (Entry.NeobotPurple.log_to_console) {
                     Entry.console.print('=== neobot_purple_melody_stop ===', 'speak');
@@ -2906,7 +2906,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 PORT: 0,
             },
             class: 'neobot_purple_servo',
-            isNotFor: ['neobot_purple'],
+            isNotFor: ['neosoco'],
             func: function(sprite, script) {
                 if (!script.isStart) {
                     const port = script.getStringField('PORT', script);
@@ -3057,7 +3057,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 SPEED: 2,
             },
             class: 'neobot_purple_servo',
-            isNotFor: ['neobot_purple'],
+            isNotFor: ['neosoco'],
             func: function(sprite, script) {
                 let dir_cvt = {
                     'forward': 1,
@@ -3209,7 +3209,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 PORT: 0,
             },
             class: 'neobot_purple_servo',
-            isNotFor: ['neobot_purple'],
+            isNotFor: ['neosoco'],
             func: function(sprite, script) {
                 const port = script.getStringField('PORT', script);
                 let outValue = 254;
@@ -3390,7 +3390,7 @@ Entry.NeobotPurple.getBlocks = function() {
                 SPEED: 2,
             },
             class: 'neobot_purple_servo',
-            isNotFor: ['neobot_purple'],
+            isNotFor: ['neosoco'],
             func: function(sprite, script) {
                 if (!script.isStart) {
                     let dir_cvt = {
@@ -3643,7 +3643,7 @@ Entry.NeobotPurple.getBlocks = function() {
         //         VALUE: 0,
         //     },
         //     class: 'neobot_purple_led',
-        //     isNotFor: ['neobot_purple'],
+        //     isNotFor: ['neosoco'],
         //     func: function(sprite, script) {
         //         return script.getStringField('VALUE');
         //     },
@@ -3687,7 +3687,7 @@ Entry.NeobotPurple.getBlocks = function() {
         //         VALUE: 0,
         //     },
         //     class: 'neobot_purple_motor',
-        //     isNotFor: ['neobot_purple'],
+        //     isNotFor: ['neosoco'],
         //     func: function(sprite, script) {
         //         return script.getStringField('VALUE');
         //     },
@@ -3727,7 +3727,7 @@ Entry.NeobotPurple.getBlocks = function() {
         //         VALUE: 0,
         //     },
         //     class: 'neobot_purple_motor',
-        //     isNotFor: ['neobot_purple'],
+        //     isNotFor: ['neosoco'],
         //     func: function(sprite, script) {
         //         return script.getStringField('VALUE');
         //     },
@@ -3797,7 +3797,7 @@ Entry.NeobotPurple.getBlocks = function() {
         //         VALUE: 0,
         //     },
         //     class: 'neobot_purple_servo',
-        //     isNotFor: ['neobot_purple'],
+        //     isNotFor: ['neosoco'],
         //     func: function(sprite, script) {
         //         return script.getStringField('VALUE');
         //     },
