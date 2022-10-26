@@ -223,6 +223,9 @@ class VideoUtils implements MediaUtilsInterface {
         }
 
         try {
+            if (!this.motionWorker) {
+                this.motionWorker = new VideoMotionWorker();
+            }
             /*
                 NT11576  #11683
                 파이어폭스는 기본적으로 4:3비율로만 비디오를 가져오게 되어있어서, 사이즈를 조절해야함. 
@@ -253,7 +256,9 @@ class VideoUtils implements MediaUtilsInterface {
             });
             console.time('test');
             if (this.isChrome) {
-                this.worker = new VideoWorker();
+                if (!this.worker) {
+                    this.worker = new VideoWorker();
+                }
                 this.worker.onmessage = (e: { data: { type: String; message: any } }) => {
                     const { type, message } = e.data;
                     if (Entry.engine.state !== 'run' && type !== 'init') {
@@ -370,6 +375,7 @@ class VideoUtils implements MediaUtilsInterface {
             this.stream = stream;
             this.canvasVideo = GEHelper.getVideoElement(video);
             this.video = video;
+            this.stopVideo();
             this.isInitialized = true;
         } catch (err) {
             console.log(err);
@@ -851,8 +857,9 @@ class VideoUtils implements MediaUtilsInterface {
     destroy() {
         this.disableAllModels();
         this.turnOffWebcam();
+        this.reset();
         this.stopVideo();
-        GEHelper.destroyWebcam();
+        GEHelper.destroy();
         this.video = null;
         this.canvasVideo = null;
         this.inMemoryCanvas = null;
@@ -863,6 +870,8 @@ class VideoUtils implements MediaUtilsInterface {
         this.objects = [];
         this.poses = { predictions: [], adjacents: [] };
         this.faces = [];
+        this.worker = null;
+        this.motionWorker = null;
         this.isInitialized = false;
     }
 
