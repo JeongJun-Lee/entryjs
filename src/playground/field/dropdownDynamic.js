@@ -90,7 +90,10 @@ Entry.FieldDropdownDynamic = class FieldDropdownDynamic extends Entry.FieldDropd
             if (this._menuName) {
                 options = await Entry.container.getDropdownList(this._menuName, object);
             } else {
-                options = await this._menuGenerator();
+                options = await this._menuGenerator(this._block);
+                if (options.length === 0) {
+                    options = [[Lang.Blocks.no_target, 'null']];
+                }
             }
         }
 
