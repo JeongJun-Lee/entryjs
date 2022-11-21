@@ -742,7 +742,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [{syntax: 'dht.begin()'}]
+                ar: [{syntax: 'dht.begin();'}]
             },
         },
         arduino_ext_get_temp_value: {
