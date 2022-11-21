@@ -45,6 +45,7 @@ Entry.ArduinoExt = {
         STEPPER: 9,
         DHTTEMP: 10,
         DHTHUMI: 11,
+        DHTINIT: 12,
     },
     toneTable: {
         '0': 0,
@@ -77,6 +78,17 @@ Entry.ArduinoExt = {
     },
     highList: ['high', '1', 'on'],
     lowList: ['low', '0', 'off'],
+    duration: {
+        TIME_1ms: 1,
+        TIME_5ms: 5,
+        TIME_10ms: 10,
+        TIME_20ms: 20,
+        TIME_50ms: 50,
+        TIME_100ms: 100,
+        TIME_200ms: 200, 
+        TIME_500ms: 500,    
+        TIME_600ms: 600,   
+    },
     BlockState: {},
     monitorTemplate: {
         imgPath: 'hw/arduino.png',
@@ -190,8 +202,9 @@ Entry.ArduinoExt.setLanguage = function() {
                 arduino_ext_set_tone: '디지털 %1 번 핀의 버저를 %2 %3 음으로 %4 초 연주하기 %5',
                 arduino_ext_set_servo: '디지털 %1 번 핀의 서보모터를 %2 의 각도로 정하기 %3',
                 arduino_ext_get_digital: '디지털 %1 번 센서값',
-                arduino_ext_get_temp: '온습도센서 %1 번 온도값',
-                arduino_ext_get_humi: '온습도센서 %1 번 습도값',
+                arduino_ext_set_temp_humi_init: "디지털 %1 번 핀에 연결된 온습도센서 사용하기 %2",
+                arduino_ext_get_temp_value: '온습도센서 온도값',
+                arduino_ext_get_humi_value: '온습도센서 습도값',
                 arduino_ext_set_stepper: '디지털 %1 %2 %3 %4 번 핀의 스텝모터를 %5 RPM으로 %6 스텝 이동하기 %7'
             },
         },
@@ -205,8 +218,9 @@ Entry.ArduinoExt.setLanguage = function() {
                 arduino_ext_set_tone: 'Play tone pin %1 on note %2 octave %3 beat %4 %5',
                 arduino_ext_set_servo: 'Set servo pin %1 angle as %2 %3',
                 arduino_ext_get_digital: 'Digital %1 Sensor value',
-                arduino_ext_get_temp: 'Temp %1 Sensor value',
-                arduino_ext_get_humi: 'Humidity %1 Sensor value',
+                arduino_ext_set_temp_humi_init: "Init temp-humid pin %1 %2",
+                arduino_ext_get_temp_value: 'Temp sensor value',
+                arduino_ext_get_humi_value: 'Humidity sensor value',
                 arduino_ext_set_stepper: 'Set stepper pin %1 %2 %3 %4 RPM as %5 and steps as %6 %7'
             },
         },
@@ -220,8 +234,9 @@ Entry.ArduinoExt.setLanguage = function() {
                 arduino_ext_set_tone: "Raqamli %1 pinni buzzerni %2 %3 oktavada %4 soniya yangrash %5",
                 arduino_ext_set_servo: "Raqamli %1 pinning servo motorini %2 gradusiga sozlash %3",
                 arduino_ext_get_digital: "Raqamli %1 pin sensor qiymati",
-                arduino_ext_get_temp: 'Harorat %1 pin sensor qiymati',
-                arduino_ext_get_humi: 'Namlik %1 pin sensor qiymati',
+                arduino_ext_set_temp_humi_init: "Harorat-namlik sensorni %1 pindan foydalanish",
+                arduino_ext_get_temp_value: 'Harorat sensor qiymati',
+                arduino_ext_get_humi_value: 'Namlik sensor qiymati',
                 arduino_ext_set_stepper: "Raqamli %1 %2 %3 %4 pinning stepper motorini %5 RPMdan %6 qadam ko'chirish %7"
           },
       },
@@ -233,8 +248,9 @@ Entry.ArduinoExt.blockMenuBlocks = [
     'arduino_ext_get_analog_value_map',
     'arduino_ext_get_ultrasonic_value',
     'arduino_ext_get_digital',
-    'arduino_ext_get_temp',
-    'arduino_ext_get_humi',
+    'arduino_ext_set_temp_humi_init',
+    'arduino_ext_get_temp_value',
+    'arduino_ext_get_humi_value',
     'arduino_ext_toggle_led',
     'arduino_ext_digital_pwm',
     'arduino_ext_set_servo',
@@ -642,7 +658,94 @@ Entry.ArduinoExt.getBlocks = function() {
                 ar: [{syntax: 'digitalRead(%1)'}]
             },
         },
-		arduino_ext_get_temp: {
+		arduino_ext_set_temp_humi_init: {
+            color: EntryStatic.colorSet.block.default.HARDWARE,
+            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            fontColor: '#fff',
+            skeleton: 'basic',
+            statements: [],
+            params: [
+                {
+                    type: 'Block',
+                    accept: 'string',
+                    defaultType: 'number',
+                },
+                {
+                    type: 'Indicator',
+                    img: 'block_icon/hardware_icon.svg',
+                    size: 12,
+                },
+            ],
+            events: {},
+            def: {
+                params: [
+                    {
+                        type: 'arduino_get_port_number',
+                        params: [3],
+                    },
+                ],
+                type: 'arduino_ext_set_temp_humi_init',
+            },
+            paramsKeyMap: {
+                PORT: 0,
+            },
+            class: 'dht',
+            isNotFor: ['ArduinoExt'],
+            func(sprite, script) {
+                var sq = Entry.hw.sendQueue;
+                var port = script.getNumberValue('PORT', script);
+
+				if (!script.isStart) 
+                {
+					if (!sq.SET) {
+						sq.SET = {};
+					}
+					
+					var duration = Entry.ArduinoExt.TIME_500ms;
+                    script.isStart = true;
+                    script.timeFlag = 1;
+					
+					sq.SET[port] = {
+							type: Entry.ArduinoExt.sensorTypes.DHTINIT,
+							data: port,
+							time: new Date().getTime(),
+					};
+					setTimeout(function() {
+                        script.timeFlag = 0;
+                    }, duration );
+                    return script;
+				}
+				else if (script.timeFlag == 1)
+                {
+                    return script;
+                }
+                else 
+                {
+                    delete script.timeFlag;
+                    delete script.isStart;
+
+                    Entry.engine.isContinue = false;
+                    return script.callReturn();
+                }
+            },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'Arduino.dhtTempHumiInit(%1)',
+                        blockType: 'param',
+                        textParams: [
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                        ],
+                    },
+                ],
+                ar: [{syntax: 'dht.begin()'}]
+            },
+        },
+        arduino_ext_get_temp_value: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
             outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
             fontColor: '#fff',
@@ -658,54 +761,40 @@ Entry.ArduinoExt.getBlocks = function() {
             events: {},
             def: {
                 params: [
-                    {
-                        type: 'arduino_get_port_number',
-                        params: ['2'],
-                    },
+					'0',
                 ],
-                type: 'arduino_ext_get_temp',
+                type: 'arduino_ext_get_temp_value',
             },
             paramsKeyMap: {
-                PORT: 0,
+                TEMP: 0,
             },
-            class: 'ArduinoExtGet',
+            class: 'dht',
             isNotFor: ['ArduinoExt'],
             func(sprite, script) {
-                const port = script.getNumberValue('PORT', script);
+                const temp = script.getNumberValue('TEMP', script);
 
                 if (!Entry.hw.sendQueue.SET) {
                     Entry.hw.sendQueue.SET = {};
                 }
-                delete Entry.hw.sendQueue.SET[port];
+                delete Entry.hw.sendQueue.SET[temp];
 
                 if (!Entry.hw.sendQueue.GET) {
                     Entry.hw.sendQueue.GET = {};
                 }
-                
+				
                 Entry.hw.sendQueue.GET[Entry.ArduinoExt.sensorTypes.DHTTEMP] = {
-                    port: port,
+                    port: temp,
                     time: new Date().getTime(),
                 };
                 return Entry.hw.portData.DHTTEMP || 0;
             },
             syntax: {
                 js: [],
-                py: [
-                    {
-                        syntax: 'Arduino.temperatureRead(%1)',
-                        blockType: 'param',
-                        textParams: [
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                        ],
-                    },
-                ],
+                py: [{syntax: 'Arduino.temperatureRead()'}],
                 ar: [{syntax: 'dht.readTemperature()'}]
             },
         },
-        arduino_ext_get_humi: {
+		arduino_ext_get_humi_value: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
             outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
             fontColor: '#fff',
@@ -721,50 +810,36 @@ Entry.ArduinoExt.getBlocks = function() {
             events: {},
             def: {
                 params: [
-                    {
-                        type: 'arduino_get_port_number',
-                        params: ['2'],
-                    },
+					'1',
                 ],
-                type: 'arduino_ext_get_humi',
+                type: 'arduino_ext_get_humi_value',
             },
             paramsKeyMap: {
-                PORT: 0,
+                HUMI: 0,
             },
-            class: 'ArduinoExtGet',
+            class: 'dht',
             isNotFor: ['ArduinoExt'],
             func(sprite, script) {
-                const port = script.getNumberValue('PORT', script);
+                const humi = script.getNumberValue('HUMI', script);
 
                 if (!Entry.hw.sendQueue.SET) {
                     Entry.hw.sendQueue.SET = {};
                 }
-                delete Entry.hw.sendQueue.SET[port];
+                delete Entry.hw.sendQueue.SET[humi];
 
                 if (!Entry.hw.sendQueue.GET) {
                     Entry.hw.sendQueue.GET = {};
                 }
-                
+				
                 Entry.hw.sendQueue.GET[Entry.ArduinoExt.sensorTypes.DHTHUMI] = {
-                    port: port,
+                    port: humi,
                     time: new Date().getTime(),
                 };
                 return Entry.hw.portData.DHTHUMI || 0;
             },
             syntax: {
                 js: [],
-                py: [
-                    {
-                        syntax: 'Arduino.humidityRead(%1)',
-                        blockType: 'param',
-                        textParams: [
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                        ],
-                    },
-                ],
+                py: [{syntax: 'Arduino.humidityRead()'}],
                 ar: [{syntax: 'dht.readHumidity()'}]
             },
         },
