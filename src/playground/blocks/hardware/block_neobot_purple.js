@@ -427,7 +427,7 @@ Entry.NeobotPurple.setLanguage = function() {
 
                 // servo
                 // get_servo_degree: '%1',
-                neobot_purple_servo_init: '%1 servo motorini nollashtirish %2',
+                neobot_purple_servo_init: '%1 servo motorini nolga sozlash %2',
                 neobot_purple_servo_rotate: 'Servo motorni aylantirish: %1 %2 %3 %4',
                 neobot_purple_servo_stop: "%1 servo motorini to'xtatish %2",
                 neobot_purple_servo_change_degree: "Servo motor gradusini o'zgartirish: %2 %3 %4 %1 %5",

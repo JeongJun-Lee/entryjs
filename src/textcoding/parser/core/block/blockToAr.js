@@ -147,16 +147,13 @@ Entry.BlockToArParser = class {
             block.type === 'arduino_ext_set_servo' ||
             block.type === 'arduino_ext_set_stepper' ||
             block.type === 'arduino_ext_get_ultrasonic_value' ||
-            block.type === 'arduino_ext_get_temp' ||
-            block.type === 'arduino_ext_get_humi'
+            block.type === 'arduino_ext_set_temp_humi_init'
         )) {
             this.insertIntoGlobal(block.type);
         }
 
         // Place UserFunc after loop()
         if (block && (block.type === 'arduino_ext_get_ultrasonic_value'
-            || block.type === 'arduino_ext_get_temp'
-            || block.type === 'arduino_ext_get_humi'
             || (this.isFunc(block) && addFunc) // User defined function
         )) {
             this.AddUserFunc(stat);
@@ -187,8 +184,8 @@ Entry.BlockToArParser = class {
         if (blockType === 'arduino_ext_set_servo') {
             stat = '#include <Servo.h>\nServo myServo;\n';
         } else if (blockType === 'arduino_ext_set_stepper') {
-            stat = '#include <Stepper.h>\n';
-        } else if (blockType === 'arduino_ext_get_temp' || blockType === 'arduino_ext_get_humi') {
+            stat = `#include <Stepper.h>\nStepper myStepper(2048, ${this._pinNum}, ${this._pinNum2}, ${this._pinNum3}, ${this._pinNum4});\n`;
+        } else if (blockType === 'arduino_ext_set_temp_humi_init') {
             stat = `#include <DHT.h>\nDHT dht(${this._pinNum}, DHT11);\n`;
         } else if (blockType === 'arduino_ext_get_ultrasonic_value') {
             stat = `int trig = ${this._pinNum};\nint echo = ${this._pinNum2};\n`;
@@ -212,15 +209,12 @@ Entry.BlockToArParser = class {
         let pinStat = '';
         switch (this._funcName) {
             case 'digitalRead': pinStat = `pinMode(${this._pinNum}, INPUT);`; break;
-            case 'dht.readTemperature':
-            case 'dht.readHumidity':
-                pinStat = 'dht.begin();'; break;
             case 'analogWrite':
             case 'digitalWrite':
             case 'tone':
                 pinStat = `pinMode(${this._pinNum}, OUTPUT);`; break;
             case 'myServo.write': pinStat = `myServo.attach(${this._pinNum});`; break;
-            case 'myStepper.step': pinStat = `Stepper myStepper(2048, ${this._pinNum}, ${this._pinNum2}, ${this._pinNum3}, ${this._pinNum4});\n\tmyStepper.setSpeed(${this._pramVal[4]});`; break;
+            case 'myStepper.step': pinStat = `myStepper.setSpeed(${this._pramVal[4]});`; break;
             case 'distance': pinStat = `pinMode(${this._pinNum}, OUTPUT);\n\tpinMode(${this._pinNum2}, INPUT);`; break;
         }
 
@@ -575,24 +569,24 @@ Entry.BlockToArParser = class {
                 this.errChkPinNum(this._pinNum2, block);
                 
                 this.insertIntoSrc(
-`int distance() {
-    digitalWrite(${this._pinNum}, LOW);
-    delayMicroseconds(2);
+                `int distance() {
+                    digitalWrite(${this._pinNum}, LOW);
+                    delayMicroseconds(2);
 
-    digitalWrite(${this._pinNum}, HIGH);
-    delayMicroseconds(10);
-    digitalWrite(${this._pinNum}, LOW);
-    long duration = pulseIn(${this._pinNum2}, HIGH);
+                    digitalWrite(${this._pinNum}, HIGH);
+                    delayMicroseconds(10);
+                    digitalWrite(${this._pinNum}, LOW);
+                    long duration = pulseIn(${this._pinNum2}, HIGH);
 
-    int distance = (duration/2) * 0.034;
-    return distance;
-}`
+                    int distance = (duration/2) * 0.034;
+                    return distance;
+                }`
                 , block);
                 break;
 
             case 'arduino_ext_set_servo':
                 stat = block._schema.syntax.ar[0].syntax; 
-                this._funcName = 'myServo.write';
+                this._funcName = stat.split('(')[0];
                 this._pinNum = Number(this._pramVal[0]); // Arr to Number
                 this.errChkPinNum(this._pinNum, block);
                 value = this._pramVal[1]; 
@@ -601,7 +595,7 @@ Entry.BlockToArParser = class {
 
             case 'arduino_ext_set_stepper':
                 stat = block._schema.syntax.ar[0].syntax; 
-                this._funcName = 'myStepper.step';
+                this._funcName = stat.split('(')[0];
                 this._pinNum = Number(this._pramVal[0]); // Arr to Number
                 this.errChkPinNum(this._pinNum, block);
                 this._pinNum2 = Number(this._pramVal[1]); // Arr to Number
@@ -614,17 +608,19 @@ Entry.BlockToArParser = class {
                 stat = stat.replace('%1', value);
                 break;
 
-            case 'arduino_ext_get_temp':
-            case 'arduino_ext_get_humi':
-                if (block.type == 'arduino_ext_get_temp') { 
-                    this._funcName = 'dht.readTemperature';
-                } else {
-                    this._funcName = 'dht.readHumidity';
-                }
+            case 'arduino_ext_set_temp_humi_init':
                 stat = block._schema.syntax.ar[0].syntax;
+                this._funcName = stat.split('(')[0];
                 this._pinNum = Number(this._pramVal[0]); // Arr to Number
                 this.errChkPinNum(this._pinNum, block);
-                this.insertIntoSrc('', block);
+                value = this._pramVal[1]; 
+                stat = stat.replace('%1', value);
+                break;  
+
+            case 'arduino_ext_get_temp_value':
+            case 'arduino_ext_get_humi_value':
+                stat = block._schema.syntax.ar[0].syntax;
+                this._funcName = stat.split('(')[0];
                 break;
 
             case 'set_variable':
