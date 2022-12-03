@@ -295,7 +295,7 @@ export default class Hardware {
     upload() {
         let option = {boardType: Entry.Workspace.MODE_UPLOAD};
         switch (this.hwModule.name) {
-            case 'neobot_purple':
+            case 'neosoco':
                 option.textType = Entry.Vim.TEXT_TYPE_NEO;
                 break;
             case 'arduino':
@@ -378,7 +378,7 @@ export default class Hardware {
         if (
             this.hwModule.name == 'arduino' ||
             this.hwModule.name == 'ArduinoExt' ||
-            this.hwModule.name == 'neobot_purple'
+            this.hwModule.name == 'neosoco'
         ) {
             Entry.options.uploadEnable = true;
         }
