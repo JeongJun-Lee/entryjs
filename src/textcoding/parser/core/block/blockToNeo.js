@@ -178,6 +178,29 @@ Entry.BlockToNeoParser = class {
         return rtn;
     }
 
+    noteToNum = {
+        '0' : 0,
+        'c' : 1,
+        'c#': 2,
+        'd' : 3,
+        'd#': 4,
+        'e' : 5,
+        'f' : 6,
+        'f#': 7,
+        'g' : 8,
+        'g#': 9,
+        'a' : 10,
+        'a#': 11,
+        'b' : 12,
+    }
+
+    durationToNum = {
+        '2' : 1,
+        '4' : 2,
+        '8' : 3,
+        '16': 4,
+    }
+
     createDataFrame(block) {
         let cmd = [];
         let duration = 0, bright = 0;
@@ -301,19 +324,19 @@ Entry.BlockToNeoParser = class {
             case 'neobot_purple_decision_equal_with_sensor':
                 port = this.extractNum(this._pramVal[0]);
                 switch (this._pramVal[1]) {
-                    case 0: // White color
+                    case 'white':
                         value = 200;
                         break;
-                    case 1: // Red
+                    case 'red':
                         value = 20;
                         break;
-                    case 2: // Yellow
+                    case 'yellow':
                         value = 40;
                         break;
-                    case 3: // Green
+                    case 'green':
                         value = 120;
                         break;
-                    case 4: // Blue
+                    case 'blue':
                         value = 160;
                         break;
                 }
@@ -323,6 +346,10 @@ Entry.BlockToNeoParser = class {
             case 'neobot_purple_remote_button':
                 this._remote_btn = true;
                 value = Number(this._pramVal[0]);
+                if (isNaN(value)) { // In App mode, can't use arrow keys
+                    this.throwErr('error', 'WrongInputVal', block);
+                }
+                
                 if (this.getParentBlk(block) === '_if' || this.getParentBlk(block) === 'if_else') {
                     cmd = [0x03, 0x01, value, 0x01, 0x00];
                 } else if (this.getParentBlk(block) === 'wait_until_true') {
@@ -398,8 +425,23 @@ Entry.BlockToNeoParser = class {
                 break;
 
             case 'neobot_purple_robot':
-                direction = Number(this._pramVal[0]);
-                if (direction === 5) { // Stop
+                direction = this._pramVal[0];
+                switch (direction) {
+                    case 'forward':
+                        direction = 0x01;
+                        break;
+                    case 'backward':
+                        direction = 0x02;
+                        break;
+                    case 'left':
+                        direction = 0x03;
+                        break;
+                    case 'right':
+                        direction = 0x04;
+                        break;
+                }
+
+                if (direction === 'stop') {
                     cmd = [0x05, 0x00, 0x00, 0x00, 0xFF];
                 } else {
                     cmd = [0x05, direction, 100, 0xFF, 0xFF];
@@ -407,19 +449,34 @@ Entry.BlockToNeoParser = class {
                 break;
 
             case 'neobot_purple_motor_start':
-                motor = Number(this._pramVal[0]);
+                motor = this._pramVal[0];
                 switch (motor) {
-                    case 1: // Both
+                    case 'both':
                         motor = 0xFF;
                         break;
-
-                    case 2: // Left
-                    case 3: // Right
-                        motor = motor - 1; // Left should be 1
+                    case 'left':
+                        motor = 0x01;
+                        break;
+                    case 'right':
+                        motor = 0x02;
                         break;
                 }
 
-                direction = Number(this._pramVal[1]);
+                direction = this._pramVal[1];
+                switch (direction) {
+                    case 'forward':
+                        direction = 0x01;
+                        break;
+                    case 'backward':
+                        direction = 0x02;
+                        break;
+                    case 'left':
+                        direction = 0x03;
+                        break;
+                    case 'right':
+                        direction = 0x04;
+                        break;
+                }
 
                 speed = this.extractNum(this._pramVal[2]);
                 if (!Entry.Utils.isNumber(this._pramVal[2]) && speed < 4) { // IN1~3 will be 1~3
@@ -441,15 +498,16 @@ Entry.BlockToNeoParser = class {
                 break;
 
             case 'neobot_purple_motor_stop':
-                motor = Number(this._pramVal[0]);
+                motor = this._pramVal[0];
                 switch (motor) {
-                    case 1: // Both
+                    case 'both':
                         motor = 0xFF;
                         break;
-
-                    case 2: // Left
-                    case 3: // Right 
-                        motor = motor - 1; // Left should be 1
+                    case 'left':
+                        motor = 0x01;
+                        break;
+                    case 'right':
+                        motor = 0x02;
                         break;
                 }
                 cmd = [0x05, 0x00, 0x00, 0x00, motor];
@@ -457,8 +515,8 @@ Entry.BlockToNeoParser = class {
 
             case 'neobot_purple_play_note_for':
                 octave = Number(this._pramVal[0]);
-                note = Number(this._pramVal[1]);
-                duration = Number(this._pramVal[2]);
+                note = this.noteToNum(this._pramVal[1]);
+                duration = this.durationToNum(this._pramVal[2]);
                 cmd = [0x09, octave, note, duration, 0x00];
                 break;
 
@@ -487,7 +545,15 @@ Entry.BlockToNeoParser = class {
                     port = this.extractNum(this._pramVal[0]);
                 }
 
-                direction = Number(this._pramVal[1]);
+                direction = this._pramVal[1];
+                switch (direction) {
+                    case 'forward':
+                        direction = 0x01;
+                        break;
+                    case 'backward':
+                        direction = 0x02;
+                        break;
+                }
 
                 speed = Number(this._pramVal[2]);
                 if (isNaN(speed)) { // IN1~3 could not be converted to number
@@ -514,7 +580,15 @@ Entry.BlockToNeoParser = class {
                     port = this.extractNum(this._pramVal[1]);
                 }
 
-                direction = Number(this._pramVal[2]);
+                direction = this._pramVal[2];
+                switch (direction) {
+                    case 'forward':
+                        direction = 0x01;
+                        break;
+                    case 'backward':
+                        direction = 0x02;
+                        break;
+                }
 
                 speed = Number(this._pramVal[3]);
                 if (isNaN(speed)) { // IN1~3 could not be converted to number
