@@ -41,6 +41,7 @@ Entry.Playground = class Playground {
 
         Entry.addEventListener('hwChanged', this.toggleArBtn.bind(this));
         Entry.addEventListener('hwChanged', this.updateUploadBtn.bind(this));
+        Entry.addEventListener('workspaceChangeMode', this.updateUploadBtn.bind(this));
 
         Entry.windowResized.attach(this, this.clearClientRectMemo.bind(this));
     }
@@ -232,7 +233,8 @@ Entry.Playground = class Playground {
               this.toast.show(Lang.Blocks.ARDUINO_upload_to_hw);
               Entry.hw.upload();
           });
-      } else if (!Entry.options.uploadEnable) {
+      } else if (this._uploadButton && // Make upload unable on Python mode
+            (!Entry.options.uploadEnable || Entry.getMainWS().mode == Entry.Workspace.MODE_VIMBOARD)) { 
           this._uploadButton && Entry.removeElement(this._uploadButton);
           this._uploadButton = null;
       }
