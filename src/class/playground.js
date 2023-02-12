@@ -25,9 +25,7 @@ Entry.Playground = class Playground {
         this.isTextBGMode_ = false;
         this.dataTable = DataTable;
         this._uploadButton = null;
-        this._arToggleButton = null;
-        this._arToggleVisible = false;
-
+    
         /**
          * playground's current view type
          * View types are 'default', 'code', 'picture', 'text', sound'
@@ -39,7 +37,6 @@ Entry.Playground = class Playground {
         });
         Entry.addEventListener('commentVisibleChanged', this.toggleCommentButtonVisible.bind(this));
 
-        Entry.addEventListener('hwChanged', this.toggleArBtn.bind(this));
         Entry.addEventListener('hwChanged', this.updateUploadBtn.bind(this));
         Entry.addEventListener('workspaceChangeMode', this.updateUploadBtn.bind(this));
 
@@ -238,67 +235,6 @@ Entry.Playground = class Playground {
           this._uploadButton && Entry.removeElement(this._uploadButton);
           this._uploadButton = null;
       }
-    }
-
-    toggleArBtn() {
-        if (Entry.options.uploadEnable && Entry.options.arEnable && !this._arToggleButton) {
-            this._arToggleButton = Entry.createElement('div')
-                .addClass('entryPlaygroundArButtonWorkspace')
-                .appendTo(this.tabButtonView_);
-                this._arToggleButton.setAttribute('alt', Lang.Menus.block_coding);
-            this._arToggleButton.setAttribute('title', Lang.Menus.block_coding);
-            this._arToggleButton.bindOnClick(() => {
-                this.toggleArButtonVisible();
-            });
-        } else if (!Entry.options.uploadEnable) {
-            this._arToggleButton && Entry.removeElement(this._arToggleButton);
-            this._arToggleButton = null;
-        }
-    }
-
-    toggleArButtonVisible() {
-        const button = this._arToggleButton;
-        this._arToggleVisible = !this._arToggleVisible;
-        const option = {};
-
-        if (this._arToggleVisible) {
-            // Arduino coding
-            option.boardType = Entry.Workspace.MODE_ARBOARD;
-            option.textType = Entry.Vim.TEXT_TYPE_AR; 
-            option.runType = Entry.Vim.WORKSPACE_MODE;
-        } else {
-            // Block coding
-            option.boardType = Entry.Workspace.MODE_BOARD;
-            option.textType = -1;
-        }
-        const expectedBoardType = option.boardType;
-        try {
-            Entry.getMainWS().setMode(option);
-        } catch (e) { // When error in conversion, roll-back to toogleMode
-            this._arToggleVisible = !this._arToggleVisible;
-            return;
-        }
-
-        const actualBoardType = Entry.getMainWS().getMode();
-        if (expectedBoardType !== actualBoardType) { // If error, recover it to before
-            this._arToggleVisible = !this._arToggleVisible;;
-        }
-
-        if (this._arToggleVisible) { 
-            button.addClass('showAr');
-            button.setAttribute('alt', Lang.Menus.arduino_coding);
-            button.setAttribute('title', Lang.Menus.arduino_coding);
-            this.toast.show(Lang.Menus.arduino_coding);
-        } else {
-            button.removeClass('showAr');
-            button.setAttribute('alt', Lang.Menus.block_coding);
-            button.setAttribute('title', Lang.Menus.block_coding);
-            this.toast.show(Lang.Menus.block_coding);
-            
-            if (expectedBoardType === actualBoardType) { // Accept for only real mode change
-                Entry.toast.success(Lang.Workspace.confirm_load_header, Lang.TextCoding.alert_return_to_origin);
-            }
-        }
     }
 
     createButtonTabView(tabButtonView) {
