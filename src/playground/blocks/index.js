@@ -46,12 +46,17 @@ Entry.EXPANSION_BLOCK_LIST = {
     behaviorConductLifeSafety: Entry.EXPANSION_BLOCK.behaviorConductLifeSafety,
 };
 
+const destroyBlockList = [];
+
 function getBlockObject(items) {
     const blockObject = {};
     items.forEach((item) => {
         try {
             if ('getBlocks' in item) {
                 Object.assign(blockObject, item.getBlocks());
+            }
+            if ('destroy' in item) {
+                destroyBlockList.push(item.destroy);
             }
         } catch (err) {
             console.log(err, item);
@@ -88,4 +93,5 @@ module.exports = {
         const hardwareBlockObjectList = getBlockObject(hardwareModules);
         return Object.assign({}, basicAndExpansionBlockObjectList, hardwareBlockObjectList);
     },
+    destroyBlockList,
 };

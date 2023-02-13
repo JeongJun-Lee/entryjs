@@ -13,6 +13,8 @@ function replaceLanguageCode(originalLanguage) {
             return 'ja';
         case 'vn':
             return 'vi';
+        case 'uz': // Currently UZ is not supported, so change to EN
+            return 'en';
         default:
             return originalLanguage;
     }
@@ -182,7 +184,7 @@ Entry.AI_UTILIZE_BLOCK.translate = {
         dictionary: 'nsmt',
         artificial_intelligence: 'n2mt',
     },
-    apiType: 'nsmt',
+    apiType: 'n2mt',
 };
 
 Entry.AI_UTILIZE_BLOCK.translate.getBlocks = function() {

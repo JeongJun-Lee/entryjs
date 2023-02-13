@@ -68,7 +68,11 @@ module.exports = {
                     },
                     {
                         type: 'Dropdown',
-                        options: [[Lang.Blocks.speak, 'speak']],
+                        options: [
+                            [Lang.Blocks.speak, 'speak'],
+                            [Lang.Blocks.think, 'think'],
+                            // [Lang.Blocks.yell, 'yell'],
+                        ],
                         value: 'speak',
                         fontSize: 10,
                         bgColor: EntryStatic.colorSet.block.darken.LOOKS,
@@ -106,7 +110,10 @@ module.exports = {
                             type: 'number',
                             params: ['B&value'],
                         },
-                        null,
+                        {
+                            type: 'text',
+                            params: ['C&value'],
+                        },
                         null,
                     ],
                     type: 'dialog_time',
@@ -117,7 +124,7 @@ module.exports = {
                     OPTION: 2,
                 },
                 class: 'say',
-                isNotFor: ['textBox'],
+                isNotFor: [],
                 func(sprite, script) {
                     if (!script.isStart) {
                         let [timeValue, message] = script.getValues(['SECOND', 'VALUE'], script);
@@ -136,7 +143,7 @@ module.exports = {
                         message = Entry.convertToRoundedDecimals(message, 3);
                         new Entry.Dialog(sprite, message, mode);
                         sprite.syncDialogVisible(sprite.getVisible());
-                        setTimeout(function() {
+                        setTimeout(() => {
                             script.timeFlag = 0;
                         }, timeValue * 1000);
                     }
@@ -178,7 +185,11 @@ module.exports = {
                                 },
                                 {
                                     type: 'Dropdown',
-                                    options: [[Lang.Blocks.speak, 'speak']],
+                                    options: [
+                                        [Lang.Blocks.speak, 'speak'],
+                                        [Lang.Blocks.think, 'think'],
+                                        // [Lang.Blocks.yell, 'yell'],
+                                    ],
                                     value: 'speak',
                                     fontSize: 11,
                                     arrowColor: EntryStatic.colorSet.arrow.default.LOOKS,
@@ -201,7 +212,11 @@ module.exports = {
                     },
                     {
                         type: 'Dropdown',
-                        options: [[Lang.Blocks.speak, 'speak']],
+                        options: [
+                            [Lang.Blocks.speak, 'speak'],
+                            [Lang.Blocks.think, 'think'],
+                            // [Lang.Blocks.yell, 'yell'],
+                        ],
                         value: 'speak',
                         fontSize: 10,
                         bgColor: EntryStatic.colorSet.block.darken.LOOKS,
@@ -231,7 +246,10 @@ module.exports = {
                             type: 'text',
                             params: ['A&value'],
                         },
-                        null,
+                        {
+                            type: 'text',
+                            params: ['B&value'],
+                        },
                         null,
                     ],
                     type: 'dialog',
@@ -241,7 +259,7 @@ module.exports = {
                     OPTION: 1,
                 },
                 class: 'say',
-                isNotFor: ['textBox'],
+                isNotFor: [],
                 func(sprite, script) {
                     let message = script.getValue('VALUE', script);
                     if (message === '') {
@@ -285,7 +303,7 @@ module.exports = {
                     type: 'remove_dialog',
                 },
                 class: 'say',
-                isNotFor: ['textBox'],
+                isNotFor: [],
                 func(sprite, script) {
                     if (sprite.dialog) {
                         sprite.dialog.remove();

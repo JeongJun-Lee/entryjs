@@ -359,7 +359,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Arduino.analogRead(%1)',
+                        syntax: 'ArduinoExt.analogRead(%1)',
                         blockType: 'param',
                         textParams: [
                             {
@@ -490,7 +490,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Arduino.map(%1, %2, %3, %4, %5)',
+                        syntax: 'ArduinoExt.map(%1, %2, %3, %4, %5)',
                         blockType: 'param',
                         textParams: [
                             {
@@ -580,7 +580,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Arduino.ultrasonicRead(%1, %2)',
+                        syntax: 'ArduinoExt.ultrasonicRead(%1, %2)',
                         blockType: 'param',
                         textParams: [
                             {
@@ -645,7 +645,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Arduino.digitalRead(%1)',
+                        syntax: 'ArduinoExt.digitalRead(%1)',
                         blockType: 'param',
                         textParams: [
                             {
@@ -732,7 +732,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Arduino.dhtTempHumiInit(%1)',
+                        syntax: 'ArduinoExt.dhtTempHumiInit(%1)',
                         blockType: 'param',
                         textParams: [
                             {
@@ -742,7 +742,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [{syntax: 'dht.begin()'}]
+                ar: [{syntax: 'dht.begin();'}]
             },
         },
         arduino_ext_get_temp_value: {
@@ -790,7 +790,7 @@ Entry.ArduinoExt.getBlocks = function() {
             },
             syntax: {
                 js: [],
-                py: [{syntax: 'Arduino.temperatureRead()'}],
+                py: [{syntax: 'ArduinoExt.temperatureRead()'}],
                 ar: [{syntax: 'dht.readTemperature()'}]
             },
         },
@@ -839,7 +839,7 @@ Entry.ArduinoExt.getBlocks = function() {
             },
             syntax: {
                 js: [],
-                py: [{syntax: 'Arduino.humidityRead()'}],
+                py: [{syntax: 'ArduinoExt.humidityRead()'}],
                 ar: [{syntax: 'dht.readHumidity()'}]
             },
         },
@@ -965,7 +965,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Arduino.digitalWrite(%1, %2)',
+                        syntax: 'ArduinoExt.digitalWrite(%1, %2)',
                         textParams: [
                             {
                                 type: 'Block',
@@ -1043,7 +1043,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Arduino.analogWrite(%1, %2)',
+                        syntax: 'ArduinoExt.analogWrite(%1, %2)',
                         textParams: [
                             {
                                 type: 'Block',
@@ -1357,7 +1357,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Arduino.tone(%1, %2, %3, %4)',
+                        syntax: 'ArduinoExt.tone(%1, %2, %3, %4)',
                         textParams: [
                             {
                                 type: 'Block',
@@ -1442,7 +1442,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Arduino.servomotorWrite(%1, %2)',
+                        syntax: 'ArduinoExt.servomotorWrite(%1, %2)',
                         textParams: [
                             {
                                 type: 'Block',
@@ -1578,7 +1578,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 js: [],
                 py: [
                     {
-                        syntax: 'Arduino.steppermotorWrite(%1, %2, %3, %4, %5, %6)',
+                        syntax: 'ArduinoExt.steppermotorWrite(%1, %2, %3, %4, %5, %6)',
                         textParams: [
                             {
                                 type: 'Block',
