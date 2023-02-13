@@ -285,24 +285,45 @@ Entry.Workspace = class Workspace {
                 dispatchChangeBoardEvent();
                 break;
 
-            case WORKSPACE.MODE_UPLOAD: // Upload to board
+            case WORKSPACE.MODE_UPLOAD: // When pressed upload button
                 try {
-                    return this.codeToText(this.board.code, mode);
+                    if (this.oldTextType === VIM.TEXT_TYPE_PY) {
+                        // First, Check if is no problem at PY to Block
+                        this.textToCode(this.oldMode, this.oldTextType);
+                    } 
+                    return this.codeToText(this.board.code, mode); // Generate codes for upload
                 } catch (e) {
-                    e.block && Entry.getMainWS() && Entry.getMainWS().board.activateBlock(e.block);    
-                } finally{ // Forcely return to Board mode
-                    this.vimBoard.hide();
-                    this.board.show();
-                    blockMenu.unbanClass('functionInit');
-                    this.set({ selectedBoard: this.board });
-                    this.mode = WORKSPACE.MODE_BOARD;
-                    mode.boardType = WORKSPACE.MODE_BOARD;
-                    mode.runType = VIM.WORKSPACE_MODE;
-                    dispatchChangeBoardEvent();
+                    if (this.oldTextType === VIM.TEXT_TYPE_PY) { // Failed mode change by code error in PY mode
+                        if (this.board && this.board.code) {
+                            this.board.code.clear();
+                        }
+                        if (this.board) {
+                            this.board.hide();
+                        }
+                        this.set({ selectedBoard: this.vimBoard });
+                        blockMenu.banClass('functionInit');
+    
+                        this.mode = WORKSPACE.MODE_VIMBOARD;
+                        this.boardType = WORKSPACE.MODE_VIMBOARD;
+                        this.textType = VIM.TEXT_TYPE_PY;
+                        this.runType = VIM.WORKSPACE_MODE;
+                    } else { // Failed mode change by code error in Block mode
+                        this.vimBoard.hide();
+                        this.board.show();
+                        blockMenu.unbanClass('functionInit');
+                        this.set({ selectedBoard: this.board });
+
+                        this.mode = WORKSPACE.MODE_BOARD;
+                        mode.boardType = WORKSPACE.MODE_BOARD;
+                        mode.runType = VIM.WORKSPACE_MODE;
+                        dispatchChangeBoardEvent();
+
+                        e.block && Entry.getMainWS() && Entry.getMainWS().board.activateBlock(e.block);    
+                    }
                 }
                 break;
 
-            case WORKSPACE.MODE_ARBOARD:  // Arduino C++ code view
+            case WORKSPACE.MODE_ARBOARD:  // When selected Entry-Arduino menu
                 try {
                     this.textToCode(this.oldMode, this.oldTextType);
                     this.board && this.board.hide();

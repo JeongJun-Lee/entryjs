@@ -294,6 +294,7 @@ export default class Hardware {
 
     upload() {
         let option = {boardType: Entry.Workspace.MODE_UPLOAD};
+        option.runType = Entry.Vim.WORKSPACE_MODE;
         switch (this.hwModule.name) {
             case 'neosoco':
                 option.textType = Entry.Vim.TEXT_TYPE_NEO;
@@ -306,11 +307,11 @@ export default class Hardware {
 
         const ws = Entry.getMainWS();
         let uploadObj = null;
-        if (ws.getMode() === Entry.Workspace.MODE_BOARD) {
-            uploadObj = ws.setMode(option);
-        } else if (ws.getMode() === Entry.Workspace.MODE_ARBOARD) {
+        if (ws.getMode() === Entry.Workspace.MODE_ARBOARD) {
             const doc = ws.vimBoard.codeMirror.getValue(); // Get source code in editor
             uploadObj = { name: Entry.hw.hwModule ? Entry.hw.hwModule.name : '', frame: doc };
+        } else {
+            uploadObj = ws.setMode(option);
         }
         if (uploadObj && uploadObj.frame.length) {
             Entry.propertyPanel.select('console');

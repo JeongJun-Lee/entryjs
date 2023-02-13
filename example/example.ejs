@@ -155,11 +155,12 @@
                 } else if (mode === 'upload') {
                     option.boardType = Entry.Workspace.MODE_UPLOAD;
                     option.textType = Entry.Vim.TEXT_TYPE_NEO;
+                    option.runType = Entry.Vim.WORKSPACE_MODE;
                 } else if (mode === 'arduino') {
                     option.boardType = Entry.Workspace.MODE_ARBOARD;
                     option.textType = Entry.Vim.TEXT_TYPE_AR; 
                     option.runType = Entry.Vim.WORKSPACE_MODE;
-                } else {
+                } else if (mode === 'python') {
                     option.boardType = Entry.Workspace.MODE_VIMBOARD;
                     option.textType = Entry.Vim.TEXT_TYPE_PY;
                     option.runType = Entry.Vim.WORKSPACE_MODE;

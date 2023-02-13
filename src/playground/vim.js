@@ -246,7 +246,9 @@ class Vim {
             return {name: Entry.hw.hwModule.name, frame: dataFrame};
         } else if (textType === Vim.TEXT_TYPE_AR) {
             textCode = this._parser.parse(code, Entry.Parser.PARSE_GENERAL);
-            this.codeMirror.setValue(textCode);
+            if (mode.boardType != Entry.Workspace.MODE_UPLOAD) {
+                this.codeMirror.setValue(textCode);
+            }
             doc = this.codeMirror.getDoc();
             doc.setCursor({ line: doc.lastLine() - 1 });
             return {name: Entry.hw.hwModule ? Entry.hw.hwModule.name : '', frame: textCode};
