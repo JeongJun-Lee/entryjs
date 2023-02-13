@@ -288,10 +288,15 @@ Entry.Workspace = class Workspace {
             case WORKSPACE.MODE_UPLOAD: // When pressed upload button
                 try {
                     if (this.oldTextType === VIM.TEXT_TYPE_PY) {
-                        // First, Check if is no problem at PY to Block
+                        // First, Check if is no conversion error at PY to Block
+                        // If there, user have to clear the error first
                         this.textToCode(this.oldMode, this.oldTextType);
-                    } 
-                    return this.codeToText(this.board.code, mode); // Generate codes for upload
+                    } else { // Block mode
+                        this.mode = WORKSPACE.MODE_BOARD;
+                        mode.boardType = WORKSPACE.MODE_BOARD;
+                        mode.runType = VIM.WORKSPACE_MODE;
+                    }
+                    return this.codeToText(this.board.code, mode); // Generate codes for upload and return the Obj
                 } catch (e) {
                     if (this.oldTextType === VIM.TEXT_TYPE_PY) { // Failed mode change by code error in PY mode
                         if (this.board && this.board.code) {
