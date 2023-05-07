@@ -58,7 +58,7 @@ Entry.init = function(container, options) {
     Entry.paintMode = options.paintMode || 'literallycanvas';
     container && this.createDom(container, this.type);
 
-    if (Lang.type.includes('uz')) { // If Lang is UZ, remove expansion category
+    if (!Lang.type.includes('ko')) { // If Lang is ko only, Enable expansion category
         Entry.playground.blockMenu.banCategory('expansion');
     }
 
