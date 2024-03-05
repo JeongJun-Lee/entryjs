@@ -147,14 +147,17 @@ Entry.BlockToArParser = class {
             block.type === 'arduino_ext_set_servo' ||
             block.type === 'arduino_ext_set_stepper' ||
             block.type === 'arduino_ext_get_ultrasonic_value' ||
+            block.type === 'ITPLE_get_ultrasonic_value' ||
             block.type === 'arduino_ext_set_temp_humi_init'
         )) {
             this.insertIntoGlobal(block.type);
         }
 
         // Place UserFunc after loop()
-        if (block && (block.type === 'arduino_ext_get_ultrasonic_value'
-            || (this.isFunc(block) && addFunc) // User defined function
+        if (block && (
+            block.type === 'arduino_ext_get_ultrasonic_value' ||
+            block.type === 'ITPLE_get_ultrasonic_value' ||
+            (this.isFunc(block) && addFunc) // User defined function
         )) {
             this.AddUserFunc(stat);
 
@@ -187,7 +190,8 @@ Entry.BlockToArParser = class {
             stat = `#include <Stepper.h>\nStepper myStepper(2048, ${this._pinNum}, ${this._pinNum2}, ${this._pinNum3}, ${this._pinNum4});\n`;
         } else if (blockType === 'arduino_ext_set_temp_humi_init') {
             stat = `#include <DHT.h>\nDHT dht(${this._pinNum}, DHT11);\n`;
-        } else if (blockType === 'arduino_ext_get_ultrasonic_value') {
+        } else if (blockType === 'arduino_ext_get_ultrasonic_value' || 
+                    blockType === 'ITPLE_get_ultrasonic_value') {
             stat = `int trig = ${this._pinNum};\nint echo = ${this._pinNum2};\n`;
         } else { // variable
             stat = Entry.TextCodingUtil.generateVariablesDeclarationForAr();
@@ -457,6 +461,8 @@ Entry.BlockToArParser = class {
 
             case 'arduino_toggle_led': // digitalWrite
             case 'arduino_ext_toggle_led':
+            case 'ITPLE_toggle_led':
+            case 'ITPLE_set_motor_direction':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
                 this._pinNum = Number(this._pramVal[0]); // Arr to Number
@@ -469,6 +475,8 @@ Entry.BlockToArParser = class {
 
             case 'arduino_toggle_pwm': // pwm(anlogWrite)
             case 'arduino_ext_digital_pwm':
+            case 'ITPLE_digital_pwm':
+            case 'ITPLE_set_motor_speed':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
                 this._pinNum = Number(this._pramVal[0]); // Arr to Number
@@ -489,6 +497,8 @@ Entry.BlockToArParser = class {
 
             case 'arduino_get_digital_value': // digitalRead
             case 'arduino_ext_get_digital':
+            case 'ITPLE_get_digital':
+            case 'ITPLE_get_digital_value':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
                 this._pinNum = Number(this._pramVal[0]); // Arr to Number
@@ -499,6 +509,7 @@ Entry.BlockToArParser = class {
 
             case 'arduino_get_number_sensor_value': // analogRead
             case 'arduino_ext_get_analog_value':
+            case 'ITPLE_get_analog_value':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
                 this._pinNum = this.extractNum(this._pramVal[0]); // A1 -> 1
@@ -511,6 +522,7 @@ Entry.BlockToArParser = class {
 
             case 'arduino_convert_scale': // map
             case 'arduino_ext_get_analog_value_map':
+            case 'ITPLE_value_mapping':
                 stat = block._schema.syntax.ar[0].syntax;
                 if (Entry.Utils.isNumber(this._pramVal[0])) {
                     this.throwErr('error', 'WrongInputVal', block);
@@ -527,6 +539,7 @@ Entry.BlockToArParser = class {
                 break;
 
             case 'arduino_ext_set_tone': // tone
+            case 'ITPLE_set_tone':
                 const octave_tone_hz = [
                     [0, 32.7, 34.6, 36.7, 38.9, 41.2, 43.7, 46.2, 49.0, 51.9, 55.0, 58.3, 61.7], // 1octave
                     [0, 65.4, 69.3, 73.4, 77.8, 82.4, 87.3, 92.5, 98.0, 103.8, 110.0, 116.5, 123.5],
@@ -561,6 +574,7 @@ Entry.BlockToArParser = class {
                 break;
 
             case 'arduino_ext_get_ultrasonic_value':
+            case 'ITPLE_get_ultrasonic_value':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
                 this._pinNum = Number(this._pramVal[0]); // trig
@@ -568,19 +582,20 @@ Entry.BlockToArParser = class {
                 this._pinNum2 = Number(this._pramVal[1]); // echo
                 this.errChkPinNum(this._pinNum2, block);
                 
+                // Don't fix the tab spaces in the distance func below
                 this.insertIntoSrc(
-                `int distance() {
-                    digitalWrite(${this._pinNum}, LOW);
-                    delayMicroseconds(2);
+`int distance() {
+    digitalWrite(${this._pinNum}, LOW);
+    delayMicroseconds(2);
 
-                    digitalWrite(${this._pinNum}, HIGH);
-                    delayMicroseconds(10);
-                    digitalWrite(${this._pinNum}, LOW);
-                    long duration = pulseIn(${this._pinNum2}, HIGH);
+    digitalWrite(${this._pinNum}, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(${this._pinNum}, LOW);
+    long duration = pulseIn(${this._pinNum2}, HIGH);
 
-                    int distance = (duration/2) * 0.034;
-                    return distance;
-                }`
+    int distance = (duration/2) * 0.034;
+    return distance;
+}`
                 , block);
                 break;
 

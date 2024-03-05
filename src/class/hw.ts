@@ -301,6 +301,7 @@ export default class Hardware {
                 break;
             case 'arduino':
             case 'ArduinoExt':
+            case 'ITPLE':
                 option.textType = Entry.Vim.TEXT_TYPE_AR;
                 break;
         }
@@ -379,11 +380,14 @@ export default class Hardware {
         if (
             this.hwModule.name == 'arduino' ||
             this.hwModule.name == 'ArduinoExt' ||
-            this.hwModule.name == 'neosoco'
+            this.hwModule.name == 'neosoco' ||
+            this.hwModule.name == 'ITPLE'
         ) {
             Entry.options.uploadEnable = true;
         }
-        if (this.hwModule.name == 'arduino' || this.hwModule.name == 'ArduinoExt') {
+        if (this.hwModule.name == 'arduino' || 
+            this.hwModule.name == 'ArduinoExt' ||
+            this.hwModule.name == 'ITPLE') {
             Entry.options.arEnable = true;
         }
         Entry.dispatchEvent('hwChanged');
