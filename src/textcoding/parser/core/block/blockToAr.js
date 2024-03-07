@@ -174,11 +174,11 @@ Entry.BlockToArParser = class {
         }
 
         // init
-        this._funcName = '';
-        this._pinNum = -1;
-        this._pinNum2 = -1;
-        this._pinNum3 = -1;
-        this._pinNum4 = -1;
+        // this._funcName = '';
+        // this._pinNum = -1;
+        // this._pinNum2 = -1;
+        // this._pinNum3 = -1;
+        // this._pinNum4 = -1;
         this.funcDefMap = {};
     }
 
@@ -658,6 +658,8 @@ Entry.BlockToArParser = class {
         }
 
         this.insertIntoSetup(); // Frist, Setup the pin mode in case of Digital
+
+        
         return stat;
     }
 
