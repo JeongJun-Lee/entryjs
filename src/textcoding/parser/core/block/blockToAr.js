@@ -460,6 +460,28 @@ Entry.BlockToArParser = class {
                 stat = this._pramVal[0] + operator + this._pramVal[2];
                 break;
 
+            case 'quotient_and_mod':
+                value = Number(this._pramVal[0]); // String to Number
+                if (isNaN(value)) { // In case the value is not a number
+                    value = this._pramVal[0];
+                }
+                value2 = Number(this._pramVal[1]); // String to Number
+                if (isNaN(value2)) { // In case the value is not a number
+                    value2 = this._pramVal[1];
+                }
+
+                switch (this._pramVal[2]) {
+                    case 'QUOTIENT':
+                        operator = ' / ';
+                        break;
+                    case 'MOD':
+                        operator = ' % ';
+                        break;
+                }
+
+                stat = value + operator + value2;
+                break;
+
             case 'arduino_toggle_led': // digitalWrite
             case 'arduino_ext_toggle_led':
             case 'ITPLE_toggle_led':

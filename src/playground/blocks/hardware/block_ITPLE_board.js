@@ -211,7 +211,7 @@ Entry.ITPLE.getBlocks = function() {
                 PORT: 0,
             },
             class: 'ITPLEGet',
-            // isNotFor: ['ITPLE'],
+            isNotFor: ['ITPLE'],
             func(sprite, script) {
                 let port = script.getValue('PORT', script);
                 const ANALOG = Entry.hw.portData.ANALOG;
@@ -263,7 +263,7 @@ Entry.ITPLE.getBlocks = function() {
                 PORT: 0,
             },
             class: 'ITPLEGet',
-            // isNotFor: ['ITPLE'],
+            isNotFor: ['ITPLE'],
             func(sprite, script) {
                 const { hwModule = {} } = Entry.hw;
                 const { name } = hwModule;
@@ -366,7 +366,7 @@ Entry.ITPLE.getBlocks = function() {
                 VALUE5: 4,
             },
             class: 'ITPLEGet',
-            // isNotFor: ['ITPLE'],
+            isNotFor: ['ITPLE'],
             func(sprite, script) {
                 let result = script.getValue('PORT', script);
                 const ANALOG = Entry.hw.portData.ANALOG;
@@ -479,7 +479,7 @@ Entry.ITPLE.getBlocks = function() {
                 PORT2: 1,
             },
             class: 'ITPLEGet',
-            // isNotFor: ['ITPLE'],
+            isNotFor: ['ITPLE'],
             func(sprite, script) {
                 const port1 = script.getNumberValue('PORT1', script);
                 const port2 = script.getNumberValue('PORT2', script);
@@ -546,7 +546,7 @@ Entry.ITPLE.getBlocks = function() {
                 PORT: 0,
             },
             class: 'ITPLEGet',
-            // isNotFor: ['ITPLE'],
+            isNotFor: ['ITPLE'],
             func(sprite, script) {
                 const { hwModule = {} } = Entry.hw;
                 const { name } = hwModule;
@@ -677,7 +677,7 @@ Entry.ITPLE.getBlocks = function() {
                 VALUE: 1,
             },
             class: 'ITPLE',
-            // isNotFor: ['ITPLE'],
+            isNotFor: ['ITPLE'],
             func(sprite, script) {
                 const port = script.getNumberValue('PORT');
                 let value = script.getValue('VALUE');
@@ -763,7 +763,7 @@ Entry.ITPLE.getBlocks = function() {
                 VALUE: 1,
             },
             class: 'ITPLE',
-            // isNotFor: ['ITPLE'],
+            isNotFor: ['ITPLE'],
             func(sprite, script) {
                 const port = script.getNumberValue('PORT');
                 let value = script.getNumberValue('VALUE');
@@ -1014,7 +1014,7 @@ Entry.ITPLE.getBlocks = function() {
                 DURATION: 3,
             },
             class: 'ITPLE',
-            // isNotFor: ['ITPLE'],
+            isNotFor: ['ITPLE'],
             func(sprite, script) {
                 const sq = Entry.hw.sendQueue;
                 const port = script.getNumberValue('PORT', script);
@@ -1209,7 +1209,7 @@ Entry.ITPLE.getBlocks = function() {
                 VALUE: 1,
             },
             class: 'ITPLE',
-            // isNotFor: ['ITPLE'],
+            isNotFor: ['ITPLE'],
             func(sprite, script) {
                 const port = script.getNumberValue('PORT');
                 let value = script.getValue('VALUE');
@@ -1299,7 +1299,7 @@ Entry.ITPLE.getBlocks = function() {
                 VALUE: 1,
             },
             class: 'ITPLE',
-            // isNotFor: ['ITPLE'],
+            isNotFor: ['ITPLE'],
             func(sprite, script) {
                 const port = script.getNumberValue('PORT');
                 let value = script.getNumberValue('VALUE');
