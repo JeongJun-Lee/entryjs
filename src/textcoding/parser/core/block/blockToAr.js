@@ -327,6 +327,7 @@ Entry.BlockToArParser = class {
             block.type === 'arduino_get_sensor_number' ||    // Port for analogRead
             block.type === 'arduino_get_digital_toggle' ||
             block.type === 'arduino_ext_analog_list' ||
+            block.type === 'ITPLE_analog_list' ||
             block.type === 'arduino_ext_octave_list' ||
             block.type === 'arduino_ext_tone_list'
         ) {

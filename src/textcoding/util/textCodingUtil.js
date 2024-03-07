@@ -580,6 +580,7 @@ class TextCodingUtil {
             || blockType === 'arduino_text'
             || blockType === 'arduino_get_digital_toggle'
             || blockType === 'arduino_ext_analog_list'
+            || block.type === 'ITPLE_analog_list'
             || blockType === 'arduino_ext_octave_list'
             || blockType === 'arduino_ext_tone_list'
             || blockType === 'boolean_basic_operator'
