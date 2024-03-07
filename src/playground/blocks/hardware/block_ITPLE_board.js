@@ -118,7 +118,7 @@ Entry.ITPLE.blockMenuBlocks = [
 //region ITPLE 보드
 Entry.ITPLE.getBlocks = function() {
     return {
-        arduino_ext_analog_list: {
+        ITPLE_analog_list: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
             outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
             skeleton: 'basic_string_field',
@@ -175,12 +175,12 @@ Entry.ITPLE.getBlocks = function() {
                                 value: '0',
                                 fontSize: 11,
                                 converter: Entry.block.converters.returnStringKey,
-                                codeMap: 'Entry.CodeMap.Arduino.arduino_ext_analog_list[0]',
+                                codeMap: 'Entry.CodeMap.Arduino.ITPLE_analog_list[0]',
                                 bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
                                 arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
                             },
                         ],
-                        keyOption: 'arduino_ext_analog_list',
+                        keyOption: 'ITPLE_analog_list',
                     },
                 ],
             },
@@ -202,7 +202,7 @@ Entry.ITPLE.getBlocks = function() {
             def: {
                 params: [
                     {
-                        type: 'arduino_ext_analog_list',
+                        type: 'ITPLE_analog_list',
                     },
                 ],
                 type: 'ITPLE_get_analog_value',
