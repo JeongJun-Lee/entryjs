@@ -579,7 +579,7 @@ Entry.BlockToArParser = class {
                 this._pinNum = Number(this._pramVal[0]); // Arr to Number
                 this.errChkPinNum(this._pinNum, block);
                 value2 = this._pramVal[1]; // tone
-                if (Entry.Utils.isNumber(value2)) { // Tone should be string
+                if (typeof value2 != 'string') { // Tone should be string
                     this.throwErr('error', 'WrongInputVal', block);
                 }
                 value = this._pramVal[2]; // octave
