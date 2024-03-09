@@ -3,8 +3,5 @@
   "entry.js": "/dist/entry.js",
   "entry.min.css": "/dist/entry.min.css",
   "entry.min.js": "/dist/entry.min.js",
-  "2.6481bc4a656568415085.js": "/dist/2.6481bc4a656568415085.js",
-  "67114047a4de54384245.worker.js": "/dist/67114047a4de54384245.worker.js",
-  "6a21618bd57128347ab6.worker.js": "/dist/6a21618bd57128347ab6.worker.js",
-  "entry.min.js.LICENSE.txt": "/dist/entry.min.js.LICENSE.txt"
+  "522.js": "/dist/522.d7e34d38111de43c0158.js"
 }
