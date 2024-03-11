@@ -1014,7 +1014,7 @@ Entry.ITPLE.getBlocks = function() {
                 DURATION: 3,
             },
             class: 'ITPLE',
-            isNotFor: ['ITPLE'],
+            // isNotFor: ['ITPLE'],
             func(sprite, script) {
                 const sq = Entry.hw.sendQueue;
                 const port = script.getNumberValue('PORT', script);
@@ -1119,7 +1119,7 @@ Entry.ITPLE.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [{syntax: 'tone(%1, %2);'}]
+                ar: [{syntax: 'tone(%1, %2, %3);'}]
             },
         },
         arduino_ext_octave_list: {
