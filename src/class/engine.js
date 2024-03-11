@@ -22,12 +22,15 @@ Entry.Engine = class Engine {
 
         _addEventListener('canvasClick', () => this.fireEvent('mouse_clicked'));
         _addEventListener('canvasClickCanceled', () => this.fireEvent('mouse_click_cancled'));
-        _addEventListener('entityClick', (entity) =>
-            this.fireEventOnEntity('when_object_click', entity)
-        );
-        _addEventListener('entityClickCanceled', (entity) =>
-            this.fireEventOnEntity('when_object_click_canceled', entity)
-        );
+        _addEventListener('entityClick', (entity) => {
+            const objId = entity.id;
+            Entry.stage.clickedObjectId = objId;
+            this.fireEventOnEntity('when_object_click', entity);
+        });
+        _addEventListener('entityClickCanceled', (entity) => {
+            delete Entry.stage.clickedObjectId;
+            this.fireEventOnEntity('when_object_click_canceled', entity);
+        });
 
         if (Entry.type !== 'phone' && Entry.type !== 'playground') {
             _addEventListener(
@@ -138,7 +141,7 @@ Entry.Engine = class Engine {
                     this.blur();
                 })
                 .appendTo(this.buttonWrapper);
-            this.addButton.innerHTML = Lang.Workspace.add_object;
+            this.addButton.textContent = Lang.Workspace.add_object;
             if (!Entry.objectAddable) {
                 this.addButton.addClass('entryRemove');
             }
@@ -148,7 +151,7 @@ Entry.Engine = class Engine {
                 .addClass('entryRunButtonWorkspace_w')
                 .bindOnClick(() => Entry.do('toggleRun', 'runButton'))
                 .appendTo(this.buttonWrapper);
-            this.runButton.innerHTML = Lang.Workspace.run;
+            this.runButton.textContent = Lang.Workspace.run;
 
             this.runButton2 = Entry.createElement('button')
                 .addClass('entryEngineButtonWorkspace_w')
@@ -182,7 +185,7 @@ Entry.Engine = class Engine {
                 .addClass('entryRemove')
                 .bindOnClick(() => Entry.do('toggleStop', 'stopButton'))
                 .appendTo(this.buttonWrapper);
-            this.stopButton.innerHTML = Lang.Workspace.stop;
+            this.stopButton.textContent = Lang.Workspace.stop;
 
             this.stopButton2 = Entry.createElement('button')
                 .addClass('entryEngineButtonWorkspace_w')
@@ -193,7 +196,7 @@ Entry.Engine = class Engine {
                     Entry.engine.toggleStop();
                 })
                 .appendTo(this.buttonWrapper);
-            this.stopButton2.innerHTML = Lang.Workspace.stop;
+            this.stopButton2.textContent = Lang.Workspace.stop;
         } else if (option == 'minimize') {
             /** @type {!Element} */
             this.view_ = controlView;
@@ -225,7 +228,7 @@ Entry.Engine = class Engine {
             this.stopButton.addClass('entryEngineButtonMinimize');
             this.stopButton.addClass('entryStopButtonMinimize');
             this.stopButton.addClass('entryRemove');
-            this.stopButton.innerHTML = Lang.Workspace.stop;
+            this.stopButton.textContent = Lang.Workspace.stop;
             this.view_.appendChild(this.stopButton);
             this.stopButton.bindOnClick(function(e) {
                 this.blur();
@@ -233,7 +236,7 @@ Entry.Engine = class Engine {
             });
 
             this.pauseButton = Entry.createElement('button');
-            this.pauseButton.innerHTML = Lang.Workspace.pause;
+            this.pauseButton.textContent = Lang.Workspace.pause;
             this.pauseButton.addClass('entryEngineButtonMinimize');
             this.pauseButton.addClass('entryPauseButtonMinimize');
             this.pauseButton.addClass('entryRemove');
@@ -311,7 +314,7 @@ Entry.Engine = class Engine {
             if (Entry.objectAddable) {
                 this.runButton.addClass('small');
             }
-            this.runButton.innerHTML = Lang.Workspace.run;
+            this.runButton.textContent = Lang.Workspace.run;
 
             this.footerView_.appendChild(this.runButton);
             this.runButton.bindOnClick((e) => {
@@ -327,7 +330,7 @@ Entry.Engine = class Engine {
             if (Entry.objectAddable) {
                 this.stopButton.addClass('small');
             }
-            this.stopButton.innerHTML = Lang.Workspace.stop;
+            this.stopButton.textContent = Lang.Workspace.stop;
 
             this.footerView_.appendChild(this.stopButton);
             this.stopButton.bindOnClick((e) => {
@@ -341,7 +344,7 @@ Entry.Engine = class Engine {
             this.audioShadePanelOn = false;
             $(this.audioShadePanel_).remove();
             delete this.audioShadePanel_;
-        } else {
+        } else if (Entry.engine.isState('run')) {
             this.audioShadePanelOn = true;
             this.audioShadePanel_ = Entry.createElement('div', 'audioShadeCirclebox');
             this.audioShadePanel_.addClass('audioShadeCirclebox');
@@ -365,7 +368,7 @@ Entry.Engine = class Engine {
             const audioShadeText = Entry.createElement('div', 'audioShadeText').addClass(
                 'audioShadeText'
             );
-            audioShadeText.innerHTML = Lang.Msgs.ai_utilize_audio_listening;
+            audioShadeText.textContent = Lang.Msgs.ai_utilize_audio_listening;
             this.audioShadePanel_.appendChild(audioShadeText);
             this.minimizedView_ = document.querySelector('#entryCanvasWrapper');
             if (this.view_.classList[0] === 'entryEngine') {
@@ -384,7 +387,7 @@ Entry.Engine = class Engine {
             this.audioProgressPanelOn = false;
             $(this.audioProgressPanel_).remove();
             delete this.audioProgressPanel_;
-        } else {
+        } else if (Entry.engine.isState('run')) {
             this.audioProgressPanelOn = true;
             this.audioProgressPanel_ = Entry.createElement('div', 'audioShadeCirclebox');
             this.audioProgressPanel_.addClass('audioShadeCirclebox');
@@ -436,14 +439,17 @@ Entry.Engine = class Engine {
 
             this.audioProgressPanel_.appendChild(audioShadeMainCircle);
 
-            // const audioShadeText = Entry.createElement('div', 'audioShadeText').addClass(
-            //     'audioShadeText'
-            // );
-            // audioShadeText.innerHTML = '진행중이에요';
-            // this.audioProgressPanel_.appendChild(audioShadeText);
+            const audioShadeText = Entry.createElement('div', 'audioShadeText').addClass(
+                'audioShadeText'
+            );
+            audioShadeText.innerHTML = Lang.Msgs.ai_utilize_audio_progress;
+            this.audioProgressPanel_.appendChild(audioShadeText);
             this.minimizedView_ = document.querySelector('#entryCanvasWrapper');
             if (this.view_.classList[0] === 'entryEngine') {
-                this.minimizedView_.insertBefore(this.audioShadePanel_, Entry.stage.canvas.canvas);
+                this.minimizedView_.insertBefore(
+                    this.audioProgressPanel_,
+                    Entry.stage.canvas.canvas
+                );
             } else {
                 this.view_.insertBefore(this.audioProgressPanel_, Entry.stage.canvas.canvas);
             }
@@ -487,7 +493,7 @@ Entry.Engine = class Engine {
             this.view_.insertBefore(speedBox, Entry.stage.canvas.canvas);
 
             this.speedLabel_ = Entry.createElement('div', 'entrySpeedLabelWorkspace');
-            this.speedLabel_.innerHTML = Lang.Workspace.speed;
+            this.speedLabel_.textContent = Lang.Workspace.speed;
             speedBox.appendChild(this.speedLabel_);
 
             this.speedProgress_ = Entry.createElement('table', 'entrySpeedProgressWorkspace');
@@ -598,6 +604,7 @@ Entry.Engine = class Engine {
             createjs.WebAudioPlugin.playEmptySound();
             this.isSoundInitialized = true;
         }
+        Entry.Utils.forceStopSounds();
         const variableContainer = Entry.variableContainer;
         const container = Entry.container;
         const WS = Entry.getMainWS();
@@ -622,6 +629,12 @@ Entry.Engine = class Engine {
             variableContainer.mapList((variable) => {
                 variable.takeSnapshot();
             });
+            variableContainer.mapFunc((func) => {
+                func.takeSnapshot();
+            });
+            if (Entry.container.sttValue) {
+                Entry.container.sttValue.takeSnapshot();
+            }
             this.projectTimer.takeSnapshot();
             container.inputValue.takeSnapshot();
 
@@ -704,6 +717,9 @@ Entry.Engine = class Engine {
             if (entity.brush) {
                 entity.removeBrush();
             }
+            if (entity.paint) {
+                entity.removePaint();
+            }
         });
 
         variableContainer.mapVariable((variable) => {
@@ -712,11 +728,17 @@ Entry.Engine = class Engine {
         variableContainer.mapList((variable) => {
             variable.loadSnapshot();
         });
+        variableContainer.mapFunc((func) => {
+            func.loadSnapshot();
+        });
         this.stopProjectTimer();
         if (Entry.timerInstances) {
             Entry.timerInstances.forEach((instance) => {
                 instance.destroy();
             });
+        }
+        if (Entry.container.sttValue) {
+            Entry.container.sttValue.loadSnapshot();
         }
         container.clearRunningState();
         container.loadSequenceSnapshot();
@@ -725,9 +747,14 @@ Entry.Engine = class Engine {
         Entry.scene.loadStartSceneSnapshot();
         Entry.Func.clearThreads();
         Entry.Utils.setVolume(1);
+        if (Entry.hwLite.getStatus() === 'connected') {
+            Entry.hwLite.setZero();
+        }
         createjs.Sound.setVolume(1);
         createjs.Sound.stop();
-        Entry.soundInstances = [];
+        Entry.soundInstances.clear();
+        Entry.bgmInstances.clear();
+        Entry.playbackRateValue = 1;
         Entry.targetChecker && Entry.targetChecker.clearListener();
 
         this.view_.removeClass('entryEngineBlueWorkspace');
@@ -843,14 +870,14 @@ Entry.Engine = class Engine {
     setPauseButton() {
         if (this.state === EntryEngineState.pause) {
             if (this.pauseButton) {
-                this.pauseButton.innerHTML = Lang.Workspace.restart;
+                this.pauseButton.textContent = Lang.Workspace.restart;
                 if (this.option !== 'minimize') {
                     this.pauseButton.removeClass('entryPauseButtonWorkspace_w');
                     this.pauseButton.addClass('entryRestartButtonWorkspace_w');
                 }
             }
             if (this.pauseButtonFull) {
-                this.pauseButtonFull.innerHTML = Lang.Workspace.restart;
+                this.pauseButtonFull.textContent = Lang.Workspace.restart;
                 if (this.option !== 'minimize') {
                     // workspace && buttonWrapper check
                     if (this.buttonWrapper) {
@@ -863,14 +890,14 @@ Entry.Engine = class Engine {
             }
         } else {
             if (this.pauseButton) {
-                this.pauseButton.innerHTML = Lang.Workspace.pause;
+                this.pauseButton.textContent = Lang.Workspace.pause;
                 if (this.option !== 'minimize') {
                     this.pauseButton.addClass('entryPauseButtonWorkspace_w');
                     this.pauseButton.removeClass('entryRestartButtonWorkspace_w');
                 }
             }
             if (this.pauseButtonFull) {
-                this.pauseButtonFull.innerHTML = Lang.Workspace.pause;
+                this.pauseButtonFull.textContent = Lang.Workspace.pause;
                 if (this.option !== 'minimize') {
                     this.pauseButtonFull.addClass('entryPauseButtonWorkspace_full');
                     this.pauseButtonFull.removeClass('entryRestartButtonWorkspace_full');
@@ -887,6 +914,17 @@ Entry.Engine = class Engine {
             return;
         }
         Entry.container.mapEntityIncludeCloneOnScene(this.raiseEvent, eventName);
+    }
+
+    /**
+     * @param {string} eventName
+     * @param {string} value
+     */
+    fireEventWithValue(eventName, value) {
+        if (this.state !== EntryEngineState.run) {
+            return;
+        }
+        return Entry.container.mapEntityIncludeCloneOnScene(this.raiseKeyEvent, [eventName, value]);
     }
 
     /**
@@ -1009,11 +1047,21 @@ Entry.Engine = class Engine {
             }
 
             if (window.top !== window.self) {
+                window.top.addEventListener('pointermove', this.copyEvent);
+                window.top.addEventListener('pointerdown', this.copyEvent);
+                window.top.addEventListener('pointerup', this.copyEvent);
+                window.top.addEventListener('pointerupoutside', this.copyEvent);
+                window.top.addEventListener('pointercancel', this.copyEvent);
                 window.top.addEventListener('mouseup', this.copyEvent);
                 window.top.addEventListener('mousemove', this.copyEvent);
             }
         } else {
             if (window.top !== window.self) {
+                window.top.removeEventListener('pointermove', this.copyEvent);
+                window.top.removeEventListener('pointerdown', this.copyEvent);
+                window.top.removeEventListener('pointerup', this.copyEvent);
+                window.top.removeEventListener('pointerupoutside', this.copyEvent);
+                window.top.removeEventListener('pointercancel', this.copyEvent);
                 window.top.removeEventListener('mouseup', this.copyEvent);
                 window.top.removeEventListener('mousemove', this.copyEvent);
             }
@@ -1235,16 +1283,4 @@ Entry.Engine = class Engine {
             this.execPromises[index + i] = execPromise;
         });
     }
-};
-
-Entry.Engine.computeThread = function(entity, script) {
-    Entry.engine.isContinue = true;
-    let isSame = false;
-    while (script && Entry.engine.isContinue && !isSame) {
-        Entry.engine.isContinue = !script.isRepeat;
-        const newScript = script.run();
-        isSame = newScript && newScript === script;
-        script = newScript;
-    }
-    return script;
 };

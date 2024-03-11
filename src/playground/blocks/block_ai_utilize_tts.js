@@ -5,8 +5,11 @@ const _trim = require('lodash/trim');
 
 Entry.AI_UTILIZE_BLOCK.tts = {
     name: 'tts',
-    imageName: 'tts.png',
-    sponserText: 'Powered by NAVER Clova',
+    imageName: 'tts.svg',
+    category: 'general',
+    sponsorText: 'Powered by {image}',
+    sponsorImage: 'naverClova.png',
+    sponsorOnImage: 'naverClovaOn.png',
     title: {
         ko: '읽어주기',
         en: 'read',
@@ -20,7 +23,6 @@ Entry.AI_UTILIZE_BLOCK.tts = {
     api: '/api/expansionBlock/tts/read',
     sponsor: 'clovaNaver',
     sponsorLink: 'https://www.ncloud.com/product/aiService/css',
-    sponsorText: 'Powered by NAVER Clova',
     loadQueue: [],
 };
 
@@ -37,6 +39,10 @@ Entry.AI_UTILIZE_BLOCK.tts.getBlocks = function() {
                     [Lang.Blocks.tts_echo, 'brown'],
                     [Lang.Blocks.tts_mischievous, 'minions'],
                     [Lang.Blocks.tts_dainty, 'sally'],
+                    [Lang.Blocks.tts_sabina, 'nsabina'],
+                    [Lang.Blocks.tts_mammon, 'nmammon'],
+                    [Lang.Blocks.tts_kitty, 'nmeow'],
+                    [Lang.Blocks.tts_doggy, 'nwoof'],
                 ],
                 value: 'kyuri',
                 fontSize: 11,
@@ -126,7 +132,7 @@ Entry.AI_UTILIZE_BLOCK.tts.getBlocks = function() {
      * https://github.com/CreateJS/PreloadJS/issues/232#issuecomment-338739115
      *  */
     const read = function(args) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             const { message, hash, prop } = args;
             const tts = Entry.AI_UTILIZE_BLOCK.tts;
             const id = `tts-${hash}-${JSON.stringify(prop)}`;
@@ -156,16 +162,12 @@ Entry.AI_UTILIZE_BLOCK.tts.getBlocks = function() {
                     return true;
                 });
             };
-            // if Error, retry
-            const errorHandler = async (error) => {
+            // 읽어주기 오류 발생 시, 다음 블록 실행
+            const errorHandler = async () => {
                 soundQueue.removeEventListener('complete', loadHandler);
                 soundQueue.removeEventListener('error', errorHandler);
                 soundQueue.destroy();
-                if (isWait) {
-                    await read(args, true);
-                } else {
-                    read(args);
-                }
+                resolve();
             };
             soundQueue.on('complete', loadHandler);
             soundQueue.on('error', errorHandler);

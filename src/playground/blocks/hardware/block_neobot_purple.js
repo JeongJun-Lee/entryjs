@@ -6,8 +6,8 @@ Entry.NeobotPurple = {
     url: 'http://www.neobot.co.kr',
     imageName: 'neobot_purple.png',
     title: {
-        ko: 'NEW 네오봇 Purple',
-        en: 'NEW NEOBOT Purple',
+        ko: '네오쏘코',
+        en: 'NEO SoCo',
         uz: 'NEO SoCo',
         ru: 'NEO SoCo'
     },

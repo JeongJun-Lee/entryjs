@@ -4,10 +4,12 @@ import { GEHelper } from '../graphicEngine/GEHelper';
 import _uniq from 'lodash/uniq';
 import _intersection from 'lodash/intersection';
 import _clamp from 'lodash/clamp';
+import _round from 'lodash/round';
 import FontFaceOnload from 'fontfaceonload';
 import DataTable from '../class/DataTable';
 import entryModuleLoader from '../class/entryModuleLoader';
 import { bignumber, chain } from 'mathjs';
+import { Scheduler } from './scheduler';
 
 Entry.Utils = {};
 
@@ -26,6 +28,7 @@ Entry.clipboard = null;
  * @param {*} project
  */
 Entry.loadProject = function(project) {
+    Entry.isLoadProject = false;
     if (!project) {
         project = Entry.getStartProject(Entry.mediaFilePath);
     }
@@ -33,7 +36,9 @@ Entry.loadProject = function(project) {
         Entry.stateManager.startIgnore();
     }
     Entry.projectId = project._id;
-    Entry.variableContainer.setVariables(Entry.Utils.combineCloudVariable(project));
+    Entry.variableContainer?.setVariables(Entry.Utils.combineCloudVariable(project), {
+        aiUtilizeBlocks: project.aiUtilizeBlocks,
+    });
     Entry.variableContainer.setMessages(project.messages);
     Entry.variableContainer.setFunctions(project.functions);
     DataTable?.setTables(project.tables);
@@ -45,7 +50,7 @@ Entry.loadProject = function(project) {
     GEHelper.Ticker.setFPS(Entry.FPS);
     Entry.aiUtilizeBlocks = project?.aiUtilizeBlocks || [];
     if (Entry.aiUtilizeBlocks.length > 0) {
-        for (const type in Entry.AI_UTILIZE_BLOCK_LIST) {
+        for (const type in Entry.ALL_AI_UTILIZE_BLOCK_LIST) {
             if (Entry.aiUtilizeBlocks.indexOf(type) > -1) {
                 Entry.AI_UTILIZE_BLOCK[type].init();
                 if (Entry.type === 'workspace' || Entry.type === 'playground') {
@@ -63,6 +68,16 @@ Entry.loadProject = function(project) {
                 if (Entry.type === 'workspace' || Entry.type === 'playground') {
                     Entry.playground.blockMenu.unbanClass(type);
                 }
+            }
+        }
+    }
+
+    Entry.hardwareLiteBlocks = project.hardwareLiteBlocks || [];
+    if (Entry.hardwareLiteBlocks.length > 0) {
+        for (const type in Entry.HARDWARE_LITE_LIST) {
+            if (Entry.hardwareLiteBlocks.indexOf(type) > -1) {
+                const module = Entry.HARDWARE_LITE_LIST[type];
+                Entry.playground.addHardwareLiteModule(module);
             }
         }
     }
@@ -115,9 +130,12 @@ Entry.loadProject = function(project) {
         Entry.loadInterfaceState(project.interface);
     }
 
-    if (window.parent && window.parent.childIframeLoaded) {
-        window.parent.childIframeLoaded();
-    }
+    try {
+        if (window.parent && window.parent.childIframeLoaded) {
+            window.parent.childIframeLoaded();
+        }
+    } catch (e) {}
+    Entry.isLoadProject = true;
     return project;
 };
 
@@ -164,8 +182,10 @@ Entry.exportProject = function(project) {
     project.interface = Entry.captureInterfaceState();
     project.expansionBlocks = Entry.expansionBlocks;
     project.aiUtilizeBlocks = Entry.aiUtilizeBlocks;
+    project.hardwareLiteBlocks = Entry.hardwareLiteBlocks;
     project.learning = Entry.aiLearning?.toJSON();
     project.externalModules = entryModuleLoader.moduleList;
+    project.externalModulesLite = entryModuleLoader.moduleListLite;
 
     if (!objects || !objects.length) {
         return false;
@@ -723,64 +743,96 @@ Entry.Utils.bindIOSDeviceWatch = function() {
     }
 };
 
+function addEntryEvent(dom, event, func) {
+    if (dom && event) {
+        dom.on(event, func);
+    }
+}
+
+function removeEntryEvent(dom, event, func) {
+    if (dom && event) {
+        dom.off(event, func);
+    }
+}
+
 Entry.Utils.bindGlobalEvent = function(options) {
     const doc = $(document);
+    let parentDoc;
+    if (window.parent !== window.self) {
+        try {
+            parentDoc = $(window.parent.document);
+        } catch (e) {}
+    }
     if (options === undefined) {
         options = ['resize', 'mousedown', 'mousemove', 'keydown', 'keyup', 'dispose'];
     }
 
     if (options.indexOf('resize') > -1) {
         if (Entry.windowReszied) {
-            $(window).off('resize');
+            removeEntryEvent($(window), 'resize');
+            if (parentDoc) {
+                removeEntryEvent($(window.parent), 'resize');
+            }
             Entry.windowReszied.clear();
         }
         Entry.windowResized = new Entry.Event(window);
-        $(window).on('resize', (e) => {
+        const func = (e) => {
             Entry.windowResized.notify(e);
-        });
+        };
+        addEntryEvent($(window), 'resize', func);
+        if (parentDoc) {
+            addEntryEvent($(window.parent), 'resize', func);
+        }
         Entry.Utils.bindIOSDeviceWatch();
     }
 
     if (options.indexOf('mousedown') > -1) {
         if (Entry.documentMousedown) {
-            doc.off('mousedown');
+            removeEntryEvent(doc, 'mousedown');
+            removeEntryEvent(parentDoc, 'mousedown');
             Entry.documentMousedown.clear();
         }
         Entry.documentMousedown = new Entry.Event(window);
-        doc.on('mousedown', (e) => {
+        const func = (e) => {
             const selectedBlock = document.querySelector('.block.selected');
             if (selectedBlock) {
                 selectedBlock.classList.remove('selected');
             }
-        });
+        };
+        addEntryEvent(doc, 'mousedown', func);
+        addEntryEvent(parentDoc, 'mousedown', func);
     }
 
     if (options.indexOf('mousemove') > -1) {
         if (Entry.documentMousemove) {
-            doc.off('touchmove mousemove');
+            removeEntryEvent(doc, 'touchmove mousemove');
+            removeEntryEvent(parentDoc, 'touchmove mousemove');
             Entry.documentMousemove.clear();
         }
 
         Entry.mouseCoordinate = {};
         Entry.documentMousemove = new Entry.Event(window);
-        doc.on('touchmove mousemove', (e) => {
+        const func = (e) => {
             if (e.originalEvent && e.originalEvent.touches) {
                 e = e.originalEvent.touches[0];
             }
             Entry.documentMousemove.notify(e);
             Entry.mouseCoordinate.x = e.clientX;
             Entry.mouseCoordinate.y = e.clientY;
-        });
+        };
+        addEntryEvent(doc, 'touchmove mousemove', func);
+        addEntryEvent(parentDoc, 'touchmove mousemove', func);
     }
 
     if (options.indexOf('keydown') > -1) {
         if (Entry.keyPressed) {
-            doc.off('keydown');
+            removeEntryEvent(doc, 'keydown');
+            removeEntryEvent(parentDoc, 'keydown');
             Entry.keyPressed.clear();
         }
         Entry.pressedKeys = [];
         Entry.keyPressed = new Entry.Event(window);
-        doc.on('keydown', (e) => {
+        const func = (e) => {
             const keyCode = Entry.Utils.inputToKeycode(e);
             if (!keyCode) {
                 return;
@@ -789,16 +841,19 @@ Entry.Utils.bindGlobalEvent = function(options) {
                 Entry.pressedKeys.push(keyCode);
             }
             Entry.keyPressed.notify(e);
-        });
+        };
+        addEntryEvent(doc, 'keydown', func);
+        addEntryEvent(parentDoc, 'keydown', func);
     }
 
     if (options.indexOf('keyup') > -1) {
         if (Entry.keyUpped) {
-            doc.off('keyup');
+            removeEntryEvent(doc, 'keyup');
+            removeEntryEvent(parentDoc, 'keyup');
             Entry.keyUpped.clear();
         }
         Entry.keyUpped = new Entry.Event(window);
-        doc.on('keyup', (e) => {
+        const func = (e) => {
             const keyCode = Entry.Utils.inputToKeycode(e);
             if (!keyCode) {
                 return;
@@ -808,7 +863,9 @@ Entry.Utils.bindGlobalEvent = function(options) {
                 Entry.pressedKeys.splice(index, 1);
             }
             Entry.keyUpped.notify(e);
-        });
+        };
+        addEntryEvent(doc, 'keyup', func);
+        addEntryEvent(parentDoc, 'keyup', func);
     }
 
     if (options.indexOf('dispose') > -1) {
@@ -1331,7 +1388,7 @@ Entry.computeInputWidth = (function() {
                 document.body.appendChild(elem);
             }
 
-            elem.innerHTML = value;
+            elem.textContent = value;
             const ret = `${Number(elem.offsetWidth + 10)}px`;
 
             if (window.fontLoaded) {
@@ -1533,6 +1590,25 @@ Entry.setCloneBrush = function(sprite, parentBrush) {
     sprite.brush = brush;
 
     sprite.shapes.push(shape);
+};
+
+Entry.setBasicPaint = function(sprite) {
+    const isWebGL = GEHelper.isWebGL;
+    const paint = GEHelper.brushHelper.newPaint();
+    const shape = GEHelper.brushHelper.newShape(paint);
+    paint.entity = sprite;
+    paint.opacity = 0;
+    paint.rgb = Entry.hex2rgb('#ff0000');
+    if (isWebGL) {
+        paint.beginFillFast(0xff0000, 1);
+    } else {
+        paint.beginFill('rgba(255,0,0,1)');
+    }
+    shape.entity = sprite;
+    const selectedObjectContainer = Entry.stage.selectedObjectContainer;
+    selectedObjectContainer.addChildAt(shape, selectedObjectContainer.getChildIndex(sprite.object));
+    sprite.paint = paint;
+    sprite.paintShapes.push(shape);
 };
 
 Entry.isFloat = function(num) {
@@ -1888,7 +1964,9 @@ Entry.Utils.addNewBlock = function(item) {
         }
     });
     DataTable.setTables(tables);
-    Entry.aiLearning.load(learning);
+    if (!Entry.options.aiUtilizeDisable) {
+        Entry.aiLearning.load(learning);
+    }
     handleOptionalBlocksActive(item);
 
     Entry.variableContainer.appendMessages(messages);
@@ -2326,7 +2404,6 @@ Entry.Utils.getUniqObjectsBlocks = function(objects) {
 
 Entry.Utils.getObjectsBlocks = function(objects) {
     const _typePicker = _.partial(_.result, _, 'type');
-
     return _.chain(objects || Entry.container.objects_)
         .map(({ script }) => {
             if (!(script instanceof Entry.Code)) {
@@ -2336,6 +2413,70 @@ Entry.Utils.getObjectsBlocks = function(objects) {
         })
         .flatten()
         .value();
+};
+
+const scheduler = new Scheduler();
+
+Entry.Utils.getObjectsBlocksBySceneId = _.memoize((sceneId) => {
+    if (!sceneId) {
+        return [];
+    }
+    const _typePicker = _.partial(_.result, _, 'type');
+    const job = new Promise((resolve) => {
+        scheduler.run(function*() {
+            const result = [];
+            const codes = Entry.container.objects_;
+            for (const code of codes) {
+                if (code?.scene?.id !== sceneId) {
+                    continue;
+                }
+                let script = code.script;
+                if (!(script instanceof Entry.Code)) {
+                    script = new Entry.Code(script);
+                }
+                result.push(script.getBlockListForEventThread(true).map(_typePicker));
+                yield;
+            }
+            resolve(_.flatten(result));
+        });
+    });
+    return job;
+});
+
+Entry.Utils.getObjectsBlocksForEventThread = _.memoize((object) => {
+    const nowScheduler = new Scheduler();
+    const _typePicker = _.partial(_.result, _, 'type');
+    const job = new Promise((resolve) => {
+        nowScheduler.run(function*() {
+            const result = [];
+            try {
+                let codes;
+                if (object) {
+                    codes = [object];
+                } else {
+                    codes = Entry.container.objects_;
+                }
+                for (const code of codes) {
+                    let script = code.script;
+                    if (!(script instanceof Entry.Code)) {
+                        script = new Entry.Code(script);
+                    }
+                    result.push(script.getBlockListForEventThread(true).map(_typePicker));
+                    yield;
+                }
+                resolve(_.flatten(result));
+            } catch (e) {
+                console.warn('blockCount : ', e);
+                resolve(_.flatten(result));
+            }
+        });
+    });
+    return job;
+});
+
+Entry.Utils.clearObjectsBlocksForEventThread = () => {
+    Entry.Utils.getObjectsBlocksForEventThread.cache = new _.memoize.Cache();
+    Entry.Utils.getObjectsBlocksBySceneId.cache = new _.memoize.Cache();
 };
 
 Entry.Utils.makeCategoryDataByBlocks = function(blockArr) {
@@ -2570,6 +2711,7 @@ Entry.Utils.setVolume = function(volume) {
     this._volume = _clamp(volume, 0, 1);
 
     Entry.soundInstances
+        .getAllValues()
         .filter(({ soundType }) => !soundType)
         .forEach((instance) => {
             instance.volume = this._volume;
@@ -2583,36 +2725,64 @@ Entry.Utils.getVolume = function() {
     return 1;
 };
 
-Entry.Utils.forceStopSounds = function() {
-    _.each(Entry.soundInstances, (instance) => {
+Entry.Utils.playBGM = function(id, option = {}) {
+    const instance = createjs.Sound.play(id, Object.assign({ volume: 1 }, option));
+    return instance;
+};
+
+Entry.Utils.addBGMInstances = function(instance, sprite = 'global') {
+    Entry.bgmInstances.add(sprite, instance);
+    instance.on('complete', () => {
+        Entry.bgmInstances.deleteItemByKeyAndValue(sprite, instance);
+    });
+};
+
+Entry.Utils.forceStopBGM = function() {
+    _.each([...Entry.bgmInstances.getAllValues()], (instance) => {
         instance?.dispatchEvent?.('complete');
         instance?.stop?.();
     });
-    Entry.soundInstances = [];
+    Entry.bgmInstances.clear();
+};
+
+Entry.Utils.forceStopSounds = function() {
+    _.each([...Entry.soundInstances.getAllValues()], (instance) => {
+        instance?.dispatchEvent?.('complete');
+        instance?.stop?.();
+    });
+    Entry.soundInstances.clear();
 };
 
 Entry.Utils.playSound = function(id, option = {}) {
-    return createjs.Sound.play(id, Object.assign({ volume: this._volume }, option));
+    const instance = createjs.Sound.play(id, Object.assign({ volume: this._volume }, option));
+    if (instance.sourceNode?.playbackRate) {
+        instance.sourceNode.playbackRate.value = Entry.playbackRateValue;
+    }
+    return instance;
 };
 
-Entry.Utils.addSoundInstances = function(instance) {
-    Entry.soundInstances.push(instance);
+Entry.Utils.addSoundInstances = function(instance, sprite = 'global') {
+    Entry.soundInstances.add(sprite, instance);
     instance.on('complete', () => {
-        const index = Entry.soundInstances.indexOf(instance);
-        if (index > -1) {
-            Entry.soundInstances.splice(index, 1);
-        }
+        Entry.soundInstances.deleteItemByKeyAndValue(sprite, instance);
     });
 };
 
 Entry.Utils.pauseSoundInstances = function() {
-    Entry.soundInstances.map((instance) => {
+    Entry.soundInstances.getAllValues().forEach((instance) => {
+        instance.paused = true;
+    });
+    Entry.bgmInstances.getAllValues().forEach((instance) => {
         instance.paused = true;
     });
 };
 
 Entry.Utils.recoverSoundInstances = function() {
-    Entry.soundInstances.map((instance) => {
+    Entry.soundInstances.getAllValues().forEach((instance) => {
+        instance.paused = false;
+        instance.sourceNode.playbackRate.value = Entry.playbackRateValue;
+    });
+    Entry.bgmInstances.getAllValues().forEach((instance) => {
         instance.paused = false;
     });
 };
@@ -2891,6 +3061,9 @@ Entry.Utils.asyncAnimationFrame = (func) => {
     let captureTimeout = false;
 
     const asyncFunc = () => {
+        if (!Entry.engine.isState('run')) {
+            return;
+        }
         if (func instanceof Promise) {
             func().then(() => {
                 captureTimeout = requestAnimationFrame(asyncFunc);
@@ -2902,5 +3075,50 @@ Entry.Utils.asyncAnimationFrame = (func) => {
     };
 
     captureTimeout = requestAnimationFrame(asyncFunc);
-    return captureTimeout;
+    return () => {
+        cancelAnimationFrame(captureTimeout);
+    };
 };
+
+Entry.Utils.stringFormat = (text, ...args) => {
+    if (!text) {
+        return text;
+    }
+    let result = text;
+    for (let i = 0; i < args.length; i++) {
+        const regexp = new RegExp(`\\{${i}\\}`, 'gi');
+        result = result.replace(regexp, args[i]);
+    }
+    return result;
+};
+
+Entry.Utils.shortenNumber = (num = 0) => {
+    if (num >= 1000000000) {
+        return `${_round(num / 1000000000, 1)}B`;
+    }
+    if (num >= 1000000) {
+        return `${_round(num / 1000000, 1)}M`;
+    }
+    if (num >= 100000) {
+        return `${_round(num / 1000, 1)}K`;
+    }
+    return num;
+};
+
+Entry.Utils.doCodeChange = () => {
+    if (Entry.codeChangedEvent) {
+        Entry.Utils.clearObjectsBlocksForEventThread();
+        Entry.codeChangedEvent.notify();
+    }
+};
+
+Entry.Utils.extractTextFromHTML = (htmlString) => {
+    const parser = new DOMParser();
+    const dom = parser.parseFromString(htmlString, 'text/html');
+    return dom.body.textContent || '';
+};
+
+Entry.Utils.getEntryjsPath = () =>
+    window.navigator.userAgent.indexOf('Electron') > -1
+        ? `file://${window.getEntryjsPath()}`
+        : `${window.location.origin}/lib/entry-js`;

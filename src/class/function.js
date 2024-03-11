@@ -1,6 +1,229 @@
+import _truncate from 'lodash/truncate';
+import _trim from 'lodash/trim';
+import _cloneDeep from 'lodash/cloneDeep';
+import _find from 'lodash/find';
+
 class EntryFunc {
     static isEdit = false;
     static threads = {};
+
+    constructor(func = {}) {
+        const {
+            type = 'normal',
+            id = Entry.generateHash(),
+            localVariables = [],
+            useLocalVariables = false,
+        } = func;
+        this.id = id;
+        this.type = type;
+        this.localVariables = localVariables;
+        this.useLocalVariables = useLocalVariables;
+        let content;
+        //inspect empty content
+        if (func && func.content && func.content.length > 4) {
+            content = func.content;
+        }
+
+        let codeType = 'function_create';
+        if (type === 'value') {
+            codeType = 'function_create_value';
+        }
+        this.content = content
+            ? new Entry.Code(content)
+            : new Entry.Code([
+                  [
+                      {
+                          type: codeType,
+                          copyable: false,
+                          deletable: false,
+                          x: 40,
+                          y: 40,
+                      },
+                  ],
+              ]);
+        this.block = null;
+        this.blockMenuBlock = null;
+        this.hashMap = {};
+        this.paramMap = {};
+
+        EntryFunc._generateFunctionSchema(this.id, type);
+
+        if (func && func.content) {
+            const blockMap = this.content._blockMap;
+            for (const key in blockMap) {
+                EntryFunc.registerParamBlock(blockMap[key].type);
+            }
+            EntryFunc.generateWsBlock(this);
+        }
+
+        EntryFunc.registerFunction(this);
+
+        EntryFunc.updateMenu();
+    }
+
+    destroy() {
+        this.blockMenuBlock && this.blockMenuBlock.destroy();
+    }
+
+    edit() {
+        if (EntryFunc.isEdit) {
+            return;
+        }
+        EntryFunc.isEdit = true;
+        Entry.getMainWS().blockMenu.deleteRendered('variable');
+        if (!EntryFunc.svg) {
+            EntryFunc.isEdit = EntryFunc.initEditView();
+        } else {
+            this.parentView.appendChild(this.svg);
+        }
+    }
+
+    generateBlock() {
+        const generatedInfo = EntryFunc.generateBlock(this);
+        this.block = generatedInfo.block;
+        this.description = generatedInfo.description;
+    }
+
+    defaultLocalVariable(isForce) {
+        return {
+            name: this.makeLocalVariableName(isForce),
+            value: 0,
+        };
+    }
+
+    setLocalVariableLength(length) {
+        if (!this.localVariables) {
+            this.localVariables = [];
+        }
+        if (this.localVariables.length >= length) {
+            this.localVariables.splice(length, this.localVariables.length - length);
+        } else {
+            const max = length - this.localVariables.length;
+            for (let i = 0; i < max; i++) {
+                this.localVariables.push(this.defaultLocalVariable(true));
+            }
+        }
+        Entry.variableContainer && Entry.variableContainer.updateFuncScrollBar(this);
+    }
+
+    appendLocalVariable(value) {
+        if (!this.localVariables) {
+            this.localVariables = [];
+        }
+        this.localVariables.push(value);
+
+        Entry.variableContainer && Entry.variableContainer.updateFuncScrollBar(this);
+    }
+
+    insertFuncLocalVariable(value, index) {
+        if (!this.localVariables) {
+            this.localVariables = [];
+        }
+        this.localVariables.splice(index, 0, value);
+
+        Entry.variableContainer && Entry.variableContainer.updateFuncScrollBar(this);
+    }
+
+    removeLocalVariable(idx) {
+        if (!Array.isArray(this.localVariables)) {
+            return;
+        }
+        if (this.localVariables.length >= idx) {
+            this.localVariables.splice(idx, 1);
+        }
+        Entry.variableContainer && Entry.variableContainer.updateFuncScrollBar(this);
+    }
+
+    removeLastLocalVariable() {
+        this.removeLocalVariable(this.localVariables.length - 1);
+    }
+
+    toggleFunctionUseLocalVariables() {
+        this.useLocalVariables = !this.useLocalVariables;
+        Entry.variableContainer && Entry.variableContainer.updateFuncSettingView(this);
+        EntryFunc.updateMenu();
+    }
+
+    getLocalVariables() {
+        return this.localVariables;
+    }
+
+    makeLocalVariableName(isForce) {
+        let name = Lang.Workspace.local_variable;
+        if (this.checkLocalVariableName(name)) {
+            name = Entry.getOrderedName(name, this.localVariables, 'name');
+            if (!isForce) {
+                Entry.toast.warning(
+                    Lang.Workspace.local_variable_rename,
+                    Lang.Workspace.local_variable_dup
+                );
+            }
+        }
+
+        return name;
+    }
+
+    checkLocalVariableName(name) {
+        return this.localVariables.some((localVariable) => localVariable.name === name);
+    }
+
+    changeNameLocalVariable(name, index) {
+        const localVariable = this.localVariables[index];
+        localVariable.name = name;
+        const { playground } = Entry;
+        if (playground) {
+            playground.blockMenu.deleteRendered('func');
+            playground.reloadPlayground();
+        }
+    }
+
+    getValue(variableId, localVariables) {
+        const localVariable = _find(
+            localVariables || this.localVariables,
+            (localVariable) => localVariable.id === variableId
+        );
+        return localVariable?.value || 0;
+    }
+
+    setValue(value, variableId, localVariables) {
+        const localVariable = _find(
+            localVariables || this.localVariables,
+            (localVariable) => localVariable.id === variableId
+        );
+        localVariable.value = value;
+    }
+
+    getBlockById(blockId) {
+        return this?.content?.findById(blockId);
+    }
+
+    getFuncBlockByFuncId(funcId) {
+        return this?.content?.findByType(funcId);
+    }
+
+    getBlockByParamId(paramId) {
+        return this?.content?.findByParamId(paramId);
+    }
+
+    static changeFunctionName(name) {
+        Entry.Mutator.mutate(
+            'function_name',
+            {
+                template: `${Lang.Workspace.func}: ${_trim(
+                    _truncate(name, {
+                        length: 20,
+                    })
+                )}`,
+            },
+            { type: 'noChange', isRestore: undefined }
+        );
+    }
+
+    static initBlock(blockMenu) {
+        blockMenu.banClass('functionEdit', true);
+        blockMenu.banClass('useLocalVariables', true);
+        this.changeFunctionName('');
+    }
 
     static registerFunction(func) {
         const workspace = Entry && Entry.getMainWS();
@@ -10,26 +233,22 @@ class EntryFunc {
         const blockMenu = workspace.getBlockMenu();
         const menuCode = blockMenu.code;
 
-        this._targetFuncBlock = menuCode.createThread([
-            {
-                type: `func_${func.id}`,
-                category: 'func',
-                x: -9999,
-            },
-        ]);
-        func.blockMenuBlock = this._targetFuncBlock;
-    }
-
-    static executeFunction(threadHash) {
-        let script = this.threads[threadHash];
-        script = Entry.Engine.computeThread(script.entity, script);
-        if (script) {
-            this.threads[threadHash] = script;
-            return true;
-        } else {
-            delete this.threads[threadHash];
-            return false;
+        let index = undefined;
+        if (this._fieldLabel) {
+            index = menuCode.getThreadIndex(this._fieldLabel.thread);
         }
+
+        this._targetFuncBlock = menuCode.createThread(
+            [
+                {
+                    type: `func_${func.id}`,
+                    category: 'func',
+                    x: -9999,
+                },
+            ],
+            index
+        );
+        func.blockMenuBlock = this._targetFuncBlock;
     }
 
     static clearThreads() {
@@ -60,17 +279,56 @@ class EntryFunc {
         } // edit fail
         this.bindFuncChangeEvent(funcElement);
         this.updateMenu();
-        setTimeout(() => {
+        requestAnimationFrame(() => {
             const schema = Entry.block[`func_${funcElement.id}`];
             if (schema && schema.paramsBackupEvent) {
                 schema.paramsBackupEvent.notify();
             }
 
             this._backupContent = funcElement.content.stringify();
-        }, 0);
+            this._backupOption = {
+                type: funcElement.type,
+                useLocalVariables: funcElement.useLocalVariables,
+                localVariables: _cloneDeep(funcElement.localVariables),
+            };
+            Entry.getMainWS().overlayBoard.reDraw();
+        });
     }
 
     static initEditView(content) {
+        if (this.targetFunc) {
+            const defBlock = this.targetFunc.content.getEventMap('funcDef')[0];
+
+            if (defBlock) {
+                let outputBlock = defBlock.params[0];
+                let functionNmaeTemplate = '';
+                let booleanIndex = 0;
+                let stringIndex = 0;
+
+                while (outputBlock) {
+                    const value = outputBlock.params[0];
+                    const valueType = value.type;
+                    switch (outputBlock.type) {
+                        case 'function_field_label':
+                            functionNmaeTemplate = `${functionNmaeTemplate} ${value}`;
+                            break;
+                        case 'function_field_boolean':
+                            booleanIndex++;
+                            // eslint-disable-next-line max-len
+                            functionNmaeTemplate += ` <${Lang.Blocks.FUNCTION_logical_variable} ${booleanIndex}>`;
+                            break;
+                        case 'function_field_string':
+                            stringIndex++;
+                            // eslint-disable-next-line max-len
+                            functionNmaeTemplate += ` (${Lang.Blocks.FUNCTION_character_variable} ${stringIndex})`;
+                            break;
+                    }
+
+                    outputBlock = outputBlock.getOutputBlock();
+                }
+                this.changeFunctionName(functionNmaeTemplate);
+            }
+        }
         if (!this.menuCode) {
             this.setupMenuCode();
         }
@@ -88,6 +346,7 @@ class EntryFunc {
             }
         });
         content.board.alignThreads();
+
         return true;
     }
 
@@ -110,10 +369,16 @@ class EntryFunc {
         }
 
         this._backupContent = null;
+        this._backupOption = null;
 
         delete this.targetFunc;
         EntryFunc.isEdit = false;
-        Entry.getMainWS().blockMenu.deleteRendered('variable');
+
+        const workspace = Entry.getMainWS();
+        const blockMenu = workspace.getBlockMenu();
+
+        blockMenu.deleteRendered('variable');
+
         const blockSchema = Entry.block[`func_${targetFuncId}`];
         if (blockSchema && blockSchema.destroyParamsBackupEvent) {
             blockSchema.destroyParamsBackupEvent.notify();
@@ -124,7 +389,6 @@ class EntryFunc {
     static save() {
         this.targetFunc.generateBlock(true);
         Entry.variableContainer.saveFunction(this.targetFunc);
-
         this._restoreBoardToVimBoard();
     }
 
@@ -140,8 +404,11 @@ class EntryFunc {
         } else {
             if (this._backupContent) {
                 this.targetFunc.content.load(this._backupContent);
+                this.targetFunc.useLocalVariables = this._backupOption.useLocalVariables;
+                this.targetFunc.localVariables = this._backupOption.localVariables;
+                this.changeType(this.targetFunc, this._backupOption.type);
                 this._generateFunctionSchema(this.targetFunc.id);
-                this.generateWsBlock(this.targetFunc, true);
+                this.generateWsBlock(this.targetFunc);
             }
         }
         Entry.variableContainer.updateList();
@@ -175,6 +442,7 @@ class EntryFunc {
                     category: CATEGORY,
                     x: -9999,
                     copyable: false,
+                    assemble: false,
                     params: [{ type: this.requestParamBlock('string') }],
                 },
             ])
@@ -185,6 +453,7 @@ class EntryFunc {
                 {
                     type: 'function_field_boolean',
                     copyable: false,
+                    assemble: false,
                     category: CATEGORY,
                     x: -9999,
                     params: [{ type: this.requestParamBlock('boolean') }],
@@ -271,9 +540,17 @@ class EntryFunc {
             !this.menuCode && this.setupMenuCode();
             blockMenu.banClass('functionInit', true);
             blockMenu.unbanClass('functionEdit', true);
+            if (this.targetFunc && this.targetFunc.useLocalVariables) {
+                blockMenu.unbanClass('useLocalVariables', true);
+            } else {
+                blockMenu.banClass('useLocalVariables', true);
+            }
+            Entry.variableContainer &&
+                Entry.variableContainer.updateFuncSettingView(this.targetFunc);
         } else {
             !workspace.isVimMode() && blockMenu.unbanClass('functionInit', true);
             blockMenu.banClass('functionEdit', true);
+            blockMenu.banClass('useLocalVariables', true);
         }
         blockMenu.lastSelector === 'func' && blockMenu.align();
     }
@@ -326,6 +603,7 @@ class EntryFunc {
         let stringIndex = 0;
         const schemaParams = [];
         let schemaTemplate = '';
+        let functionNmaeTemplate = '';
         const hashMap = targetFunc.hashMap;
         const paramMap = targetFunc.paramMap;
         const blockIds = [];
@@ -336,6 +614,7 @@ class EntryFunc {
             switch (outputBlock.type) {
                 case 'function_field_label':
                     schemaTemplate = `${schemaTemplate} ${value}`;
+                    functionNmaeTemplate = `${functionNmaeTemplate} ${value}`;
                     break;
                 case 'function_field_boolean':
                     Entry.Mutator.mutate(valueType, {
@@ -349,6 +628,10 @@ class EntryFunc {
                         accept: 'boolean',
                     });
                     schemaTemplate += ` %${booleanIndex + stringIndex}`;
+
+                    // eslint-disable-next-line max-len
+                    functionNmaeTemplate += ` <${Lang.Blocks.FUNCTION_logical_variable} ${booleanIndex}>`;
+
                     blockIds.push(outputBlock.id);
                     break;
                 case 'function_field_string':
@@ -359,6 +642,10 @@ class EntryFunc {
                     paramMap[valueType] = booleanIndex + stringIndex;
                     stringIndex++;
                     schemaTemplate += ` %${booleanIndex + stringIndex}`;
+
+                    // eslint-disable-next-line max-len
+                    functionNmaeTemplate += ` (${Lang.Blocks.FUNCTION_character_variable} ${stringIndex})`;
+
                     schemaParams.push({
                         type: 'Block',
                         accept: 'string',
@@ -368,6 +655,8 @@ class EntryFunc {
             }
             outputBlock = outputBlock.getOutputBlock();
         }
+
+        this.changeFunctionName(functionNmaeTemplate);
 
         if (targetFunc.type !== 'value') {
             schemaTemplate += ` %${booleanIndex + stringIndex + 1}`;
@@ -393,6 +682,10 @@ class EntryFunc {
             if (outputBlockIds) {
                 let startPos = 0;
                 while (outputBlockIds[startPos] === blockIds[startPos]) {
+                    if (!outputBlockIds[startPos]) {
+                        break;
+                    }
+
                     startPos++;
                 }
 
@@ -401,6 +694,9 @@ class EntryFunc {
                     outputBlockIds[outputBlockIds.length - endPos - 1] ===
                     blockIds[blockIds.length - endPos - 1]
                 ) {
+                    if (!outputBlockIds[outputBlockIds.length - endPos - 1]) {
+                        break;
+                    }
                     endPos++;
                 }
 
@@ -490,21 +786,41 @@ class EntryFunc {
         delete func.blockMenuBlock;
         EntryFunc._generateFunctionSchema(func.id, type, true);
 
+        const tempContent = func.content.toJSON();
+
         if (func && func.content) {
             const blockMap = func.content._blockMap;
             for (const key in blockMap) {
                 EntryFunc.registerParamBlock(blockMap[key].type);
             }
-            EntryFunc.generateWsBlock(func);
         }
 
-        EntryFunc.registerFunction(func);
         const blockType = type === 'normal' ? 'function_create' : 'function_create_value';
-        const block = func.content.getThread(0).getFirstBlock();
-        block.set({ statements: [] });
-        block.changeType(blockType);
+        let block;
+        func.content.getThreads().some((thread, idx) => {
+            const target = thread.getFirstBlock();
+            if (
+                target instanceof Entry.Block &&
+                ['function_create_value', 'function_create'].includes(target?.type)
+            ) {
+                tempContent[idx][0].type = blockType;
+                block = target;
+                return true;
+            }
+        });
 
+        block.changeType(blockType);
+        func.content = new Entry.Code(tempContent);
+
+        const workspace = Entry.getMainWS();
+        workspace.changeOverlayBoardCode(func.content);
+        func.block = block;
+        Entry.variableContainer.updateList();
+        EntryFunc.registerFunction(func);
+        EntryFunc.generateWsBlock(func, true);
         EntryFunc.updateMenu();
+
+        // reDrawVariableContainer()
 
         // b = Entry.variableContainer.getFunction(/(func_)?(.*)/.exec('0q91')[2]);
         // Entry.Func.changeType(b, 'value')
@@ -549,74 +865,16 @@ class EntryFunc {
         }
     }
 
-    constructor(func = {}) {
-        const { type = 'normal', id = Entry.generateHash() } = func;
-        this.id = id;
-        this.type = type;
-        let content;
-        //inspect empty content
-        if (func && func.content && func.content.length > 4) {
-            content = func.content;
-        }
-
-        let codeType = 'function_create';
-        if (type === 'value') {
-            codeType = 'function_create_value';
-        }
-        this.content = content
-            ? new Entry.Code(content)
-            : new Entry.Code([
-                  [
-                      {
-                          type: codeType,
-                          copyable: false,
-                          deletable: false,
-                          x: 40,
-                          y: 40,
-                      },
-                  ],
-              ]);
-        this.block = null;
-        this.blockMenuBlock = null;
-        this.hashMap = {};
-        this.paramMap = {};
-
-        EntryFunc._generateFunctionSchema(this.id, type);
-
-        if (func && func.content) {
-            const blockMap = this.content._blockMap;
-            for (const key in blockMap) {
-                EntryFunc.registerParamBlock(blockMap[key].type);
-            }
-            EntryFunc.generateWsBlock(this);
-        }
-
-        EntryFunc.registerFunction(this);
-
-        EntryFunc.updateMenu();
+    takeSnapshot() {
+        this.snapshot_ = {
+            localVariables: _cloneDeep(this.localVariables),
+        };
     }
 
-    destroy() {
-        this.blockMenuBlock && this.blockMenuBlock.destroy();
-    }
-
-    edit() {
-        if (EntryFunc.isEdit) {
-            return;
-        }
-        EntryFunc.isEdit = true;
-        Entry.getMainWS().blockMenu.deleteRendered('variable');
-        if (!EntryFunc.svg) {
-            EntryFunc.isEdit = EntryFunc.initEditView();
-        } else {
-            this.parentView.appendChild(this.svg);
-        }
-    }
-
-    generateBlock() {
-        const generatedInfo = EntryFunc.generateBlock(this);
-        this.block = generatedInfo.block;
-        this.description = generatedInfo.description;
+    loadSnapshot() {
+        const { localVariables } = this.snapshot_;
+        this.localVariables = localVariables;
+        delete this.snapshot_;
     }
 }
 

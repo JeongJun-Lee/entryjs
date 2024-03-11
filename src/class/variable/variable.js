@@ -68,7 +68,7 @@ class Variable {
             this.x_ = variable.x ? variable.x : null;
             /** @type {number} */
             this.y_ = variable.y ? variable.y : null;
-            const fontFamily = EntryStatic.fontFamily || 'NanumGothic';
+            const fontFamily = EntryStatic.fontFamily || "NanumGothic, 'Nanum Gothic'";
             this.BORDER = 6;
             this.FONT = `10pt ${fontFamily}`;
             this.VALUE_FONT = `9pt ${fontFamily}`;
@@ -129,11 +129,11 @@ class Variable {
                 this.setY(this.getY());
             } else {
                 //TODO
-                console.log(10 - 240 + Math.floor((variableLength % 66) / 11) * 80, x);
-                console.log(
-                    variableIndex * 28 + 20 - 135 - Math.floor(variableLength / 11) * 264,
-                    y
-                );
+                // console.log(10 - 240 + Math.floor((variableLength % 66) / 11) * 80, x);
+                // console.log(
+                //     variableIndex * 28 + 20 - 135 - Math.floor(variableLength / 11) * 264,
+                //     y
+                // );
                 this.setX(x - 230);
                 this.setY(y - 105);
                 // this.setX(10 - 240 + Math.floor((variableLength % 66) / 11) * 80);

@@ -192,6 +192,21 @@ Entry.CodeMap = {};
                 hide: 'HIDE',
             },
         ],
+        text_change_font: [
+            EntryStatic.fonts.reduce(
+                (obj, { family }) => ({
+                    ...obj,
+                    [family.toLowerCase()]: family,
+                }),
+                {}
+            ),
+        ],
+        get_block_count: [
+            {
+                자신: 'self',
+                self: 'self',
+            },
+        ],
     };
 
     cc.Arduino = {

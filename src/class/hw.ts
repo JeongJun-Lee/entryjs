@@ -4,7 +4,12 @@ import createHardwarePopup from './hardware/functions/createHardwarePopup';
 import ExternalProgramLauncher from './hardware/externalProgramLauncher';
 // eslint-disable-next-line prettier/prettier
 import PopupHelper from './popup_helper';
-import { WSAEACCES } from 'constants';
+import {
+    HardwareMessageData,
+    WebSocketMessage,
+    EntryHardwareBlockModule,
+    UnknownAny,
+} from '../../types/index';
 
 enum HardwareModuleType {
     builtIn = 'builtin',
@@ -83,17 +88,14 @@ export default class Hardware {
         this._addEntryEventListener();
     }
 
-    async _loadExternalHardwareBlock(moduleName: string) {
+    async _loadExternalHardwareBlock(moduleinfo: { name: string; file: any }) {
         try {
-            await Entry.moduleManager.loadModule(moduleName);
+            await Entry.moduleManager.loadModuleFromLocalOrOnline(moduleinfo.name);
         } catch (e) {
-            // Entry.toast.alert(
-            //     Lang.Hw.hw_module_load_fail_title,
-            //     `${moduleName} ${Lang.Hw.hw_module_load_fail_desc}`
-            // );
+            console.log(e);
             Entry.toast.alert(
-                '모듈 로드 실패',
-                `${moduleName} 로드에 실패했습니다. 관리자에게 문의하세요`
+                Lang.Msgs.hw_module_load_fail_title,
+                `${moduleinfo.name} ${Lang.Msgs.hw_module_load_fail_desc}`
             );
         }
     }
@@ -133,6 +135,11 @@ export default class Hardware {
      * 현재 하드웨어 로드가 외부 모듈에 의한 것인 경우는 연결이 해제되어도 블록숨김을 실행하지 않는다.
      */
     refreshHardwareBlockMenu() {
+        if (Entry.hwLite.getStatus() !== 'disconnected') {
+            console.log('canel refreshHardwareBlockMenu() for HwLITE');
+            return;
+        }
+
         const workspace = Entry.getMainWS();
         const blockMenu = workspace && workspace.blockMenu;
 
@@ -181,8 +188,8 @@ export default class Hardware {
 
             Entry.dispatchEvent('hwChanged');
             Entry.toast.alert(
-                Lang.Hw.hw_module_terminaltion_title,
-                Lang.Hw.hw_module_terminaltion_desc,
+                Lang.Msgs.hw_connection_termination_title,
+                Lang.Msgs.hw_connection_termination_desc,
                 false
             );
         }
@@ -392,14 +399,10 @@ export default class Hardware {
         }
         Entry.dispatchEvent('hwChanged');
 
-        let descMsg;
         if (Entry.propertyPanel && this.hwModule.monitorTemplate) {
-            descMsg = Lang.Msgs.hw_connection_success_desc;
             this._setHardwareMonitorTemplate();
-        } else {
-            descMsg = Lang.Msgs.hw_connection_success_desc2;
         }
-        Entry.toast.success(Lang.Msgs.hw_connection_success, descMsg);
+        Entry.toast.success(Lang.Msgs.hw_connection_success, Lang.Msgs.hw_connection_success_desc2);
     }
 
     openHardwareDownloadPopup() {
@@ -587,6 +590,12 @@ export default class Hardware {
                         return true;
                     }
 
+                    // NOTE : 하드웨어 웹연결과 충돌을 방지
+                    if (Entry.hwLite.getStatus() !== 'disconnected') {
+                        console.log('canel connectionTry for HwLITE');
+                        return;
+                    }
+
                     try {
                         await this._trySocketConnect(address);
                         return true;
@@ -627,13 +636,18 @@ export default class Hardware {
                 blockMenu.unbanClass('arduinoDisconnected', true);
                 blockMenu.banClass('arduinoConnected', true);
                 blockMenu.banClass('arduinoConnect', true);
+                Entry.hwLite?.isHwLiteSupportAgent()
+                    ? blockMenu.unbanClass('arduinoLiteSupported', true)
+                    : blockMenu.banClass('arduinoLiteSupported', true);
                 break;
             case socketConnected:
+                blockMenu.banClass('arduinoLiteSupported', true);
                 blockMenu.banClass('arduinoDisconnected', true);
                 blockMenu.banClass('arduinoConnected', true);
                 blockMenu.unbanClass('arduinoConnect', true);
                 break;
             case hardwareConnected:
+                blockMenu.banClass('arduinoLiteSupported', true);
                 blockMenu.banClass('arduinoDisconnected', true);
                 blockMenu.banClass('arduinoConnect', true);
                 blockMenu.unbanClass('arduinoConnected', true);
@@ -652,7 +666,7 @@ export default class Hardware {
             return;
         }
 
-        Object.values(Entry.HARDWARE_LIST).forEach((hardware: any) => {
+        Object.values(Entry.HARDWARE_LIST || {}).forEach((hardware: any) => {
             blockMenu.banClass(hardware.name, true);
         });
     }
@@ -664,6 +678,11 @@ export default class Hardware {
             this.hwModule = undefined;
             Entry.options.uploadEnable = false;
             Entry.dispatchEvent('hwChanged');
+            Entry.toast.alert(
+                Lang.Msgs.hw_connection_termination_title,
+                Lang.Msgs.hw_connection_termination_desc,
+                false
+            );
         }
     }
 
@@ -713,17 +732,17 @@ export default class Hardware {
             if (!dontShowChecked) {
                 const title = Lang.Msgs.hardware_need_update_title;
                 const content = Lang.Msgs.hardware_need_update_content;
-                entrylms
-                    .alert(content, title, { withDontShowAgain: true })
-                    .one(
-                        'click',
-                        (event: any, { dontShowChecked }: { dontShowChecked: boolean }) => {
-                            if (dontShowChecked) {
-                                localStorage.setItem('skipNoticeHWOldVersion', 'true');
-                            }
-                            resolve(null);
+                Entry.modal
+                    .alert(content, title, {
+                        withDontShowAgain: true,
+                    })
+                    .then((data: { dontShowChecked: boolean }) => {
+                        const { dontShowChecked } = data || {};
+                        if (dontShowChecked) {
+                            localStorage.setItem('skipNoticeHWOldVersion', 'true');
                         }
-                    );
+                        resolve(null);
+                    });
             } else {
                 resolve(null);
             }

@@ -50,6 +50,7 @@ Entry.Robotis_rb_H = {
             [Entry.Robotis_rb.INSTRUCTION.WRITE, 40, 2, 0],
             [Entry.Robotis_rb.INSTRUCTION.WRITE, 66, 2, 0],
             [Entry.Robotis_rb.INSTRUCTION.WRITE, 710, 2, 0],
+            [Entry.Robotis_rb.INSTRUCTION.WRITE, 19, 1, 1], // bypass 모드 켜기
             // [Entry.Robotis_rb.INSTRUCTION.WRITE, 163, 2, 30759],
             // [Entry.Robotis_rb.INSTRUCTION.WRITE, 162, 1, 1],
         ]);
@@ -82,9 +83,15 @@ Entry.Robotis_rb_H.blockMenuBlocks = [
     'robotis_RB_detectSound_compare',
     'robotis_RB_imu',
     'robotis_RB_roll_pitch', 
-    'robotis_RB_detectPose',
+    'robotis_RB_environment_value',
+    'robotis_RB_environment_compare',
+    'robotis_RB_distance_value',
+    'robotis_RB_distance_compare',
+
+    //'robotis_RB_detectPose',
 
     'robotis_RB_cm_buzzer_index',
+
     'robotis_RB_cm_screen',
     'robotis_RB_cm_anim_screen',
     'robotis_RB_rsp_screen',
@@ -99,6 +106,11 @@ Entry.Robotis_rb_H.blockMenuBlocks = [
     'robotis_RB_effectSound',
     'robotis_RB_record',
     'robotis_RB_playRecord',
+
+    'robotis_RB_car_screen',
+    'robotis_RB_car_anim_screen',
+    'robotis_RB_kkokdu_screen',
+    'robotis_RB_kkokdu_anim_screen',
 
     'robotis_RB_cm_motion',
     'robotis_RB_cm_motion2',
@@ -123,15 +135,19 @@ Entry.Robotis_rb_H.setLanguage = function() {
                 robotis_RB_detectSound_compare: "소리가 %1에서 나면",
                 robotis_RB_imu: "%1축의 %2 값",
                 robotis_RB_roll_pitch: "제어기 각도 %1 값",
-                robotis_RB_detectPose: "로봇이 %1 넘어지면",
+                robotis_RB_environment_value: "%1 %2 값",
+                robotis_RB_environment_compare: "%1 %2 값이 %3 %4이면",
+                robotis_RB_distance_value: "%1 %2 값",
+                robotis_RB_distance_compare: "%1 %2 값이 %3 %4이면",
+                //robotis_RB_detectPose: "로봇이 %1 넘어지면",
 
                 robotis_RB_cm_buzzer_index: "제어기 음계값 %1 을(를) %2 옥타브로 %3 초 동안 %4 %5",
-                robotis_RB_cm_screen: "제어기 화면 배경을 %1 로 선택 %2",
-                robotis_RB_cm_anim_screen: "제어기 화면 애니메이션을 %1 로 선택 %2",
+                robotis_RB_cm_screen: "제어기 화면 배경을 알쥐 %1 로 선택 %2",
+                robotis_RB_cm_anim_screen: "제어기 화면 애니메이션을 알쥐 %1 로 선택 %2",
                 robotis_RB_rsp_screen: "제어기 화면에 %1 출력하기 %2",
 
                 robotis_RB_LCDBright: "제어기 화면 밝기를 %1로 정하기 %2",
-                robotis_RB_LCDColor: "제어기 화면 색상을 %1로 정하기 %2",
+                robotis_RB_LCDColor: "제어기 화면 색상을 %1 으로 정하기 %2",
                 
                 robotis_RB_LEDBright: "제어기 %1 LED 밝기를 %2로 정하기 %3",
                 robotis_RB_cm_led: "제어기 %1 LED %2 %3",
@@ -326,7 +342,11 @@ Entry.Robotis_rb_H.setLanguage = function() {
                 robotis_RB_detectSound_compare:"If sound is detected from %1",
                 robotis_RB_imu:"%1 axis' %2 value",
                 robotis_RB_roll_pitch:"%1 Controller position ",
-                robotis_RB_detectPose:"If robot falls %1",
+                robotis_RB_environment_value: "%1 %2 value",
+                robotis_RB_environment_compare: "If %1 %2 value is %3 %4",
+                robotis_RB_distance_value: "%1 %2 value",
+                robotis_RB_distance_compare: "If %1 %2 value is %3 %4",
+                //robotis_RB_detectPose:"If robot falls %1",
                 
                 robotis_RB_cm_buzzer_index:"%1 at %2 octaves for %3 second(s) -> %4 %5",
                 robotis_RB_cm_screen:"Choose %1 as a screen background %2",
@@ -944,7 +964,7 @@ Entry.Robotis_rb_H.getBlocks = function() {
                     var value = script.getNumberValue('ANGLE' + i, script);
                 
                     var engValue = 2048;
-                    engValue = Math.floor(Math.round(value * 4096) / 360 + 2048);
+                    engValue = Math.floor(2048 - Math.round(value * 4096) / 360);
 
                     var time = script.getNumberValue('TIME', script) * 1000;
                     
@@ -1066,7 +1086,7 @@ Entry.Robotis_rb_H.getBlocks = function() {
                 var time = script.getNumberValue('TIME', script) * 1000;
 
                 var engValue = 2048;
-                engValue = Math.floor(Math.round(angle * 4096) / 360 + 2048);
+                engValue = Math.floor(2048 - Math.round(angle * 4096) / 360);
                 var velocity = 0;
                 
                 if(time == 0) {

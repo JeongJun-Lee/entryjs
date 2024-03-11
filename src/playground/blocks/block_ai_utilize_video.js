@@ -5,6 +5,7 @@ Entry.VideoUtils = VideoUtils;
 Entry.AI_UTILIZE_BLOCK.video = {
     name: 'video',
     imageName: 'video.svg',
+    category: 'video',
     title: {
         ko: '비디오 감지',
         en: 'Video Detection',
@@ -269,7 +270,7 @@ Entry.AI_UTILIZE_BLOCK.video.getBlocks = function() {
                     [Lang.video_object_params['hair drier'], 'hair drier'],
                     [Lang.video_object_params.toothbrush, 'toothbrush'],
                 ],
-                value: 'person',
+                value: 'bicycle',
                 fontSize: 11,
                 bgColor: EntryStatic.colorSet.block.darken.AI_UTILIZE,
                 arrowColor: EntryStatic.colorSet.common.WHITE,

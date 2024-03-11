@@ -55,6 +55,25 @@ export class PIXIBrushAdaptor {
         this._setStyle();
     }
 
+    endFill() {
+        // #10141 때문에 closePath 사용안함.
+        if (!this._shape || this._shape.destroyed) {
+            return;
+        }
+        this._shape.closePath();
+    }
+
+    beginFill(color: string) {
+        this._parseRGBCssStyleColor(color);
+        this._setStyle();
+    }
+
+    beginFillFast(color: number, alpha: number) {
+        this._color = color;
+        this._alpha = alpha;
+        this._setStyle();
+    }
+
     setStrokeStyle(thickness: number) {
         this._thickness = thickness;
         this._setStyle();
@@ -76,10 +95,11 @@ export class PIXIBrushAdaptor {
         this._shape.moveTo(this.position.x, this.position.y);
         this._shape.lineTo(Number(x), Number(y)); // 박봉배: #9374 x,y 좌표가 문자로 넘어와서 생긴 이슈
         this.position = { x: Number(x), y: Number(y) };
+        this._shape.geometry.invalidate();
     }
 
     /** @param shape - drawing 을 할 대상을 지정 */
-    internal_setShape(shape: PIXIGraphics) {
+    internalSetShape(shape: PIXIGraphics) {
         this._shape = shape;
         this._setStyle();
     }
@@ -91,8 +111,8 @@ export class PIXIBrushAdaptor {
         this._shape.lineStyle(this._thickness, this._color, this._alpha);
     }
 
-    _parseRGBCssStyleColor(color: string) {
-        color = color.replace('/s/', '');
+    _parseRGBCssStyleColor(colorOld: string) {
+        const color = colorOld.replace('/s/', '');
         if (color[0] == '#') {
             this._color = parseInt(color.replace('#', ''), 16);
             return;

@@ -8,6 +8,7 @@ import AIUtilize from '../class/AIUtilize';
 import AILearning from '../class/AILearning';
 import Extension from '../extensions/extension';
 import CloudVariable from '../extensions/CloudVariable';
+import DataSource from '../util/dataSource';
 
 import './utils';
 
@@ -55,7 +56,7 @@ Entry.init = function(container, options) {
     Entry.initFonts(options.fonts);
     setDefaultTheme(options);
 
-    Entry.paintMode = options.paintMode || 'literallycanvas';
+    Entry.paintMode = options.paintMode || 'entry-paint';
     container && this.createDom(container, this.type);
 
     if (!Lang.type.includes('ko')) { // If Lang is ko only, Enable expansion category
@@ -124,6 +125,7 @@ const setDefaultPathsFromOptions = function(options) {
         soundDir = '',
         blockInjectDir = '',
         baseUrl = location.origin || 'https://playentry.org',
+        offlineModulePath,
     } = options;
 
     Entry.mediaFilePath = `${libDir}/entry-js/images/`;
@@ -131,9 +133,10 @@ const setDefaultPathsFromOptions = function(options) {
     Entry.defaultPath = defaultDir;
     Entry.soundPath = soundDir;
     Entry.blockInjectPath = blockInjectDir;
-
+    Entry.offlineModulePath = offlineModulePath;
     Entry.baseUrl = baseUrl.replace(/\/$/, '');
     Entry.moduleBaseUrl = `${Entry.baseUrl}/modules/`;
+    Entry.moduleliteBaseUrl = `${Entry.baseUrl}/moduleslite/`;
 };
 
 const setDefaultTheme = function(options) {
@@ -215,6 +218,9 @@ Entry.initialize_ = function() {
     this.playground = new Entry.Playground();
     this._destroyer.add(this.playground);
 
+    this.blockCountViewer = new Entry.BlockCountViewer(this.playground);
+    this._destroyer.add(this.blockCountViewer);
+
     if (this.options.expansionDisable === false || this.options.expansionDisable === undefined || !Lang.type.includes('uz')) {
         this.expansion = new Expansion(this.playground);
         this._destroyer.add(this.expansion);
@@ -236,6 +242,8 @@ Entry.initialize_ = function() {
     }
     this.hw = new Entry.HW();
 
+    this.hwLite = new Entry.HWLite(this.playground);
+
     if (Entry.enableActivityLogging) {
         this.reporter = new Entry.Reporter(false);
     } else if (this.type === 'workspace' || this.type === 'phone') {
@@ -252,7 +260,8 @@ Entry.disposeContainer = function() {
 Entry.initSoundQueue_ = function() {
     Entry.soundQueue = new createjs.LoadQueue();
     Entry.soundQueue.installPlugin(createjs.Sound);
-    Entry.soundInstances = [];
+    Entry.soundInstances = new DataSource();
+    Entry.bgmInstances = new DataSource();
     Entry.soundQueue.urls = new Set();
     Entry.soundQueue.total = 0;
     Entry.soundQueue.loadCallback = (src) => {
@@ -343,10 +352,20 @@ Entry.createDom = function(container, type) {
         default: {
             Entry.documentMousedown.attach(this, this.cancelObjectEdit);
 
+            const topFloatingView = Entry.createElement('div');
+            topFloatingView.addClass('entryTopFloatingView');
+            container.appendChild(topFloatingView);
+
             const sceneView = Entry.createElement('div');
-            container.appendChild(sceneView);
+            topFloatingView.appendChild(sceneView);
             this.sceneView = sceneView;
             this.scene.generateView(this.sceneView, type);
+
+            const blockCountViewerView = Entry.createElement('div');
+            blockCountViewerView.addClass('entryBlockCountView');
+            topFloatingView.appendChild(blockCountViewerView);
+            this.blockCountViewerView = blockCountViewerView;
+            this.blockCountViewer.generateView(this.blockCountViewerView, type);
 
             const stateManagerView = Entry.createElement('div');
             this.sceneView.appendChild(stateManagerView);
@@ -599,6 +618,13 @@ Entry.Utils.initEntryEvent_ = function() {
         Entry.events_ = [];
     }
 };
+
+Entry.getSoundPath = (sound) =>
+    sound.fileurl ||
+    `${Entry.defaultPath}/uploads/${sound.filename.substring(0, 2)}/${sound.filename.substring(
+        2,
+        4
+    )}/${Entry.soundPath}${sound.filename}${sound.ext || '.mp3'}`;
 
 /**
  * initialize sound

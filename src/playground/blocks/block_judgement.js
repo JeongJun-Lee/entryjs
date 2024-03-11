@@ -36,6 +36,34 @@ module.exports = {
                     ],
                 },
             },
+            is_object_clicked: {
+                color: EntryStatic.colorSet.block.default.JUDGE,
+                outerLine: EntryStatic.colorSet.block.darken.JUDGE,
+                skeleton: 'basic_boolean_field',
+                statements: [],
+                params: [
+                    {
+                        type: 'Text',
+                        text: Lang.Blocks.JUDGEMENT_is_object_clicked,
+                        color: '#FFF',
+                    },
+                ],
+                events: {},
+                def: {
+                    params: [null],
+                    type: 'is_object_clicked',
+                },
+                class: 'boolean_input',
+                isNotFor: ['python_disable'],
+                func(sprite, script) {
+                    const objId = sprite.id;
+                    if (Entry.stage.clickedObjectId == objId) {
+                        return true;
+                    }
+                    return false;
+                },
+                syntax: { js: [], py: [] },
+            },
             is_press_some_key: {
                 color: EntryStatic.colorSet.block.default.JUDGE,
                 outerLine: EntryStatic.colorSet.block.darken.JUDGE,
@@ -227,6 +255,70 @@ module.exports = {
                             ],
                         },
                     ],
+                },
+            },
+            is_type: {
+                color: EntryStatic.colorSet.block.default.JUDGE,
+                outerLine: EntryStatic.colorSet.block.darken.JUDGE,
+                skeleton: 'basic_boolean_field',
+                statements: [],
+                params: [
+                    {
+                        type: 'Block',
+                        accept: 'string',
+                    },
+                    {
+                        type: 'Text',
+                        text: Lang.Blocks.JUDGEMENT_is_type_1,
+                        color: '#FFF',
+                    },
+                    {
+                        type: 'Dropdown',
+                        options: [
+                            [Lang.Blocks.is_type_number, 'number'],
+                            [Lang.Blocks.is_type_en, 'en'],
+                            [Lang.Blocks.is_type_ko, 'ko'],
+                        ],
+                        value: 'number',
+                        fontSize: 10,
+                        bgColor: EntryStatic.colorSet.block.darken.JUDGE,
+                        arrowColor: EntryStatic.colorSet.arrow.default.DEFAULT,
+                    },
+                    {
+                        type: 'Text',
+                        text: Lang.Blocks.JUDGEMENT_is_type_2,
+                        color: '#FFF',
+                    },
+                ],
+                events: {},
+                def: {
+                    params: ['10', null, 'number', null],
+                    type: 'is_type',
+                },
+                paramsKeyMap: {
+                    VALUE: 0,
+                    TYPE: 2,
+                },
+                class: 'boolean_type',
+                isNotFor: ['python_disable'],
+                func(sprite, script) {
+                    const value = script.getStringValue('VALUE', script);
+                    const type = script.getField('TYPE', script);
+
+                    if (type === 'number') {
+                        return Entry.Utils.isNumber(value);
+                    } else if (type === 'en') {
+                        const pattern = /^[a-zA-Z]+$/;
+                        return pattern.test(value);
+                    } else if (type === 'ko') {
+                        const pattern = /^[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]+$/;
+                        return pattern.test(value);
+                    }
+                    return false;
+                },
+                syntax: {
+                    js: [],
+                    py: [],
                 },
             },
             boolean_basic_operator: {
@@ -624,6 +716,38 @@ module.exports = {
                                     accept: 'Boolean',
                                 },
                             ],
+                        },
+                    ],
+                },
+            },
+            is_boost_mode: {
+                color: EntryStatic.colorSet.block.default.JUDGE,
+                outerLine: EntryStatic.colorSet.block.darken.JUDGE,
+                skeleton: 'basic_boolean_field',
+                statements: [],
+                params: [
+                    {
+                        type: 'Text',
+                        text: Lang.Blocks.JUDGEMENT_is_boost_mode,
+                        color: '#FFF',
+                    },
+                ],
+                events: {},
+                def: {
+                    params: [null],
+                    type: 'is_boost_mode',
+                },
+                class: 'boolean_input',
+                isNotFor: [],
+                func() {
+                    return !!Entry.options.useWebGL;
+                },
+                syntax: {
+                    js: [],
+                    py: [
+                        {
+                            syntax: 'Entry.is_boost_mode()',
+                            blockType: 'param',
                         },
                     ],
                 },

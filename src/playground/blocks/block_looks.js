@@ -143,30 +143,27 @@ module.exports = {
                         message = Entry.convertToRoundedDecimals(message, 3);
                         new Entry.Dialog(sprite, message, mode);
                         sprite.syncDialogVisible(sprite.getVisible());
-                        setTimeout(() => {
+                        let timeoutId = 0;
+                        const stopDialog = () => {
                             script.timeFlag = 0;
-                        }, timeValue * 1000);
+                            if (timeoutId) {
+                                clearTimeout(timeoutId);
+                                timeoutId = 0;
+                            }
+                        };
+                        sprite.stopDialog = stopDialog;
+                        timeoutId = setTimeout(stopDialog, timeValue * 1000);
                     }
                     if (script.timeFlag == 0) {
                         delete script.timeFlag;
                         delete script.isStart;
                         if (sprite.dialog) {
                             sprite.dialog.remove();
+                            sprite.stopDialog = undefined;
                         }
                         return script.callReturn();
-                    } else {
-                        if (!sprite.dialog) {
-                            let message = script.getStringValue('VALUE', script);
-                            const mode = script.getField('OPTION', script);
-                            if (!message && typeof message !== 'number') {
-                                message = '    ';
-                            }
-                            message = Entry.convertToRoundedDecimals(message, 3);
-                            new Entry.Dialog(sprite, message, mode);
-                            sprite.syncDialogVisible(sprite.getVisible());
-                        }
-                        return script;
                     }
+                    return script;
                 },
                 syntax: {
                     js: [],
@@ -305,6 +302,9 @@ module.exports = {
                 class: 'say',
                 isNotFor: [],
                 func(sprite, script) {
+                    if (sprite.stopDialog) {
+                        sprite.stopDialog();
+                    }
                     if (sprite.dialog) {
                         sprite.dialog.remove();
                     }
@@ -879,20 +879,27 @@ module.exports = {
 
                             const frontEntity = selectedObjectContainer.getChildAt(currentIndex + 1)
                                 .entity;
-                            targetIndex +=
-                                (frontEntity.shapes.length ? 2 : 1) + frontEntity.stamps.length;
+
+                            const offsetCount =
+                                1 +
+                                (sprite.shapes.length ? 1 : 0) +
+                                (sprite.paintShapes.length ? 1 : 0);
+                            targetIndex += offsetCount + frontEntity.stamps.length;
                             break;
                         }
                         case 'BACKWARD': {
-                            targetIndex -= (sprite.shapes.length ? 2 : 1) + sprite.stamps.length;
-                            let backEntity = selectedObjectContainer.getChildAt(targetIndex);
+                            const offsetCount =
+                                1 +
+                                (sprite.shapes.length ? 1 : 0) +
+                                (sprite.paintShapes.length ? 1 : 0);
+                            const backIndex = targetIndex - offsetCount + sprite.stamps.length;
+                            let backEntity = selectedObjectContainer.getChildAt(backIndex);
                             if (!backEntity) {
                                 targetIndex = 0;
                                 break;
                             }
                             backEntity = backEntity.entity;
-                            targetIndex -=
-                                (backEntity.shapes.length ? 1 : 0) + backEntity.stamps.length;
+                            targetIndex -= offsetCount + backEntity.stamps.length;
                             break;
                         }
                         case 'BACK':

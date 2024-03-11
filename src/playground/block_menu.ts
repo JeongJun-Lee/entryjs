@@ -11,11 +11,13 @@ import find from 'lodash/find';
 import ModelClass from '../core/modelClass';
 import Hammer from 'hammerjs';
 
+import { EntryDom } from '../../types/index';
+
 const VARIABLE = 'variable';
 const HW = 'arduino';
 const practicalCourseCategoryList = ['hw_motor', 'hw_melody', 'hw_sensor', 'hw_led', 'hw_robot'];
 const splitterHPadding = EntryStatic.splitterHPadding || 20;
-const BETA_LIST = ['ai_utilize', 'analysis'];
+const BETA_LIST = [];
 
 type BlockMenuAlignType = 'LEFT' | 'CENTER';
 
@@ -335,14 +337,17 @@ class BlockMenu extends ModelClass<Schema> {
             }
             blockView.attach();
             blockView.set({ display: true });
-            shouldReDraw && blockView.reDraw();
-
-            const className = Entry.block[type].class;
-            if (pastClass && pastClass !== className) {
-                this._createSplitter(marginFromTop);
-                marginFromTop += vPadding;
+            if (shouldReDraw || (Entry?.Func?.isEdit && blockView?.block?.data?.params?.length)) {
+                blockView.reDraw();
             }
-            pastClass = className;
+            if (Entry.block[type]) {
+                const className = Entry.block[type].class;
+                if (pastClass && pastClass !== className) {
+                    this._createSplitter(marginFromTop);
+                    marginFromTop += vPadding;
+                }
+                pastClass = className;
+            }
 
             let left = hPadding - blockView.offsetX;
             if (this._align === 'CENTER') {
@@ -618,7 +623,6 @@ class BlockMenu extends ModelClass<Schema> {
         }
 
         const oldView = this._selectedCategoryView;
-
         const name = this._convertSelector(selector);
         if (selector !== undefined && !name) {
             this.align();
@@ -1137,6 +1141,12 @@ class BlockMenu extends ModelClass<Schema> {
         this.workspace?.board?.observe(this, '_handleBoardDragBlock', ['dragBlock']);
     }
 
+    changeTypeThreadByBlockKey(key: string) {
+        this.getThreadByBlockKey(key)
+            ?.getFirstBlock()
+            .changeType();
+    }
+
     private _generateView(categoryData: CategoryData[]) {
         categoryData && this._generateCategoryView(categoryData);
 
@@ -1299,7 +1309,7 @@ class BlockMenu extends ModelClass<Schema> {
     }
 
     private _captureKeyEvent(e: KeyboardEvent) {
-        let keyCode = Entry.Utils.inputToKeycode(e);
+        const keyCode = Entry.Utils.inputToKeycode(e);
         if (!keyCode) {
             return;
         }
@@ -1353,7 +1363,7 @@ class BlockMenu extends ModelClass<Schema> {
                 class: 'entryCategoryListWorkspace',
             });
         } else {
-            this.categoryWrapper.innerHTML = '';
+            this.categoryWrapper.textContent = '';
         }
 
         this._categoryCol = Entry.Dom('ul', {

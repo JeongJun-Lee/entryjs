@@ -2,6 +2,7 @@
  * nt11576 Lee.Jaewon
  * commented area with "motion test" is for the motion detection testing canvas to test the computer vision, uncomment all codes labeled "motion test"
  */
+import { MediaUtilsInterface } from '../../types/index';
 
 import { GEHelper } from '../graphicEngine/GEHelper';
 import VideoWorker from './workers/video.worker.ts';
@@ -16,6 +17,7 @@ import clamp from 'lodash/clamp';
 type FlipStatus = {
     horizontal: boolean;
     vertical: boolean;
+    isChanged: boolean;
 };
 
 type ModelStatus = {
@@ -48,6 +50,8 @@ type DetectedObject = {
 };
 type IndicatorType = 'pose' | 'face' | 'object';
 
+const { Entry, Lang } = window;
+
 export const getInputList = async () => {
     if (navigator.mediaDevices) {
         return (await navigator.mediaDevices.enumerateDevices()) || [];
@@ -79,6 +83,7 @@ class VideoUtils implements MediaUtilsInterface {
     public flipStatus: FlipStatus = {
         horizontal: false,
         vertical: false,
+        isChanged: false,
     };
 
     public indicatorStatus: ModelStatus = {
@@ -152,17 +157,15 @@ class VideoUtils implements MediaUtilsInterface {
 
     // issue 12160 bug , 강제로 usermedia를 가져오도록 하기 위함 enumerateDevices자체로는 권한 요청을 하지 않음
     async checkPermission() {
-        await navigator.permissions
-            .query({ name: 'camera' })
-            .then(async (permission) => {
-                console.log('camera state', permission.state);
-                if (permission.state !== 'granted') {
-                    await navigator.mediaDevices.getUserMedia({ audio: false, video: true });
-                }
-            })
-            .catch(async (error) => {
-                console.log('Got error :', error);
-            });
+        if (navigator.permissions) {
+            const permission = await navigator.permissions.query({ name: 'camera' });
+            console.log('camera state', permission.state);
+            if (permission.state !== 'granted') {
+                await navigator.mediaDevices.getUserMedia({ audio: false, video: true });
+            }
+        } else {
+            await navigator.mediaDevices.getUserMedia({ audio: false, video: true });
+        }
     }
 
     async initialize() {
@@ -299,7 +302,7 @@ class VideoUtils implements MediaUtilsInterface {
                 };
                 const weightsUrl = this.getWeightUrl();
                 this.worker.postMessage({
-                    weightsUrl: weightsUrl,
+                    weightsUrl,
                     type: 'init',
                     width: this.CANVAS_WIDTH,
                     height: this.CANVAS_HEIGHT,
@@ -416,7 +419,7 @@ class VideoUtils implements MediaUtilsInterface {
     }
 
     videoOnLoadHandler() {
-        if (!this.flipStatus.horizontal) {
+        if (!this.flipStatus.horizontal && !this.flipStatus.isChanged) {
             this.setOptions('hflip', null);
         }
     }
@@ -551,34 +554,12 @@ class VideoUtils implements MediaUtilsInterface {
         }, 100);
     }
 
-    startCapturedImage(
-        callback: Function,
-        { width = this.CANVAS_WIDTH, height = this.CANVAS_HEIGHT }
-    ) {
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        this.captureTimeout = Entry.Utils.asyncAnimationFrame(async () => {
-            const context = canvas.getContext('2d');
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            context.drawImage(this.video, 0, 0, width, height);
-            callback && (await callback(canvas));
-        });
-        Entry.addEventListener('stop', () => {
-            this.stopCaptureImage();
-        });
-        return this.captureTimeout;
-    }
-
-    stopCaptureImage() {
-        this.captureTimeout && cancelAnimationFrame(this.captureTimeout);
-    }
     /**
      * MOTION DETECT CALCULATION BASED ON COMPUTER VISION
      * @param sprite Entry Entity Object
      */
     motionDetect(sprite: any) {
-        if (!this.inMemoryCanvas) {
+        if (!this.inMemoryCanvas || !this.isRunning) {
             return;
         }
         // 움직임 감지 기본 범위는 전체 캔버스 범위
@@ -734,10 +715,8 @@ class VideoUtils implements MediaUtilsInterface {
 
     turnOnWebcam() {
         GEHelper.drawVideoElement(this.canvasVideo);
-        if (!this.flipStatus.horizontal) {
-            this.setOptions('hflip', null);
-        }
     }
+
     setOptions(target: String, value: number) {
         if (!this.canvasVideo) {
             return;
@@ -747,6 +726,7 @@ class VideoUtils implements MediaUtilsInterface {
                 GEHelper.setVideoAlpha(this.canvasVideo, value);
                 break;
             case 'hflip':
+                this.flipStatus.isChanged = true;
                 this.flipStatus.horizontal = !this.flipStatus.horizontal;
                 if (this.isChrome) {
                     this.worker.postMessage({
@@ -757,6 +737,7 @@ class VideoUtils implements MediaUtilsInterface {
                 GEHelper.hFlipVideoElement(this.canvasVideo);
                 break;
             case 'vflip':
+                this.flipStatus.isChanged = true;
                 this.flipStatus.vertical = !this.flipStatus.vertical;
                 GEHelper.vFlipVideoElement(this.canvasVideo);
                 break;
@@ -823,6 +804,7 @@ class VideoUtils implements MediaUtilsInterface {
         this.disableAllModels();
         GEHelper.resetHandlers();
         this.turnOffWebcam();
+        this.flipStatus.isChanged = false;
         if (!this.flipStatus.horizontal) {
             this.setOptions('hflip', null);
         }
@@ -866,6 +848,7 @@ class VideoUtils implements MediaUtilsInterface {
         this.flipStatus = {
             horizontal: false,
             vertical: false,
+            isChanged: false,
         };
         this.objects = [];
         this.poses = { predictions: [], adjacents: [] };

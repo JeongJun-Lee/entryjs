@@ -549,6 +549,16 @@ Entry.Stage = class Stage {
     initVideoContainer() {
         this.videoContainer = GEHelper.getNewContainer();
         this.canvas.addChildAt(this.videoContainer, 2);
+        this.overlayContainer = GEHelper.getNewContainer();
+        this.canvas.addChildAt(this.overlayContainer, 3);
+    }
+
+    getCanvasElement(id) {
+        let canvas = document.getElementById(id);
+        if (!canvas) {
+            canvas = window.top.document.getElementById(id);
+        }
+        return canvas;
     }
 
     /**
@@ -578,9 +588,9 @@ Entry.Stage = class Stage {
             const isWebGL = GEHelper.isWebGL;
             const classRef = isWebGL ? window.PIXICanvasInput : CanvasInput;
             const inputField = new classRef({
-                canvas: document.getElementById('entryCanvas'),
+                canvas: THIS.getCanvasElement('entryCanvas'),
                 fontSize: 20,
-                fontFamily: EntryStatic.fontFamily || 'NanumGothic',
+                fontFamily: EntryStatic.fontFamily || "NanumGothic, 'Nanum Gothic'",
                 fontColor: '#2c313d',
                 width: 520,
                 height: 24,
@@ -692,7 +702,7 @@ Entry.Stage = class Stage {
         containers.forEach(canvas.removeChild.bind(canvas));
 
         this.selectedObjectContainer = newContainer;
-        canvas.addChildAt(newContainer, 3);
+        canvas.addChildAt(newContainer, 4);
     }
 
     /**
@@ -783,7 +793,7 @@ Entry.Stage = class Stage {
             destroyOption = { children: true, texture: false, baseTexture: false };
             this.objectContainers.forEach((c) => c.destroy(destroyOption));
             //this.handle.destroy(); // 추상화 아직 안됨.
-            PIXIAtlasManager.clearProject();
+            PIXIAtlasManager?.clearProject?.();
         } else {
             //do nothing
         }

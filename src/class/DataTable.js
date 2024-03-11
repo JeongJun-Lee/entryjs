@@ -22,13 +22,19 @@ class DataTable {
     }
 
     get dataTables() {
-        return _map(this.#tables, ({ id, fields, chart, name, origin, summary }) => ({
-            id,
-            name,
-            summary,
-            chart: _cloneDeep(chart),
-            table: [[...fields], ..._cloneDeep(origin)],
-        }));
+        return _map(
+            this.#tables,
+            ({ id, fields, chart, name, origin, summary, provider, description, fieldInfos }) => ({
+                id,
+                name,
+                provider,
+                description,
+                fieldInfos,
+                summary,
+                chart: _cloneDeep(chart),
+                table: [[...fields], ..._cloneDeep(origin)],
+            })
+        );
     }
 
     constructor() {
@@ -152,12 +158,12 @@ class DataTable {
     saveTable = ({ selected }) => {
         this.setSource(selected);
         Entry.playground.reloadPlayground();
-        Entry.creationChangedEvent.notify();
+        Entry.creationChangedEvent?.notify();
     };
 
     removeTable = (index) => {
         this.#tables = _filter(this.#tables, (__, tIndex) => index !== tIndex);
-        Entry.creationChangedEvent.notify();
+        Entry.creationChangedEvent?.notify();
     };
 
     show(data) {
@@ -288,7 +294,6 @@ class DataTable {
     }
 
     closeModal() {
-        console.log(this.modals);
         this.modals.forEach((m) => {
             m.hide();
         });

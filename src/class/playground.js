@@ -8,8 +8,9 @@ import { Backpack, ColorPicker, Dropdown, Sortable } from '@entrylabs/tool';
 import Toast from '../playground/toast';
 import EntryEvent from '@entrylabs/event';
 import { Destroyer } from '../util/destroyer/Destroyer';
-import { saveAs } from 'file-saver';
 import DataTable from './DataTable';
+import SoundEditor from './sound';
+import _get from 'lodash/get';
 
 const Entry = require('../entry');
 
@@ -38,6 +39,7 @@ Entry.Playground = class Playground {
         Entry.addEventListener('commentVisibleChanged', this.toggleCommentButtonVisible.bind(this));
 
         Entry.addEventListener('hwChanged', this.updateUploadBtn.bind(this));
+        Entry.addEventListener('workspaceChangeMode', this.updateSelectedObjectTitle.bind(this));
 
         Entry.windowResized.attach(this, this.clearClientRectMemo.bind(this));
     }
@@ -73,7 +75,7 @@ Entry.Playground = class Playground {
             const curtainView = Entry.createElement('div', 'entryCurtain')
                 .addClass('entryPlaygroundCurtainWorkspace entryRemove')
                 .appendTo(this.view_);
-            curtainView.innerHTML = Lang.Workspace.cannot_edit_click_to_stop;
+            curtainView.textContent = Lang.Workspace.cannot_edit_click_to_stop;
             curtainView.addEventListener('click', () => {
                 Entry.engine.toggleStop();
             });
@@ -93,7 +95,7 @@ Entry.Playground = class Playground {
             const pictureCurtainText = Entry.createElement('span', 'entryPictureCurtainText')
                 .addClass('entryPlaygroundPictureCurtainWorkspaceText')
                 .appendTo(pictureCurtainView);
-            pictureCurtainText.innerHTML = Lang.Workspace.add_object_before_edit;
+            pictureCurtainText.textContent = Lang.Workspace.add_object_before_edit;
 
             const textView = Entry.createElement('div', 'entryText')
                 .addClass('entryPlaygroundTextWorkspace entryRemove')
@@ -173,7 +175,7 @@ Entry.Playground = class Playground {
                 Entry.do('playgroundChangeViewMode', 'code', that.selectedViewMode);
             })
             .appendTo(tabList);
-        codeTab.innerHTML = Lang.Workspace.tab_code;
+        codeTab.textContent = Lang.Workspace.tab_code;
         this.tabViewElements.code = codeTab;
         this._codeTab = codeTab;
 
@@ -183,7 +185,7 @@ Entry.Playground = class Playground {
                 Entry.do('playgroundChangeViewMode', 'picture', that.selectedViewMode);
             })
             .appendTo(tabList);
-        pictureTab.innerHTML = Lang.Workspace.tab_picture;
+        pictureTab.textContent = Lang.Workspace.tab_picture;
         this.tabViewElements.picture = pictureTab;
         this.pictureTab = pictureTab;
 
@@ -193,7 +195,7 @@ Entry.Playground = class Playground {
             .bindOnClick(() => {
                 Entry.do('playgroundChangeViewMode', 'text', that.selectedViewMode);
             });
-        textboxTab.innerHTML = Lang.Workspace.tab_text;
+        textboxTab.textContent = Lang.Workspace.tab_text;
         this.tabViewElements.text = textboxTab;
         this.textboxTab = textboxTab;
 
@@ -203,7 +205,7 @@ Entry.Playground = class Playground {
             .bindOnClick(() => {
                 Entry.do('playgroundChangeViewMode', 'sound', that.selectedViewMode);
             });
-        soundTab.innerHTML = Lang.Workspace.tab_sound;
+        soundTab.textContent = Lang.Workspace.tab_sound;
         this.tabViewElements.sound = soundTab;
         this.soundTab = soundTab;
 
@@ -213,7 +215,7 @@ Entry.Playground = class Playground {
             .bindOnClick(() => {
                 Entry.do('playgroundChangeViewMode', 'variable', that.selectedViewMode);
             });
-        variableTab.innerHTML = Lang.Workspace.tab_attribute;
+        variableTab.textContent = Lang.Workspace.tab_attribute;
         this.tabViewElements.variable = variableTab;
         this.variableTab = variableTab;
     }
@@ -619,6 +621,7 @@ Entry.Playground = class Playground {
         this.board = this.mainWorkspace.board;
         this.toast = new Toast(this.board);
         this.blockMenu.banClass('checker');
+        Entry.Func?.initBlock(this.blockMenu);
         Entry.expansion?.banAllExpansionBlock();
         Entry.aiUtilize?.banAllAIUtilizeBlock();
         DataTable?.banAllBlock();
@@ -630,6 +633,9 @@ Entry.Playground = class Playground {
 
         if (Entry.hw) {
             Entry.hw.refreshHardwareBlockMenu();
+        }
+        if (Entry.hwLite) {
+            Entry.hwLite.refreshHardwareLiteBlockMenu();
         }
     }
 
@@ -657,7 +663,7 @@ Entry.Playground = class Playground {
                     }
                 })
                 .appendTo(pictureAdd);
-            innerPictureAdd.innerHTML = Lang.Workspace.picture_add;
+            innerPictureAdd.textContent = Lang.Workspace.picture_add;
             this._pictureAddButton = innerPictureAdd;
 
             const innerDrawNewPicture = Entry.createElement('div', 'entryNewPictureInner')
@@ -666,7 +672,7 @@ Entry.Playground = class Playground {
                     this.painter.newPicture();
                 })
                 .appendTo(pictureAdd);
-            innerDrawNewPicture.innerHTML = Lang.Workspace.draw_new;
+            innerDrawNewPicture.textContent = Lang.Workspace.draw_new;
             this._drawNewPictureButton = innerDrawNewPicture;
 
             this.pictureListView_ = Entry.createElement('ul', 'entryPictureList')
@@ -708,6 +714,7 @@ Entry.Playground = class Playground {
 
     updatePictureView() {
         if (this.pictureSortableListWidget) {
+            this.pictureSortableListWidget.setData({ items: [] });
             this.pictureSortableListWidget.setData({
                 items: this._getSortablePictureList(),
             });
@@ -917,7 +924,7 @@ Entry.Playground = class Playground {
         this.fontSizeWrapper = fontSizeWrapper;
 
         const fontSizeLabel = Entry.createElement('div').addClass('entryPlaygroundFontSizeLabel');
-        fontSizeLabel.innerHTML = Lang.General.font_size;
+        fontSizeLabel.textContent = Lang.General.font_size;
         fontSizeWrapper.appendChild(fontSizeLabel);
 
         const fontSizeSlider = Entry.createElement('div').addClass('entryPlaygroundFontSizeSlider');
@@ -1044,22 +1051,6 @@ Entry.Playground = class Playground {
             'entryPlaygroundSoundEdit'
         );
 
-        const tempNotificationWrapper = Entry.createElement('div').addClass(
-            'entryPlaygroundSoundEditWrapper'
-        );
-
-        const tempImage = Entry.createElement('div').addClass('entryPlaygroundSoundEditImage');
-
-        const tempNotification = Entry.createElement('span').addClass(
-            'entryPlaygroundSoundEditText'
-        );
-        tempNotification.innerHTML = Lang.Menus.sound_edit_warn;
-
-        tempNotificationWrapper.appendChild(tempImage);
-        tempNotificationWrapper.appendChild(tempNotification);
-
-        soundEditView.appendChild(tempNotificationWrapper);
-
         return soundEditView;
     }
 
@@ -1086,7 +1077,7 @@ Entry.Playground = class Playground {
                     );
                 }
             });
-            innerSoundAdd.innerHTML = Lang.Workspace.sound_add;
+            innerSoundAdd.textContent = Lang.Workspace.sound_add;
             soundAdd.appendChild(innerSoundAdd);
             soundView.appendChild(soundAdd);
             const soundList = Entry.createElement('ul', 'entrySoundList').addClass(
@@ -1099,6 +1090,7 @@ Entry.Playground = class Playground {
 
             const soundEditView = this._createSoundEditView();
             soundView.appendChild(soundEditView);
+            this.soundEditor = new SoundEditor(soundEditView);
         }
     }
 
@@ -1126,6 +1118,7 @@ Entry.Playground = class Playground {
                 items: this._getSortableSoundList(),
             });
         }
+
         this.reloadPlayground();
     }
 
@@ -1248,7 +1241,7 @@ Entry.Playground = class Playground {
             (this.object.pictures || []).forEach((picture, i) => {
                 !picture.view && Entry.playground.generatePictureElement(picture);
                 const element = picture.view;
-                element.orderHolder.innerHTML = i + 1;
+                element.orderHolder.textContent = i + 1;
             });
 
             isSelect && this.selectPicture(this.object.selectedPicture);
@@ -1306,7 +1299,7 @@ Entry.Playground = class Playground {
                 )}/thumb/${fileName}.png")`;
             }
             const sizeView = $element.find(`#s_${picture.id}`)[0];
-            sizeView.innerHTML = `${picture.dimension.width} X ${picture.dimension.height}`;
+            sizeView.textContent = `${picture.dimension.width} X ${picture.dimension.height}`;
         }
 
         Entry.container.setPicture(picture);
@@ -1395,15 +1388,12 @@ Entry.Playground = class Playground {
         if (font) {
             $('#entryText #entryTextBoxAttrFontName').text(font.name);
             $('#entryText #entryTextBoxAttrFontName').data('font', font);
+            this.textEditInput.style.fontFamily = font.family;
+            this.textEditArea.style.fontFamily = font.family;
         } else {
             $('#entryText #entryTextBoxAttrFontName').text('');
             $('#entryText #entryTextBoxAttrFontName').data('font', EntryStatic.fonts[0]);
         }
-
-        $('.style_link.imbtn_pop_font_bold').toggleClass('on', entity.fontBold);
-        $('.style_link.imbtn_pop_font_italic').toggleClass('on', entity.fontItalic);
-        $('.style_link.imbtn_pop_font_underline').toggleClass('on', entity.getUnderLine());
-        $('.style_link.imbtn_pop_font_through').toggleClass('on', entity.getStrike());
 
         if (entity.colour) {
             this.setTextColour(entity.colour, true);
@@ -1412,6 +1402,9 @@ Entry.Playground = class Playground {
             this.setBackgroundColour(entity.bgColor, true);
         }
 
+        this.setTextBold(entity.fontBold);
+        this.setTextItalic(entity.fontItalic);
+        this.setTextDecoration(entity);
         this.toggleLineBreak(entity.getLineBreak());
 
         if (entity.getLineBreak()) {
@@ -1436,7 +1429,7 @@ Entry.Playground = class Playground {
     /**
      * Inject sound
      */
-    injectSound() {
+    injectSound(isSelect = true) {
         const view = this.soundListView_;
         if (!view) {
             return;
@@ -1446,10 +1439,24 @@ Entry.Playground = class Playground {
             delete Entry.stage.selectedObject;
         } else {
             (this.object.sounds || []).forEach((sound, i) => {
-                !sound.view && Entry.playground.generateSoundElement(sound);
+                const soundLengthView = _get(sound, 'view.soundLengthView');
+                if (soundLengthView) {
+                    soundLengthView.textContent = `${sound.duration} ${Lang.General.second}`;
+                } else {
+                    Entry.playground.generateSoundElement(sound);
+                }
+
                 const element = sound.view;
-                element.orderHolder.innerHTML = i + 1;
+                element.orderHolder.textContent = i + 1;
             });
+
+            if (isSelect) {
+                if (this.object.selectedSound) {
+                    this.selectSound(this.object.selectedSound);
+                } else {
+                    this.unselectSound();
+                }
+            }
         }
 
         this.updateSoundsView();
@@ -1466,6 +1473,14 @@ Entry.Playground = class Playground {
             this.object.sounds.splice(end, 0, this.object.sounds.splice(start, 1)[0]);
             this.injectSound();
         }
+    }
+
+    addHardwareLiteModule(module) {
+        Entry.hwLite.addHardwareLiteModule(module);
+    }
+
+    removeHardwareLiteModule() {
+        Entry.hwLite.removeHardwareLiteModule();
     }
 
     addExpansionBlocks(items) {
@@ -1494,7 +1509,7 @@ Entry.Playground = class Playground {
      * @param {sound model} sound
      * @param {boolean} NotForView if this is true, add element into object also.
      */
-    addSound(sound, NotForView, isNew) {
+    addSound(sound, NotForView, isNew, isSelect = true) {
         const tempSound = _.clone(sound);
         delete tempSound.view;
         if (isNew === true) {
@@ -1508,8 +1523,7 @@ Entry.Playground = class Playground {
         sound.name = Entry.getOrderedName(sound.name, this.object.sounds);
 
         this.generateSoundElement(sound);
-        Entry.do('objectAddSound', this.object.id, sound);
-        this.injectSound();
+        Entry.do('objectAddSound', sound.objectId || this.object.id, sound, isSelect);
     }
 
     downloadSound(soundId) {
@@ -1569,16 +1583,24 @@ Entry.Playground = class Playground {
             }
         }
 
-        if (viewType === 'sound') {
-            this.initSortableSoundWidget();
-            if (!this.soundView_.object || this.soundView_.object != this.object) {
-                this.soundView_.object = this.object;
-                this.injectSound();
-            } else if (this.object && this.soundListView_ && !this.soundListView_.hasChildNodes()) {
-                const sounds = this.object.sounds;
-                if (sounds && sounds.length) {
+        if (Entry.soundEditable) {
+            if (viewType === 'sound') {
+                this.initSortableSoundWidget();
+                if (!this.soundView_.object || this.soundView_.object != this.object) {
+                    this.soundView_.object = this.object;
                     this.injectSound();
+                } else if (
+                    this.object &&
+                    this.soundListView_ &&
+                    !this.soundListView_.hasChildNodes()
+                ) {
+                    const sounds = this.object.sounds;
+                    if (sounds && sounds.length) {
+                        this.injectSound();
+                    }
                 }
+            } else {
+                this.soundEditor.hide();
             }
         }
 
@@ -1904,7 +1926,7 @@ Entry.Playground = class Playground {
             .addClass('entryPlaygroundPictureSize')
             .appendTo(
                 element
-            ).innerHTML = `${picture.dimension.width} X ${picture.dimension.height}`;
+            ).textContent = `${picture.dimension.width} X ${picture.dimension.height}`;
 
         const removeButton = Entry.createElement('div').addClass('entryPlayground_del');
         const { Buttons = {} } = Lang || {};
@@ -1958,7 +1980,8 @@ Entry.Playground = class Playground {
                 {
                     text: Lang.Workspace.context_duplicate,
                     callback() {
-                        Entry.playground.addSound(sound, true, true);
+                        const newSound = Entry.playground.object.getSound(sound.id);
+                        Entry.playground.addSound(newSound, true, true);
                     },
                 },
                 {
@@ -2003,7 +2026,13 @@ Entry.Playground = class Playground {
         let soundInstance;
 
         element.bindOnClick(() => {
-            this.selectSound(sound);
+            if (!this.object.sounds || !this.object.sounds.length) {
+                return;
+            }
+            const isExist = this.object.sounds.some((os) => os.id === sound.id);
+            if (isExist) {
+                this.selectSound(sound);
+            }
         });
 
         thumbnailView.addEventListener('touchmove', (e) => {
@@ -2017,6 +2046,7 @@ Entry.Playground = class Playground {
                 isPlaying = false;
                 thumbnailView.removeClass('entryPlaygroundSoundStop');
                 thumbnailView.addClass('entryPlaygroundSoundPlay');
+                soundInstance.dispatchEvent('complete');
                 soundInstance.stop();
                 return;
             } else {
@@ -2067,9 +2097,11 @@ Entry.Playground = class Playground {
         }
 
         nameView.onkeypress = Entry.Utils.blurWhenEnter;
-        Entry.createElement('div')
+        const soundLengthView = Entry.createElement('div')
             .addClass('entryPlaygroundSoundLength')
-            .appendTo(element).innerHTML = `${sound.duration} ${Lang.General.second}`;
+            .appendTo(element);
+        soundLengthView.textContent = `${sound.duration} ${Lang.General.second}`;
+        element.soundLengthView = soundLengthView;
         const removeButton = Entry.createElement('div').addClass('entryPlayground_del');
         const { Buttons = {} } = Lang || {};
         const { delete: delText = '삭제' } = Buttons;
@@ -2177,6 +2209,22 @@ Entry.Playground = class Playground {
                 item.view.addClass('entrySoundSelected');
             }
         });
+
+        let objectId_;
+        if (sound && sound.id) {
+            objectId_ = Entry.container.selectSound(sound.id, sound.objectId);
+        }
+
+        if (this.object.id === objectId_) {
+            if (!sound.objectId) {
+                sound.objectId = this.object.id;
+            }
+            Entry.dispatchEvent('soundSelected', sound, this.object);
+        }
+    }
+
+    unselectSound() {
+        Entry.dispatchEvent('soundUnselected');
     }
 
     setTextColour(colour) {
@@ -2184,6 +2232,36 @@ Entry.Playground = class Playground {
         this.object.entity.setColour(colour);
         this.textEditArea.style.color = colour;
         this.textEditInput.style.color = colour;
+    }
+
+    setTextBold(bold) {
+        $('.style_link.imbtn_pop_font_bold').toggleClass('on', bold);
+        $(this.textEditInput).removeClass('bold');
+        $(this.textEditArea).removeClass('bold');
+        if (bold) {
+            $(this.textEditInput).addClass('bold');
+            $(this.textEditArea).addClass('bold');
+        }
+    }
+
+    setTextItalic(fontItalic) {
+        $('.style_link.imbtn_pop_font_italic').toggleClass('on', fontItalic);
+        $(this.textEditInput).removeClass('italic');
+        $(this.textEditArea).removeClass('italic');
+        if (fontItalic) {
+            $(this.textEditInput).addClass('italic');
+            $(this.textEditArea).addClass('italic');
+        }
+    }
+
+    setTextDecoration(entity) {
+        $('.style_link.imbtn_pop_font_underline').toggleClass('on', entity.getUnderLine());
+        $('.style_link.imbtn_pop_font_through').toggleClass('on', entity.getStrike());
+        const effect = `${entity.getStrike() ? 'line-through' : ''} ${
+            entity.getUnderLine() ? 'underline' : ''
+        }`.trim();
+        this.textEditArea.style.textDecoration = effect;
+        this.textEditInput.style.textDecoration = effect;
     }
 
     setBackgroundColour(colour) {
@@ -2243,9 +2321,22 @@ Entry.Playground = class Playground {
             return;
         }
 
-        Object.values(Entry.AI_UTILIZE_BLOCK_LIST).forEach((block) => {
+        Object.values(Entry.ALL_AI_UTILIZE_BLOCK_LIST).forEach((block) => {
             blockMenu.banClass(block.name, true);
             blockMenu.banClass(`${block.name}_legacy`, true);
+        });
+    }
+
+    banHardwareLiteBlock() {
+        const blockMenu = _.result(this.mainWorkspace, 'blockMenu');
+        if (!blockMenu) {
+            return;
+        }
+
+        Object.values(Entry.HARDWARE_LITE_LIST).forEach((block) => {
+            blockMenu.banClass(block.name, true);
+            blockMenu.banClass(`${block.name}_legacy`, true);
+            blockMenu.banClass(`${block.name.toLowerCase()}`, true);
         });
     }
 
@@ -2355,6 +2446,29 @@ Entry.Playground = class Playground {
         }
     }
 
+    updateSelectedObjectTitle() {
+        if (
+            this.board &&
+            Entry.container.selectedObject &&
+            this.board.workspace.getMode() === Entry.Workspace.MODE_BOARD
+        ) {
+            this.board.updateObjectTitle(Entry.container.selectedObject);
+            Entry.Utils.doCodeChange();
+        }
+    }
+
+    setSound(sound) {
+        const objectSound = Entry.container.setSound(sound);
+        if (objectSound?.view) {
+            objectSound.view.sound = objectSound;
+        }
+        const soundLengthView = _get(objectSound, 'view.soundLengthView');
+        if (soundLengthView) {
+            soundLengthView.textContent = `${objectSound.duration} ${Lang.General.second}`;
+        }
+        return objectSound;
+    }
+
     destroy() {
         this._uploadButton && this._uploadButton.unBindOnClick();
         this._arToggleButton && this._arToggleButton.unBindOnClick();
@@ -2366,6 +2480,7 @@ Entry.Playground = class Playground {
         this.objectBackPackEvent && this.objectBackPackEvent.off();
         this.objectBackPackAreaEvent && this.objectBackPackAreaEvent.off();
         this.globalEvent && this.globalEvent.destroy();
+        this.soundEditor && this.soundEditor.destory();
         this._destroyer.destroy();
     }
 };

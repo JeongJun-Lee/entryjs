@@ -76,7 +76,7 @@ Entry.Container = class Container {
             .bindOnClick(() => {
                 Entry.dispatchEvent('openSpriteManager');
             });
-        addButton.innerHTML = Lang.Workspace.add_object;
+        addButton.textContent = Lang.Workspace.add_object;
 
         const ulWrapper = Entry.createElement('div');
         this._view.appendChild(ulWrapper);
@@ -338,6 +338,16 @@ Entry.Container = class Container {
             return object.id;
         }
         throw new Error('No picture found');
+    }
+
+    selectSound(soundId, objectId) {
+        const object = this.getObject(objectId);
+        const sound = object.getSound(soundId);
+        if (sound) {
+            object.selectedSound = sound;
+            return object.id;
+        }
+        throw new Error('No sound found');
     }
 
     /**
@@ -774,11 +784,11 @@ Entry.Container = class Container {
                 }
                 break;
             case 'fonts':
-                result = EntryStatic.fonts.map((font) => {
-                    return [font.name, font.family];
-                });
+                result = EntryStatic.fonts
+                    .filter((x) => x.visible)
+                    .map((font) => [font.name, font.family]);
                 break;
-            case 'connectedCameras':
+            case 'connectedCameras': {
                 const inputList = await getInputList();
                 result = [].concat(
                     inputList
@@ -788,6 +798,15 @@ Entry.Container = class Container {
                             index,
                         ])
                 );
+                break;
+            }
+            case 'blockCount':
+                result = [
+                    [Lang.Blocks.this_project, 'all'],
+                    [Lang.Blocks.this_object, 'self'],
+                    ...this.getCurrentObjects().map(({ name, id }) => [name, `object-${id}`]),
+                    ...Entry.scene.getScenes().map(({ name, id }) => [name, `scene-${id}`]),
+                ];
         }
         if (!result.length) {
             result = [[Lang.Blocks.no_target, 'null']];
@@ -1317,6 +1336,38 @@ Entry.Container = class Container {
 
         view_ && view_.scrollIntoView();
         document.body.scrollIntoView();
+    }
+
+    setSound(sound) {
+        const sounds = this.getObject(sound.objectId).sounds;
+        const index = _.findIndex(sounds, ({ id }) => id === sound.id);
+        if (!~index) {
+            throw new Error('No sound found');
+        }
+        const path =
+            sound.fileurl ||
+            `${Entry.defaultPath}/uploads/${sound.filename.substring(
+                0,
+                2
+            )}/${sound.filename.substring(2, 4)}/${Entry.soundPath}${sound.filename}${sound.ext ||
+                '.mp3'}`;
+        sounds[index] = Object.assign(
+            _.pick(sound, [
+                'duration',
+                'ext',
+                'fileurl',
+                'filename',
+                'id',
+                'label',
+                'name',
+                'path',
+            ]),
+            {
+                view: sounds[index].view,
+                path,
+            }
+        );
+        return sounds[index];
     }
 
     destroy() {

@@ -7,7 +7,7 @@ declare type Point = {
     y: number;
 };
 
-declare interface ISkeleton {
+export declare interface ISkeleton {
     executable?: boolean;
     fontSize?: number;
     movable?: boolean;
@@ -42,7 +42,7 @@ declare interface ISkeleton {
     statementPos?: (blockView: any) => Point[];
 }
 
-declare interface MediaUtilsInterface {
+export declare interface MediaUtilsInterface {
     initialize(list?: string[][]): void;
 
     reset(): void;
@@ -62,17 +62,18 @@ declare interface EntryDomOptions {
     parent?: EntryDom;
 }
 
-declare interface EntryDom extends JQuery {
+export declare interface EntryDom extends JQuery {
     innerHTML?: string;
+    textContent?: string;
     bindOnClick?: (e: any) => this;
 }
 
-declare type EntryDomConstructor = (
+export declare type EntryDomConstructor = (
     tag: string | HTMLElement | JQuery,
     options?: EntryDomOptions
 ) => EntryDom;
 
-interface HardwareMessageData extends HardwareModuleId {
+export interface HardwareMessageData extends HardwareModuleId {
     [key: string]: any;
 }
 
@@ -81,13 +82,15 @@ interface HardwareModuleId {
     model: string;
 }
 
-type WebSocketMessage = {
+export type WebSocketMessage = {
     data: string;
     mode: number;
     type: 'utf8';
 };
 
-declare module IEntry {
+declare module SerialPort {}
+
+export declare module IEntry {
     export interface Container {
         resizeEvent: any; // Entry.Event
         splitterEnable?: boolean;
@@ -140,7 +143,7 @@ declare module IEntry {
     // Entry namespace 에 필요한 객체가 있으면 추가해주세요.
 }
 
-declare type EntryBlock = {
+export declare type EntryBlock = {
     color: string;
     outerLine?: string;
     skeleton: string;
@@ -168,14 +171,14 @@ declare type EntryBlock = {
 };
 
 // expansion blocks 의 스키마를 따름
-declare interface EntryBlockModule {
+export declare interface EntryBlockModule {
     name: string;
     title: { [key: string]: string };
     description?: string;
     getBlocks: () => { [blockName: string]: EntryBlock };
 }
 
-declare interface EntryHardwareBlockModule extends EntryBlockModule {
+export declare interface EntryHardwareBlockModule extends EntryBlockModule {
     // 홍보용
     imageName: string;
     url: string;
@@ -198,3 +201,56 @@ declare interface EntryHardwareBlockModule extends EntryBlockModule {
     afterSend?: (sendQueue: HardwareMessageData) => void; // 데이서 송신 이후
     dataHandler?: (data: HardwareMessageData) => void;
 }
+
+export declare interface EntryHWLiteBaseModule extends EntryBlockModule {
+    getMonitorPort(): Object;
+    duration: number;
+    // 홍보용
+    imageName: string;
+    url: string;
+
+    // 모듈 정의용
+    id: string;
+    monitorTemplate?: UnknownAny;
+    portData?: HWLiteSerialInfo;
+    bluetoothInfo?: HWLiteBluetoothInfo;
+    type?: 'master' | 'slave';
+    delimeter?: string | number;
+    webapiType?: 'ble' | 'usb' | 'serial';
+    firmwareFlash?: boolean;
+
+    // 필수 함수 목록
+    setZero: () => void;
+    blockMenuBlocks: string[];
+    setLanguage: () => {
+        [langType: string]: { [type: string]: { [templateName: string]: string } };
+    };
+    handleLocalData: (value: any) => void;
+    initialHandshake: () => any;
+    requestLocalData: () => string;
+}
+
+export declare interface HWLiteSerialInfo {
+    baudRate: number;
+    dataBits: number;
+    parity: 'none' | 'even' | 'odd';
+    stopBits: 1 | 2;
+    bufferSize: number;
+    connectionType?: 'bytestream' | 'ascii';
+    constantServing?: boolean | 'ReadOnly';
+    constantRead?: boolean;
+    writeAscii?: boolean;
+    readAscii?: boolean;
+    flowControl?: 'hardware';
+}
+
+export declare interface HWLiteBluetoothInfo {
+    filters: BluetoothLEScanFilter[];
+    optionalServices: string[];
+}
+
+export declare type HWLiteStatus =
+    | 'disconnected'
+    | 'connected'
+    | 'willDisconnect'
+    | 'connectFailed';

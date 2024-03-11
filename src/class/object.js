@@ -46,6 +46,10 @@ Entry.EntryObject = class {
                     : this.getPicture(model.selectedPictureId);
             }
 
+            if (this.sounds?.length) {
+                this.selectedSound = this.sounds[0];
+            }
+
             this.scene = Entry.scene.getSceneById(model.scene) || Entry.scene.selectedScene;
 
             this.setRotateMethod(model.rotateMethod);
@@ -410,6 +414,14 @@ Entry.EntryObject = class {
         this.updateThumbnailView();
     }
 
+    selectSound(soundId) {
+        const sound = this.getSound(soundId);
+        if (!sound) {
+            throw new Error(`No sound with soundId : ${soundId}`);
+        }
+        this.selectedSound = sound;
+    }
+
     /**
      * Add sound to object
      * @param {sound model} sound
@@ -426,7 +438,8 @@ Entry.EntryObject = class {
         } else {
             this.sounds.splice(index, 0, sound);
         }
-        Entry.playground.injectSound();
+
+        Entry.playground.injectSound(this);
     }
 
     /**
@@ -434,10 +447,21 @@ Entry.EntryObject = class {
      * @param {string} soundId
      */
     removeSound(soundId) {
+        const playground = Entry.playground;
+        const sound = this.getSound(soundId);
+
         const index = _findIndex(this.sounds, (sound) => sound.id === soundId);
         this.sounds.splice(index, 1);
-        Entry.playground.reloadPlayground();
+        if (sound === this.selectedSound) {
+            if (this.sounds?.length) {
+                playground.selectSound(this.sounds[0], true);
+            } else {
+                this.selectedSound = undefined;
+            }
+        }
+
         Entry.playground.injectSound();
+        Entry.playground.reloadPlayground();
     }
 
     /**
@@ -543,7 +567,10 @@ Entry.EntryObject = class {
 
         this.clonedEntities.push(clonedEntity);
         let targetIndex = Entry.stage.selectedObjectContainer.getChildIndex(entity.object);
-        targetIndex -= (entity.shapes.length ? 1 : 0) + entity.stamps.length;
+
+        const offsetCount = (entity.shapes.length ? 1 : 0) + (entity.paintShapes.length ? 1 : 0);
+        targetIndex -= offsetCount + entity.stamps.length;
+
         Entry.stage.loadEntity(clonedEntity, targetIndex);
 
         if (entity.brush) {
@@ -604,6 +631,10 @@ Entry.EntryObject = class {
         //1. soundId
         //2. soundName
         //3. index
+        if (!value) {
+            return this.selectedSound;
+        }
+
         value = String(value).trim();
         const sounds = this.sounds;
         const len = sounds.length;
@@ -720,12 +751,34 @@ Entry.EntryObject = class {
         const { backpackDisable } = options;
         const object = this;
         const container = Entry.container;
+        const objects = container._getSortableObjectList();
+        const objectIndex = objects.findIndex((item) => item.key == this.id);
         const contextMenus = [
             {
                 text: Lang.Workspace.context_duplicate,
                 enable: !Entry.engine.isState('run'),
                 callback() {
                     container.addCloneObject(object);
+                },
+            },
+            {
+                text: Lang.Workspace.copy_file,
+                callback() {
+                    container.setCopiedObject(object);
+                },
+            },
+            {
+                text: Lang.Blocks.Paste_blocks,
+                enable: !Entry.engine.isState('run') && !!container.copiedObject,
+                callback() {
+                    if (container.copiedObject) {
+                        container.addCloneObject(container.copiedObject);
+                    } else {
+                        Entry.toast.alert(
+                            Lang.Workspace.add_object_alert,
+                            Lang.Workspace.object_not_found_for_paste
+                        );
+                    }
                 },
             },
             {
@@ -742,24 +795,17 @@ Entry.EntryObject = class {
                 },
             },
             {
-                text: Lang.Workspace.copy_file,
+                text: Lang.Workspace.bring_forward,
+                enable: objectIndex > 0,
                 callback() {
-                    container.setCopiedObject(object);
+                    Entry.do('objectReorder', objectIndex - 1, objectIndex);
                 },
             },
             {
-                text: Lang.Blocks.Paste_blocks,
-                enable: !Entry.engine.isState('run') && !!container.copiedObject,
+                text: Lang.Workspace.send_backward,
+                enable: objectIndex < objects.length - 1,
                 callback() {
-                    const container = Entry.container;
-                    if (container.copiedObject) {
-                        container.addCloneObject(container.copiedObject);
-                    } else {
-                        Entry.toast.alert(
-                            Lang.Workspace.add_object_alert,
-                            Lang.Workspace.object_not_found_for_paste
-                        );
-                    }
+                    Entry.do('objectReorder', objectIndex + 1, objectIndex);
                 },
             },
         ];
@@ -899,7 +945,7 @@ Entry.EntryObject = class {
             'entryObjectRotateMethodLabelWorkspace'
         );
         rotationMethodWrapper.appendChild(rotateMethodLabelView);
-        rotateMethodLabelView.innerHTML = `${Lang.Workspace.rotate_method}`;
+        rotateMethodLabelView.textContent = `${Lang.Workspace.rotate_method}`;
 
         const rotateModeAView = Entry.createElement('span').addClass(
             'entryObjectRotateModeWorkspace entryObjectRotateModeAWorkspace'
@@ -947,16 +993,15 @@ Entry.EntryObject = class {
             'entryObjectRotateWorkspaceWrapper'
         );
         const rotateSpan = Entry.createElement('span').addClass('entryObjectRotateSpanWorkspace');
-        rotateSpan.innerHTML = `${Lang.Workspace.rotation}`;
+        rotateSpan.textContent = `${Lang.Workspace.rotation}`;
         const RotateDegCoordi = Entry.createElement('span').addClass(
-            'entryObjectCoordinateSpanWorkspace'
+            'entryObjectCoordinateSpanWorkspace degree'
         );
-        RotateDegCoordi.innerHTML = '°';
 
         const rotateInput = Entry.createElement('input').addClass(
             'entryObjectRotateInputWorkspace'
         );
-        rotateInput.setAttribute('type', 'number');
+        rotateInput.setAttribute('type', 'text');
         rotateInput.onkeypress = this.editObjectValueWhenEnterPress;
         rotateInput.onfocus = this._setFocused;
         rotateInput.onblur = this._setBlurredTimer(() => {
@@ -987,15 +1032,14 @@ Entry.EntryObject = class {
         const directionSpan = Entry.createElement('span').addClass(
             'entryObjectDirectionSpanWorkspace'
         );
-        directionSpan.innerHTML = `${Lang.Workspace.direction}`;
+        directionSpan.textContent = `${Lang.Workspace.direction}`;
         const DirectionDegCoordi = Entry.createElement('span').addClass(
-            'entryObjectCoordinateSpanWorkspace'
+            'entryObjectCoordinateSpanWorkspace degree'
         );
-        DirectionDegCoordi.innerHTML = '°';
         const directionInput = Entry.createElement('input').addClass(
             'entryObjectDirectionInputWorkspace'
         );
-        directionInput.setAttribute('type', 'number');
+        directionInput.setAttribute('type', 'text');
         directionInput.onkeypress = this.editObjectValueWhenEnterPress;
         directionInput.onfocus = this._setFocused;
         directionInput.onblur = this._setBlurredTimer(() => {
@@ -1041,9 +1085,9 @@ Entry.EntryObject = class {
             'entryObjectCoordinateWorkspaceWrapper'
         );
         const xCoordi = Entry.createElement('span').addClass('entryObjectCoordinateSpanWorkspace');
-        xCoordi.innerHTML = 'X';
+        xCoordi.textContent = 'X';
         const xInput = Entry.createElement('input').addClass('entryObjectCoordinateInputWorkspace');
-        xInput.setAttribute('type', 'number');
+        xInput.setAttribute('type', 'text');
         xInput.onkeypress = this.editObjectValueWhenEnterPress;
         xInput.onfocus = this._setFocused;
         xInput.onblur = this._setBlurredTimer(() => {
@@ -1064,15 +1108,15 @@ Entry.EntryObject = class {
             'entryObjectCoordinateWorkspaceWrapper'
         );
         const yCoordi = Entry.createElement('span').addClass('entryObjectCoordinateSpanWorkspace');
-        yCoordi.innerHTML = 'Y';
+        yCoordi.textContent = 'Y';
         const PerCoordi = Entry.createElement('span').addClass(
             'entryObjectCoordinateSpanWorkspace'
         );
-        PerCoordi.innerHTML = '%';
+        PerCoordi.textContent = '%';
         const yInput = Entry.createElement('input').addClass(
             'entryObjectCoordinateInputWorkspace entryObjectCoordinateInputWorkspace_right'
         );
-        yInput.setAttribute('type', 'number');
+        yInput.setAttribute('type', 'text');
         yInput.onkeypress = this.editObjectValueWhenEnterPress;
         yInput.onfocus = this._setFocused;
         yInput.onblur = this._setBlurredTimer(() => {
@@ -1092,12 +1136,12 @@ Entry.EntryObject = class {
             'entryObjectCoordinateSizeWrapper'
         );
         const sizeSpan = Entry.createElement('span').addClass('entryObjectCoordinateSizeWorkspace');
-        sizeSpan.innerHTML = `${Lang.Workspace.Size}`;
+        sizeSpan.textContent = `${Lang.Workspace.Size}`;
         const sizeInput = Entry.createElement('input').addClass(
             'entryObjectCoordinateInputWorkspace',
             'entryObjectCoordinateInputWorkspace_size'
         );
-        sizeInput.setAttribute('type', 'number');
+        sizeInput.setAttribute('type', 'text');
         sizeInput.onkeypress = this.editObjectValueWhenEnterPress;
         sizeInput.onfocus = this._setFocused;
         sizeInput.onblur = this._setBlurredTimer(() => {
