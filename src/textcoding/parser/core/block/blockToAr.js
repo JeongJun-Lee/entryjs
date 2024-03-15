@@ -593,7 +593,11 @@ Entry.BlockToArParser = class {
 
                 stat = stat.replace('%1', this._pinNum);
                 stat = stat.replace('%2', octave_tone_hz[value-1][charToIdx[value2]]);
-                stat = stat + ` delay(${value3 * 1000});`
+                stat = stat.replace('%3', value3 * 1000);
+                if (value2 == '0') {
+                    stat = `noTone(${this._pinNum});`;
+                }
+                stat = stat + ` delay(${value3 * 1000});`;
                 break;
 
             case 'arduino_ext_get_ultrasonic_value':
