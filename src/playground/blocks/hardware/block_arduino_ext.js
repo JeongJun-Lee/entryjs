@@ -1378,7 +1378,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [{syntax: 'tone(%1, %2);'}]
+                ar: [{syntax: 'tone(%1, %2, %3);'}]
             },
         },
         arduino_ext_set_servo: {
