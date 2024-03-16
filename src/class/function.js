@@ -545,8 +545,8 @@ class EntryFunc {
             } else {
                 blockMenu.banClass('useLocalVariables', true);
             }
-            Entry.variableContainer &&
-                Entry.variableContainer.updateFuncSettingView(this.targetFunc);
+            Entry.variableContainer; /*&& // To disable rtn_val&local_var functionality
+                Entry.variableContainer.updateFuncSettingView(this.targetFunc);*/
         } else {
             !workspace.isVimMode() && blockMenu.unbanClass('functionInit', true);
             blockMenu.banClass('functionEdit', true);

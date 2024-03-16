@@ -269,7 +269,7 @@ Entry.VariableContainer = class VariableContainer {
             }
         } else if (object instanceof Entry.Func) {
             this.generateFuncSettingView(object);
-            this.updateFuncSettingView(object);
+            // this.updateFuncSettingView(object); // To disable rtn_val&local_var functionality
         } else {
             this.renderMessageReference(object);
         }
@@ -456,23 +456,24 @@ Entry.VariableContainer = class VariableContainer {
         }
         this.funcSettingView = element;
 
-        const funcAttr = createElement('div')
-            .addClass('func_attr')
-            .appendTo(element);
-        if (this._isPythonMode()) {
-            funcAttr.addClass('hidden');
-        }
-        const boxSubject = createElement('span')
-            .addClass('box_sjt')
-            .appendTo(funcAttr);
-        boxSubject.textContent = Lang.Workspace.func_property;
+        // To disable rtn_val&local_var functionality
+        // const funcAttr = createElement('div')
+        //     .addClass('func_attr')
+        //     .appendTo(element);
+        // if (this._isPythonMode()) {
+        //     funcAttr.addClass('hidden');
+        // }
+        // const boxSubject = createElement('span')
+        //     .addClass('box_sjt')
+        //     .appendTo(funcAttr);
+        // boxSubject.textContent = Lang.Workspace.func_property;
 
-        this.generateFuncDefaultView(funcAttr, func);
-        this.generateFuncLocalVariableView(funcAttr, func);
-        this.generateFuncValuesView(funcAttr, func);
+        // this.generateFuncDefaultView(funcAttr, func);
+        // this.generateFuncLocalVariableView(funcAttr, func);
+        // this.generateFuncValuesView(funcAttr, func);
         this.renderFunctionReference(func);
 
-        this.funcSettingView.func = funcAttr;
+        // this.funcSettingView.func = funcAttr;
         func.listElement.appendChild(this.funcSettingView);
     }
 
