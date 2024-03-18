@@ -32,7 +32,7 @@ Entry.BlockCountViewer = class {
 
             let langText = Lang.Workspace.use_blocks_project;
             if (count === 1) {
-                langText = Lang.Workspace.use_block_project;
+                langText = Lang.Workspace.use_blocks_project;
             }
             this.blockCountView.innerHTML = Entry.Utils.stringFormat(
                 langText,

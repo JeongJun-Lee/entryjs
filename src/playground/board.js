@@ -1521,7 +1521,7 @@ Entry.Board = class Board {
         const blocks = await Entry.Utils.getObjectsBlocksForEventThread(object);
         const count = _get(blocks, 'length', 0);
 
-        let langText = Lang.Workspace.use_blocks_project;
+        let langText = Lang.Workspace.use_block_project;
         if (count === 1) {
             langText = Lang.Workspace.use_block_project;
         }
