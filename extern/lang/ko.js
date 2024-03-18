@@ -7124,6 +7124,7 @@ Lang.template = {
     get_project_timer_value: '%1 %2',
     char_at: '%1 %2 %3 %4 %5',
     length_of_string: '%1 %2 %3',
+    reverse_of_string: '%1 %2 %3',
     substring: '%1 %2 %3 %4 %5 %6 %7',
     replace_string: '%1 %2 %3 %4 %5 %6 %7',
     change_string_case: '%1 %2 %3 %4 %5',
