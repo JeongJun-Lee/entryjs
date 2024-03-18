@@ -1359,7 +1359,7 @@ module.exports = {
                             [Lang.Blocks.CALC_get_date_year, 'YEAR'],
                             [Lang.Blocks.CALC_get_date_month, 'MONTH'],
                             [Lang.Blocks.CALC_get_date_day, 'DAY'],
-                            [Lang.Blocks.CALC_get_date_day_of_week, 'DAY_OF_WEEK'],
+                            // [Lang.Blocks.CALC_get_date_day_of_week, 'DAY_OF_WEEK'], // #2676 issue
                             [Lang.Blocks.CALC_get_date_hour, 'HOUR'],
                             [Lang.Blocks.CALC_get_date_minute, 'MINUTE'],
                             [Lang.Blocks.CALC_get_date_second, 'SECOND'],
@@ -1427,7 +1427,7 @@ module.exports = {
                                         [Lang.Blocks.CALC_get_date_hour, 'HOUR'],
                                         [Lang.Blocks.CALC_get_date_minute, 'MINUTE'],
                                         [Lang.Blocks.CALC_get_date_second, 'SECOND'],
-                                        [Lang.Blocks.CALC_get_date_day_of_week, 'DAY_OF_WEEK'],
+                                        // [Lang.Blocks.CALC_get_date_day_of_week, 'DAY_OF_WEEK'], // #2676 issue
                                     ],
                                     value: 'YEAR',
                                     fontSize: 11,
