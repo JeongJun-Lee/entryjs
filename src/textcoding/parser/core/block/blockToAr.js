@@ -482,6 +482,34 @@ Entry.BlockToArParser = class {
                 stat = value + operator + value2;
                 break;
 
+            case 'calc_basic':
+                value = Number(this._pramVal[0]); // String to Number
+                if (isNaN(value)) { // In case the value is not a number
+                    value = this._pramVal[0];
+                }
+                value2 = Number(this._pramVal[2]); // String to Number
+                if (isNaN(value2)) { // In case the value is not a number
+                    value2 = this._pramVal[2];
+                }
+
+                switch (this._pramVal[1]) {
+                    case 'PLUS':
+                        operator = ' + ';
+                        break;
+                    case 'MINUS':
+                        operator = ' - ';
+                        break;
+                    case 'MULTI':
+                        operator = ' * ';
+                        break;
+                    case 'DIVIDE':
+                        operator = ' / ';
+                        break;
+                }
+
+                stat = '('+ value + operator + value2 + ')';
+                break;
+
             case 'arduino_toggle_led': // digitalWrite
             case 'arduino_ext_toggle_led':
             case 'ITPLE_toggle_led':
