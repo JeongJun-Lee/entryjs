@@ -587,6 +587,7 @@ class TextCodingUtil {
             || blockType === 'boolean_and_or'
             || blockType === 'boolean_not'
             || blockType === 'quotient_and_mod'
+            || blockType === 'calc_basic'
             || blockType === 'set_variable'
             || blockType === 'change_variable'
             || blockType === 'get_variable'
