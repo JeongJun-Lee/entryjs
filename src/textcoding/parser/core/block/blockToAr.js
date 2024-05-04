@@ -148,7 +148,8 @@ Entry.BlockToArParser = class {
             block.type === 'arduino_ext_set_stepper' ||
             block.type === 'arduino_ext_get_ultrasonic_value' ||
             block.type === 'ITPLE_get_ultrasonic_value' ||
-            block.type === 'arduino_ext_set_temp_humi_init'
+            block.type === 'arduino_ext_set_temp_humi_init' ||
+            block.type === 'arduino_ext_set_irremote_init'
         )) {
             this.insertIntoGlobal(block.type);
         }
@@ -160,12 +161,11 @@ Entry.BlockToArParser = class {
             (this.isFunc(block) && addFunc) // User defined function
         )) {
             this.AddUserFunc(stat);
-
         } else {
             // In the setup();
             if (!this._isInRepeat) { // If the block is Not in the repeat, locate it in the setup();
                 let idx = this._source.indexOf('}\n'); // At the end of the setup()
-                this._source.splice(idx, 0, stat); 
+                this._source.splice(idx, 0, stat);
 
             } else { // In the loop()
                 this._source.splice(this._curLine, 0, stat);
@@ -188,11 +188,13 @@ Entry.BlockToArParser = class {
             stat = '#include <Servo.h>\nServo myServo;\n';
         } else if (blockType === 'arduino_ext_set_stepper') {
             stat = `#include <Stepper.h>\nStepper myStepper(2048, ${this._pinNum}, ${this._pinNum2}, ${this._pinNum3}, ${this._pinNum4});\n`;
-        } else if (blockType === 'arduino_ext_set_temp_humi_init') {
-            stat = `#include <DHT.h>\nDHT dht(${this._pinNum}, DHT11);\n`;
         } else if (blockType === 'arduino_ext_get_ultrasonic_value' || 
                     blockType === 'ITPLE_get_ultrasonic_value') {
             stat = `int trig = ${this._pinNum};\nint echo = ${this._pinNum2};\n`;
+        } else if (blockType === 'arduino_ext_set_temp_humi_init') {
+            stat = `#include <DHT.h>\nDHT dht(${this._pinNum}, DHT11);\n`;
+        } else if (blockType === 'arduino_ext_set_irremote_init') {
+            stat = `#include <IRremote.h>\nIRrecv irrecv(${this._pinNum});\ndecode_results results;\n`;
         } else { // variable
             stat = Entry.TextCodingUtil.generateVariablesDeclarationForAr();
         }
@@ -334,8 +336,8 @@ Entry.BlockToArParser = class {
             // Even usage of variable in the block without setting initial value(set_variable)
             // Declare the variable at global area, But in case of normal, just return with param value
             if (block.type === 'get_variable') {
-                this.insertIntoGlobal(block.type); 
-            } 
+                this.insertIntoGlobal(block.type);
+            }
             return val[0];
 
         } else if (
@@ -541,7 +543,7 @@ Entry.BlockToArParser = class {
                         value = 255;
                     }
                 }
-                
+
                 stat = stat.replace('%1', this._pinNum);
                 stat = stat.replace('%2', value);
                 break;
@@ -554,7 +556,7 @@ Entry.BlockToArParser = class {
                 this._funcName = stat.split('(')[0];
                 this._pinNum = Number(this._pramVal[0]); // Arr to Number
                 this.errChkPinNum(this._pinNum, block);
-                
+
                 stat = stat.replace('%1', this._pinNum);
                 break;
 
@@ -636,7 +638,7 @@ Entry.BlockToArParser = class {
                 this.errChkPinNum(this._pinNum, block);
                 this._pinNum2 = Number(this._pramVal[1]); // echo
                 this.errChkPinNum(this._pinNum2, block);
-                
+
                 // Don't fix the tab spaces in the distance func below
                 this.insertIntoSrc(
 `int distance() {
@@ -655,16 +657,16 @@ Entry.BlockToArParser = class {
                 break;
 
             case 'arduino_ext_set_servo':
-                stat = block._schema.syntax.ar[0].syntax; 
+                stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
                 this._pinNum = Number(this._pramVal[0]); // Arr to Number
                 this.errChkPinNum(this._pinNum, block);
-                value = this._pramVal[1]; 
+                value = this._pramVal[1];
                 stat = stat.replace('%1', value);
                 break;
 
             case 'arduino_ext_set_stepper':
-                stat = block._schema.syntax.ar[0].syntax; 
+                stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
                 this._pinNum = Number(this._pramVal[0]); // Arr to Number
                 this.errChkPinNum(this._pinNum, block);
@@ -674,21 +676,23 @@ Entry.BlockToArParser = class {
                 this.errChkPinNum(this._pinNum, block);
                 this._pinNum4 = Number(this._pramVal[3]); // Arr to Number
                 this.errChkPinNum(this._pinNum, block);
-                value = this._pramVal[5]; 
+                value = this._pramVal[5];
                 stat = stat.replace('%1', value);
                 break;
 
             case 'arduino_ext_set_temp_humi_init':
+            case 'arduino_ext_set_irremote_init':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
                 this._pinNum = Number(this._pramVal[0]); // Arr to Number
                 this.errChkPinNum(this._pinNum, block);
-                value = this._pramVal[1]; 
+                value = this._pramVal[1];
                 stat = stat.replace('%1', value);
-                break;  
+                break;
 
             case 'arduino_ext_get_temp_value':
             case 'arduino_ext_get_humi_value':
+            case 'arduino_ext_get_irremote_value':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
                 break;
@@ -696,13 +700,13 @@ Entry.BlockToArParser = class {
             case 'set_variable':
                 stat = block._schema.syntax.ar[0].syntax;
                 stat = stat.replace('%1', this._pramVal[0]);
-                stat = stat.replace('%2', this._pramVal[1]); 
+                stat = stat.replace('%2', this._pramVal[1]);
                 break;
 
             case 'change_variable':
                 stat = block._schema.syntax.ar[0].syntax;
                 stat = stat.replace('%1', this._pramVal[0]);
-                stat = stat.replace('%2', this._pramVal[1]); 
+                stat = stat.replace('%2', this._pramVal[1]);
                 break;
         }
 
@@ -712,8 +716,6 @@ Entry.BlockToArParser = class {
         }
 
         this.insertIntoSetup(); // Frist, Setup the pin mode in case of Digital
-
-        
         return stat;
     }
 
