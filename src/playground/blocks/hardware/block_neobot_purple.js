@@ -570,17 +570,17 @@ Entry.NeobotPurple.setLanguage = function() {
 
                 // decision
                 neobot_purple_decision_sensor_is_over: '%1 %2 %3',
-                neobot_purple_decision_equal_with_sensor: '%1 цвет %2',
-                neobot_purple_decision_sensor_angle: '%1 градус %2 %3',
+                neobot_purple_decision_equal_with_sensor: 'цвет %1 %2',
+                neobot_purple_decision_sensor_angle: 'градус %1  %2 %3',
 
                 // remote
-                neobot_purple_remote_button: 'Нажать кнопку %1 на схеме упровление',
+                neobot_purple_remote_button: 'Нажатие кнопки %1 на пульта упровления',
 
                 // LED
                 // neobot_purple_arg_led_duration: '%1',
                 neobot_purple_led_on: 'Включить LED %1 %2 %3 %4',
                 neobot_purple_output_led_off: "Выключить LED %1 %2",
-                neobot_purple_led_brightness_with_sensor: "Контролировать LED %2 с помощью сенсора %1 %3",
+                neobot_purple_led_brightness_with_sensor: "Контролировать яркость LED %2 с помощью сенсора %1 %3",
                 neobot_purple_color_led_on: 'Включить цветовой LED  %1  R %2 G %3 B %4 %5',
 
                 // output
@@ -589,21 +589,21 @@ Entry.NeobotPurple.setLanguage = function() {
                 // motor
                 neobot_purple_robot: 'Робот %1 %2',
                 neobot_purple_motor_start: 'Запустит мотор: %1 %2 %3 %4 %5',
-                neobot_purple_motor_stop: "Остановить %1 мотор(ы) %2",
+                neobot_purple_motor_stop: "Остановить %1 мотор(а) %2",
                 // neobot_purple_arg_motor_speed: '%1',
                 // neobot_purple_arg_motor_duration: '%1',
 
                 // melody
-                neobot_purple_play_note_for: "Пищалка пищит: в октаве: %2 в шкале: %1 в ноте: %3 %4",
-                neobot_purple_melody_play_with_sensor: 'Выводить звук из сенсора %1 %2',
-                neobot_purple_melody_stop: "Приостоновить пищалку %1",
+                neobot_purple_play_note_for: "Диапазон частот пищалки: %1 диапазон нот: %2 нотa: %3 %4",
+                neobot_purple_melody_play_with_sensor: 'Пищалка активируется по значению датчика  %1 %2',
+                neobot_purple_melody_stop: "Остоновить пищалку %1",
 
                 // servo
                 // get_servo_degree: '%1',
-                neobot_purple_servo_init: 'Настроит %1 servo мотор к нулю %2',
+                neobot_purple_servo_init: 'Перезагрузить %1 сервомотор %2',
                 neobot_purple_servo_rotate: 'Повернуть servo мотор: %1 %2 %3 %4',
-                neobot_purple_servo_stop: "Приостоновить %1 servo мотор %2",
-                neobot_purple_servo_change_degree: "Изменить градус %1 Servo мотора: %2 %3 на %4 %5",
+                neobot_purple_servo_stop: "Остоновить %1 сервомотор %2",
+                neobot_purple_servo_change_degree: "Изменить угол %1 сервомотора: %2 %3 на %4 %5",
             },
             Blocks: {
                 //for dropdown
@@ -613,10 +613,10 @@ Entry.NeobotPurple.setLanguage = function() {
                 neobot_purple_port_4: 'IN4',
                 neobot_purple_port_12: 'IN1 & IN2',
                 neobot_purple_port_bat: 'Батарея',
-                neobot_purple_port_remot: 'Пуль упуправления',
+                neobot_purple_port_remot: 'Пульт упуправления',
                 neobot_purple_color_white: 'Белый',
                 neobot_purple_color_red: 'Красный',
-                neobot_purple_color_yellow: 'Желтый',
+                neobot_purple_color_yellow: 'Жёлтый',
                 neobot_purple_color_green: 'Зелёный',
                 neobot_purple_color_blue: "Синий",
                 neobot_purple_direction_forward: "Вперёд",
@@ -634,10 +634,10 @@ Entry.NeobotPurple.setLanguage = function() {
                 neobot_purple_sound_la: 'Ля',
                 neobot_purple_sound_la_shop: 'Ля#',
                 neobot_purple_sound_ti: 'Си',
-                neobot_purple_sound_half_note: 'Половина',
-                neobot_purple_sound_quarter_note: 'Четверть',
-                neobot_purple_sound_eighth_note: '1/8',
-                neobot_purple_sound_sixteenth_note: '1/16',
+                neobot_purple_sound_half_note: 'Половинная нота',
+                neobot_purple_sound_quarter_note: 'Четвертная нота',
+                neobot_purple_sound_eighth_note: '1/8 нота',
+                neobot_purple_sound_sixteenth_note: '1/16 нота',
                 neobot_purple_sensor_infrared: 'Инфракрасный сенсор',
                 neobot_purple_sensor_light: 'Световой сенсор',
                 neobot_purple_sensor_sound: 'Звуковой сенсор',
@@ -658,27 +658,27 @@ Entry.NeobotPurple.setLanguage = function() {
                 neobot_purple_remote_btn_down: '▼',
                 neobot_purple_remote_btn_left: '◀',
                 neobot_purple_remote_btn_right: '▶',
-                neobot_purple_duration_cont: 'Продолжать',
+                neobot_purple_duration_cont: 'Постоянно',
                 neobot_purple_duration_1s: '1 секунда',
                 neobot_purple_duration_2s: '2 секунды',
                 neobot_purple_duration_3s: '3 секунды',
                 neobot_purple_duration_4s: '4 секунды',
-                neobot_purple_duration_5s: '5 секунды',
-                neobot_purple_duration_6s: '6 секунды',
-                neobot_purple_duration_7s: '7 секунды',
-                neobot_purple_duration_8s: '8 секунды',
-                neobot_purple_duration_9s: '9 секунды',
+                neobot_purple_duration_5s: '5 секунд',
+                neobot_purple_duration_6s: '6 секунд',
+                neobot_purple_duration_7s: '7 секунд',
+                neobot_purple_duration_8s: '8 секунд',
+                neobot_purple_duration_9s: '9 секунд',
                 neobot_purple_motor_both: 'Оба',
                 neobot_purple_motor_left: "Левый",
                 neobot_purple_motor_right: "Правый",
                 neobot_purple_motor_move_forward: "Идти вперед",
                 neobot_purple_motor_move_backward: "Идти назад",
-                neobot_purple_motor_move_left: 'Идти на лево',
-                neobot_purple_motor_move_right: "Идти на право",
+                neobot_purple_motor_move_left: 'Повернуть налево',
+                neobot_purple_motor_move_right: "Повернуть направо",
                 neobot_purple_motor_move_stop: "Стоп",
 
-                neobot_purple_servo_dir_1: "В сторону",
-                neobot_purple_servo_dir_2: 'Противоположная сторона',
+                neobot_purple_servo_dir_1: "По часовой ",
+                neobot_purple_servo_dir_2: 'Против часовой',
                 
                 neobot_purple_percent_10: '10% скорость',
                 neobot_purple_percent_20: '20% скорость',
@@ -691,7 +691,7 @@ Entry.NeobotPurple.setLanguage = function() {
                 neobot_purple_percent_90: '90% скорость',
                 neobot_purple_percent_100: '100% скорость',
 
-                neobot_purple_angle_0: '0 градус',
+                neobot_purple_angle_0: '0 градусов',
                 neobot_purple_angle_5: '5 градусов',
                 neobot_purple_angle_10: '10 градусов',
                 neobot_purple_angle_15: '15 градусов',
@@ -733,8 +733,8 @@ Entry.NeobotPurple.setLanguage = function() {
                 neobot_purple_angle_180: '180 градусов',
 
                 neobot_purple_out_all: 'Все',
-                neobot_purple_direction_left: 'Лево',
-                neobot_purple_direction_right: "Право",
+                neobot_purple_direction_left: 'Налево',
+                neobot_purple_direction_right: "Направо",
             },
         }, //
     };
