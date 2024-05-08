@@ -363,6 +363,13 @@ Entry.ArduinoExt.getBlocks = function() {
             isNotFor: ['ArduinoExt'],
             func(sprite, script) {
                 let port = script.getValue('PORT', script);
+                if (!Entry.hw.sendQueue.GET) {
+                    Entry.hw.sendQueue.GET = {};
+                }
+                Entry.hw.sendQueue.GET[Entry.ArduinoExt.sensorTypes.ANALOG] = {
+                    port,
+                    time: new Date().getTime(),
+                };
                 return Entry.hw.portData[`a${port}`];
             },
             syntax: {
