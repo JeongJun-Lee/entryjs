@@ -158,6 +158,7 @@ Entry.BlockToArParser = class {
         if (block && (
             block.type === 'arduino_ext_get_ultrasonic_value' ||
             block.type === 'ITPLE_get_ultrasonic_value' ||
+            block.type === 'arduino_ext_get_irremote_value' ||
             (this.isFunc(block) && addFunc) // User defined function
         )) {
             this.AddUserFunc(stat);
@@ -227,7 +228,7 @@ Entry.BlockToArParser = class {
         if (!this._source.find(val => { // Don't allow duplicated additon
             return val.includes(pinStat);
         })) {
-            let idx = this._source.indexOf('void setup() {'); 
+            let idx = this._source.indexOf('void setup() {');
             this._source.splice(++idx, 0, pinStat); // At nextline of the start of the setup()
             this._curLine++;
         }
@@ -247,12 +248,12 @@ Entry.BlockToArParser = class {
 
         return this._source.map((val) => {
             if (
-                val.includes('//') || 
-                val.includes('#include') || 
-                (!val.includes('for') && val.includes('int')) || 
-                val.includes('float') || 
-                val.includes('setup()') || 
-                val.includes('loop()') || 
+                val.includes('//') ||
+                val.includes('#include') ||
+                (!val.includes('for') && val.includes('int')) ||
+                val.includes('float') ||
+                val.includes('setup()') ||
+                val.includes('loop()') ||
                 val.includes('int distance()') ||  // ultrasonic
                 val.includes('void') || // user defined func doesn't have a return value
                 val === '}\n' // The end of the default func
@@ -692,9 +693,58 @@ Entry.BlockToArParser = class {
 
             case 'arduino_ext_get_temp_value':
             case 'arduino_ext_get_humi_value':
+                stat = block._schema.syntax.ar[0].syntax;
+                this._funcName = stat.split('(')[0];
+                break;
+
             case 'arduino_ext_get_irremote_value':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
+
+                // Don't fix the tab spaces in the distance func below
+                this.insertIntoSrc(
+`int translateIR() {
+    int value = -1;
+    
+    if (irrecv.decode(&results)) {
+      switch(results.value) {
+      case 0xFF6897:  
+        value = 0;
+        break;
+      case 0xFF30CF:  
+        value = 1;
+        break;
+      case 0xFF18E7:  
+        value = 2;
+        break;
+      case 0xFF7A85:  
+        value = 3;
+        break;
+      case 0xFF10EF:  
+        value = 4;
+        break;
+      case 0xFF38C7:  
+        value = 5;
+        break;
+      case 0xFF5AA5:  
+        value = 6;
+        break;
+      case 0xFF42BD:  
+        value = 7;
+        break;
+      case 0xFF4AB5:  
+        value = 8;
+        break;
+      case 0xFF52AD:  
+        value = 9;
+        break;
+      }
+    }
+  
+    irrecv.resume();
+    return value;
+}`
+                , block);
                 break;
 
             case 'set_variable':
