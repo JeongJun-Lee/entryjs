@@ -845,7 +845,7 @@ Entry.ArduinoExt.getBlocks = function() {
             events: {},
             def: {
                 params: [
-					'1',
+					'0',
                 ],
                 type: 'arduino_ext_get_humi_value',
             },
@@ -1011,7 +1011,7 @@ Entry.ArduinoExt.getBlocks = function() {
             syntax: {
                 js: [],
                 py: [{syntax: 'ArduinoExt.irRecvRead()'}],
-                ar: [{syntax: 'results.value'}]
+                ar: [{syntax: 'translateIR()'}]
             },
         },
         arduino_get_digital_toggle: {
