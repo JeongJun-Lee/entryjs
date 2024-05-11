@@ -43,9 +43,11 @@ Entry.ArduinoExt = {
         ULTRASONIC: 7,
         TIMER: 8,
         STEPPER: 9,
-        DHTTEMP: 10,
-        DHTHUMI: 11,
-        DHTINIT: 12,
+        DHTINIT: 10,
+        DHTTEMP: 11,
+        DHTHUMI: 12,
+        IRRINIT: 13,
+        IRREMOTE: 14,
     },
     toneTable: {
         '0': 0,
@@ -205,7 +207,9 @@ Entry.ArduinoExt.setLanguage = function() {
                 arduino_ext_set_temp_humi_init: "디지털 %1 번 핀에 연결된 온습도센서 사용하기 %2",
                 arduino_ext_get_temp_value: '온습도센서 온도값',
                 arduino_ext_get_humi_value: '온습도센서 습도값',
-                arduino_ext_set_stepper: '디지털 %1 %2 %3 %4 번 핀의 스텝모터를 %5 RPM으로 %6 스텝 이동하기 %7'
+                arduino_ext_set_stepper: '디지털 %1 %2 %3 %4 번 핀의 스텝모터를 %5 RPM으로 %6 스텝 이동하기 %7',
+                arduino_ext_set_irremote_init: "디지털 %1 번 핀에 연결된 적외선 수신기 사용하기 %2",
+                arduino_ext_get_irremote_value: '수신된 적외선 신호값',
             },
         },
         en: {
@@ -221,7 +225,9 @@ Entry.ArduinoExt.setLanguage = function() {
                 arduino_ext_set_temp_humi_init: "Init temp-humid pin %1 %2",
                 arduino_ext_get_temp_value: 'Temp sensor value',
                 arduino_ext_get_humi_value: 'Humidity sensor value',
-                arduino_ext_set_stepper: 'Set stepper pin %1 %2 %3 %4 RPM as %5 and steps as %6 %7'
+                arduino_ext_set_stepper: 'Set stepper pin %1 %2 %3 %4 RPM as %5 and steps as %6 %7',
+                arduino_ext_set_irremote_init: "Init IR receiver pin %1  %2",
+                arduino_ext_get_irremote_value: 'Received IR signal value',
             },
         },
         uz: {
@@ -234,12 +240,32 @@ Entry.ArduinoExt.setLanguage = function() {
                 arduino_ext_set_tone: "Raqamli %1 pinni buzzerni %2 %3 oktavada %4 soniya yangrash %5",
                 arduino_ext_set_servo: "Raqamli %1 pinning servo motorini %2 gradusiga sozlash %3",
                 arduino_ext_get_digital: "Raqamli %1 pin sensor qiymati",
-                arduino_ext_set_temp_humi_init: "Harorat-namlik sensorni %1 pindan foydalanish",
+                arduino_ext_set_temp_humi_init: "Harorat-namlik sensorni %1 pindan foydalanish %2",
                 arduino_ext_get_temp_value: 'Harorat sensor qiymati',
                 arduino_ext_get_humi_value: 'Namlik sensor qiymati',
-                arduino_ext_set_stepper: "Raqamli %1 %2 %3 %4 pinning stepper motorini %5 RPMdan %6 qadam ko'chirish %7"
+                arduino_ext_set_stepper: "Raqamli %1 %2 %3 %4 pinning stepper motorini %5 RPMdan %6 qadam ko'chirish %7",
+                arduino_ext_set_irremote_init: "Pult signali qabulqiluvchini %1 pindan foydalanish %2",
+                arduino_ext_get_irremote_value: 'Pultdan bosilgan raqami',
           },
-      },
+        },
+        ru: {
+            template: {
+                  arduino_ext_get_analog_value: "Аналоговое значение датчика %1",
+                  arduino_ext_get_analog_value_map: "Изменить диапазон %1 с %2 на %3, на %4 и на %5.",
+                  arduino_ext_get_ultrasonic_value: "Чтение триггерного пина ультразвукового датчика %1, эхо-пина %2",
+                  arduino_ext_toggle_led: "Цифровой пин %1 %2 %3",
+                  arduino_ext_digital_pwm: "Установить цифровой вывод %1 на %2 %3",
+                  arduino_ext_set_tone: "Включите пищалку на цифровом выводе %1 звуковым сигналом %2 %3 в течение %4 секунд %5",
+                  arduino_ext_set_servo: "Установить сервомотор %1 на угол %2 %3.",
+                  arduino_ext_get_digital: "Цифровое значение датчика %1",
+                  arduino_ext_set_temp_humi_init: "Инициализация датчика температуры и влажности, подключенного к цифровому выводу %1 %2",
+                  arduino_ext_get_temp_value: 'Значение температуры датчика температуры',
+                  arduino_ext_get_humi_value: 'Значение влажности датчика влажности',
+                  arduino_ext_set_stepper: "Установить шаговый пин %1 %2 %3 %4 об/мин как %5 и шаги как %6 %7",
+                  arduino_ext_set_irremote_init: "Инициализировать пин ИК-приемника %1 %2",
+                  arduino_ext_get_irremote_value: 'Полученное значение ИК-сигнала',
+            },
+          },
     };
 };
 
@@ -255,7 +281,9 @@ Entry.ArduinoExt.blockMenuBlocks = [
     'arduino_ext_digital_pwm',
     'arduino_ext_set_servo',
     'arduino_ext_set_tone',
-    'arduino_ext_set_stepper'
+    'arduino_ext_set_stepper',
+    'arduino_ext_set_irremote_init',
+    'arduino_ext_get_irremote_value',
 ];
 
 //region arduinoExt 아두이노 확장모드
@@ -353,6 +381,13 @@ Entry.ArduinoExt.getBlocks = function() {
             isNotFor: ['ArduinoExt'],
             func(sprite, script) {
                 let port = script.getValue('PORT', script);
+                if (!Entry.hw.sendQueue.GET) {
+                    Entry.hw.sendQueue.GET = {};
+                }
+                Entry.hw.sendQueue.GET[Entry.ArduinoExt.sensorTypes.ANALOG] = {
+                    port,
+                    time: new Date().getTime(),
+                };
                 return Entry.hw.portData[`a${port}`];
             },
             syntax: {
@@ -810,7 +845,7 @@ Entry.ArduinoExt.getBlocks = function() {
             events: {},
             def: {
                 params: [
-					'1',
+					'0',
                 ],
                 type: 'arduino_ext_get_humi_value',
             },
@@ -841,6 +876,142 @@ Entry.ArduinoExt.getBlocks = function() {
                 js: [],
                 py: [{syntax: 'ArduinoExt.humidityRead()'}],
                 ar: [{syntax: 'dht.readHumidity()'}]
+            },
+        },
+        arduino_ext_set_irremote_init: {
+            color: EntryStatic.colorSet.block.default.HARDWARE,
+            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            fontColor: '#fff',
+            skeleton: 'basic',
+            statements: [],
+            params: [
+                {
+                    type: 'Block',
+                    accept: 'string',
+                    defaultType: 'number',
+                },
+                {
+                    type: 'Indicator',
+                    img: 'block_icon/hardware_icon.svg',
+                    size: 12,
+                },
+            ],
+            events: {},
+            def: {
+                params: [
+                    {
+                        type: 'arduino_get_port_number',
+                        params: [3],
+                    },
+                ],
+                type: 'arduino_ext_set_irremote_init',
+            },
+            paramsKeyMap: {
+                PORT: 0,
+            },
+            class: 'irremote',
+            isNotFor: ['ArduinoExt'],
+            func(sprite, script) {
+                var sq = Entry.hw.sendQueue;
+                var port = script.getNumberValue('PORT', script);
+
+				if (!script.isStart) 
+                {
+					if (!sq.SET) {
+						sq.SET = {};
+					}
+					
+					var duration = Entry.ArduinoExt.TIME_500ms;
+                    script.isStart = true;
+                    script.timeFlag = 1;
+					
+					sq.SET[port] = {
+							type: Entry.ArduinoExt.sensorTypes.IRRINIT,
+							data: port,
+							time: new Date().getTime(),
+					};
+					setTimeout(function() {
+                        script.timeFlag = 0;
+                    }, duration );
+                    return script;
+				}
+				else if (script.timeFlag == 1)
+                {
+                    return script;
+                }
+                else 
+                {
+                    delete script.timeFlag;
+                    delete script.isStart;
+
+                    Entry.engine.isContinue = false;
+                    return script.callReturn();
+                }
+            },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'ArduinoExt.irRemoteInit(%1)',
+                        blockType: 'param',
+                        textParams: [
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                        ],
+                    },
+                ],
+                ar: [{syntax: 'irrecv.enableIRIn();'}]
+            },
+        },
+        arduino_ext_get_irremote_value: {
+            color: EntryStatic.colorSet.block.default.HARDWARE,
+            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            fontColor: '#fff',
+            skeleton: 'basic_string_field',
+            statements: [],
+            params: [
+                {
+                    type: 'Block',
+                    accept: 'string',
+                    defaultType: 'number',
+                },
+            ],
+            events: {},
+            def: {
+                params: [
+					'0',
+                ],
+                type: 'arduino_ext_get_irremote_value',
+            },
+            paramsKeyMap: {
+                RECV: 0,
+            },
+            class: 'irremote',
+            isNotFor: ['ArduinoExt'],
+            func(sprite, script) {
+                const recv = script.getNumberValue('RECV', script);
+
+                if (!Entry.hw.sendQueue.SET) {
+                    Entry.hw.sendQueue.SET = {};
+                }
+                delete Entry.hw.sendQueue.SET[recv];
+
+                if (!Entry.hw.sendQueue.GET) {
+                    Entry.hw.sendQueue.GET = {};
+                }
+				
+                Entry.hw.sendQueue.GET[Entry.ArduinoExt.sensorTypes.IRREMOTE] = {
+                    port: recv,
+                    time: new Date().getTime(),
+                };
+                return Entry.hw.portData.IRREMOTE || 0;
+            },
+            syntax: {
+                js: [],
+                py: [{syntax: 'ArduinoExt.irRecvRead()'}],
+                ar: [{syntax: 'translateIR()'}]
             },
         },
         arduino_get_digital_toggle: {
