@@ -1119,7 +1119,7 @@ Entry.ITPLE.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [{syntax: 'tone(%1, %2);'}]
+                ar: [{syntax: 'tone(%1, %2, %3);'}]
             },
         },
         arduino_ext_octave_list: {
