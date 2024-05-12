@@ -1394,6 +1394,7 @@ module.exports = {
                             [Lang.Blocks.CALC_get_date_year, 'YEAR'],
                             [Lang.Blocks.CALC_get_date_month, 'MONTH'],
                             [Lang.Blocks.CALC_get_date_day, 'DAY'],
+                            [Lang.Blocks.CALC_get_date_day_of_week, 'DAY_OF_WEEK'],
                             [Lang.Blocks.CALC_get_date_hour, 'HOUR'],
                             [Lang.Blocks.CALC_get_date_minute, 'MINUTE'],
                             [Lang.Blocks.CALC_get_date_second, 'SECOND'],
@@ -1436,6 +1437,8 @@ module.exports = {
                         return dateTime.getHours();
                     } else if (operator === 'MINUTE') {
                         return dateTime.getMinutes();
+                    } else if (operator === 'DAY_OF_WEEK') {
+                        return dateTime.getDay();
                     } else {
                         return dateTime.getSeconds();
                     }
