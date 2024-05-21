@@ -256,9 +256,9 @@ Entry.ArduinoExt.setLanguage = function() {
                 arduino_ext_set_stepper: "Raqamli %1 %2 %3 %4 pinning stepper motorini %5 RPMdan %6 qadam ko'chirish %7",
                 arduino_ext_set_irremote_init: "Pult signali qabul qiluvchini %1 pindan foydalanish %2",
                 arduino_ext_get_irremote_value: 'Pultdan bosilgan raqam',
-                arduino_ext_set_lcd_init: 'LCD 초기화 하기 %1',
-                arduino_ext_set_lcd_print: 'LCD %1 줄 %2 칸에 %3 을 쓰기 %4',
-                arduino_ext_set_lcd_clear: 'LCD 화면 지우기 %1',
+                arduino_ext_set_lcd_init: 'LCDni qaytadan tiklash %1',
+                arduino_ext_set_lcd_print: 'LCDning %1 -qatorida %2 -ustuniga %3 yozish %4',
+                arduino_ext_set_lcd_clear: 'LCD ekranni tozalash %1',
           },
         },
         ru: {
@@ -1969,7 +1969,7 @@ Entry.ArduinoExt.getBlocks = function() {
             syntax: { 
                 js: [], 
                 py: [{syntax: 'ArduinoExt.lcdInit()'}],
-                ar: [{syntax: 'lcd.init();'}]
+                ar: [{syntax: 'lcdObj->init();'}]
             },
         },	
         arduino_ext_set_lcd_print:
@@ -2028,6 +2028,8 @@ Entry.ArduinoExt.getBlocks = function() {
                 var column = script.getNumberValue('COLUMN');
                 if (column < 0) column = 0;
                 if (column > 15) column = 15;
+                if (row < 0) row = 0;
+                if (row > 1) row = 1;
                 var text = script.getValue('TEXT');
 
                 // 아래코드에서 보조 변수들(script.isStart, script.timeFlag등)이 들어간 이유는 fps(초당프레임)를 위해서입니다.
@@ -2087,7 +2089,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     }
                 ],
-                ar: [{syntax: 'lcd.print(%1, %2, %3);'}]
+                ar: [{syntax: 'lcdObj->setCursor(%1, %2);'}]
             },
         },
 		arduino_ext_set_lcd_clear: 
@@ -2129,7 +2131,7 @@ Entry.ArduinoExt.getBlocks = function() {
             syntax: { 
                 js: [], 
                 py: [{syntax: 'ArduinoExt.lcdClear()'}],
-                ar: [{syntax: 'lcd.clear();'}]
+                ar: [{syntax: 'lcdObj->clear();'}]
             },
         },
     };
