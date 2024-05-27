@@ -14,7 +14,7 @@ Entry.BlockToArParser = class {
 
     init() {
         this._iterVar = 'x';
-        this._source =  ['// Created by Entry\n', 'void setup() {', '}\n', 'void loop() {', '}\n'];
+        this._source = ['// Created by Entry\n', 'void setup() {', '}\n', 'void loop() {', '}\n'];
         this._curLine = this._source.length - 1; // the end of the source
         this._funcName = '';
         this._pinNum = -1;
@@ -114,7 +114,7 @@ Entry.BlockToArParser = class {
                             block.thread.parent.type === '_if' ||
                             block.thread.parent.type === 'if_else'
                         )) {
-                            this.insertIntoSrc('}');                            
+                            this.insertIntoSrc('}');
                         } else if (block.statements[idx].parent.type === 'repeat_inf') {
                             this._isInRepeat = false;
                         }
@@ -149,7 +149,8 @@ Entry.BlockToArParser = class {
             block.type === 'arduino_ext_get_ultrasonic_value' ||
             block.type === 'ITPLE_get_ultrasonic_value' ||
             block.type === 'arduino_ext_set_temp_humi_init' ||
-            block.type === 'arduino_ext_set_irremote_init'
+            block.type === 'arduino_ext_set_irremote_init' ||
+            block.type === 'arduino_ext_set_lcd_init'
         )) {
             this.insertIntoGlobal(block.type);
         }
@@ -162,6 +163,8 @@ Entry.BlockToArParser = class {
             (this.isFunc(block) && addFunc) // User defined function
         )) {
             this.AddUserFunc(stat);
+        } else if (block && (block.type === 'arduino_ext_set_lcd_init')) {
+            // Just pass adding the code
         } else {
             // In the setup();
             if (!this._isInRepeat) { // If the block is Not in the repeat, locate it in the setup();
@@ -196,6 +199,26 @@ Entry.BlockToArParser = class {
             stat = `#include <DHT.h>\nDHT dht(${this._pinNum}, DHT11);\n`;
         } else if (blockType === 'arduino_ext_set_irremote_init') {
             stat = `#include <IRremote.h>\nIRrecv irrecv(${this._pinNum});\ndecode_results results;\n`;
+        } else if (blockType === 'arduino_ext_set_lcd_init') {
+            // Don't chagne the tab space of the codes below!!
+            stat =
+`#include <LCDI2C_Multilingual.h>
+#include <Wire.h>\n
+LCDI2C_RussianLatin *lcdObj = NULL;\n
+byte findI2CAddress() {
+    Wire.begin();
+    byte error, address = 0, foundAddress;
+    
+    for (address = 1; address < 127; address++ ) {
+        Wire.beginTransmission(address);
+        error = Wire.endTransmission();
+    
+        if (error == 0) {
+        foundAddress =  address;
+        } 
+    }
+    return foundAddress;
+}\n`;
         } else { // variable
             stat = Entry.TextCodingUtil.generateVariablesDeclarationForAr();
         }
@@ -223,6 +246,9 @@ Entry.BlockToArParser = class {
             case 'myServo.write': pinStat = `myServo.attach(${this._pinNum});`; break;
             case 'myStepper.step': pinStat = `myStepper.setSpeed(${this._pramVal[4]});`; break;
             case 'distance': pinStat = `pinMode(${this._pinNum}, OUTPUT);\n\tpinMode(${this._pinNum2}, INPUT);`; break;
+            case 'lcdObj->init':
+                pinStat = "lcdObj = new LCDI2C_RussianLatin(findI2CAddress(), 16, 2);\n    lcdObj->init();\n    lcdObj->backlight();\n    lcdObj->clear();";
+                break;
         }
 
         if (!this._source.find(val => { // Don't allow duplicated additon
@@ -250,11 +276,12 @@ Entry.BlockToArParser = class {
             if (
                 val.includes('//') ||
                 val.includes('#include') ||
-                (!val.includes('for') && val.includes('int')) ||
+                (!val.includes('for') && !val.includes('print') && val.includes('int')) ||
                 val.includes('float') ||
                 val.includes('setup()') ||
                 val.includes('loop()') ||
                 val.includes('int distance()') ||  // ultrasonic
+                val.includes('int translateIR()') || // irremote
                 val.includes('void') || // user defined func doesn't have a return value
                 val === '}\n' // The end of the default func
             ) {
@@ -332,7 +359,9 @@ Entry.BlockToArParser = class {
             block.type === 'arduino_ext_analog_list' ||
             block.type === 'ITPLE_analog_list' ||
             block.type === 'arduino_ext_octave_list' ||
-            block.type === 'arduino_ext_tone_list'
+            block.type === 'arduino_ext_tone_list' ||
+            block.type === 'arduino_ext_lcd_row_list' ||
+            block.type === 'arduino_ext_lcd_column_list'
         ) {
             // Even usage of variable in the block without setting initial value(set_variable)
             // Declare the variable at global area, But in case of normal, just return with param value
@@ -693,6 +722,8 @@ Entry.BlockToArParser = class {
 
             case 'arduino_ext_get_temp_value':
             case 'arduino_ext_get_humi_value':
+            case 'arduino_ext_set_lcd_init':
+            case 'arduino_ext_set_lcd_clear':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
                 break;
@@ -745,6 +776,34 @@ Entry.BlockToArParser = class {
     return value;
 }`
                 , block);
+                break;
+
+            case 'arduino_ext_set_lcd_print':
+                stat = block._schema.syntax.ar[0].syntax;
+                this._funcName = stat.split('(')[0];
+                value = this._pramVal[0];
+                if (Entry.Utils.isNumber(value)) {
+                    if (value < 0) { // min is 0
+                        this.throwErr('error', 'MinusInputVal', block);
+                    } else if (value > 1) { // max is 1
+                        this.throwErr('warn', 'ExcessiveInputVal', block);
+                        value = 1;
+                    }
+                }
+                value2 = this._pramVal[1];
+                if (Entry.Utils.isNumber(value)) {
+                    if (value < 0) { // min is 0
+                        this.throwErr('error', 'MinusInputVal', block);
+                    } else if (value > 15) { // max is 15
+                        this.throwErr('warn', 'ExcessiveInputVal', block);
+                        value = 15;
+                    }
+                }
+                value3 = this._pramVal[2]; // text
+
+                stat = stat.replace('%1', this._pramVal[0]);
+                stat = stat.replace('%2', this._pramVal[1]);
+                stat += `\n \tlcdObj->print("${value3}");`;
                 break;
 
             case 'set_variable':
