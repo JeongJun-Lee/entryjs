@@ -591,6 +591,8 @@ class TextCodingUtil {
             || blockType === 'set_variable'
             || blockType === 'change_variable'
             || blockType === 'get_variable'
+            || blockType === 'arduino_ext_lcd_column_list'
+            || blockType === 'arduino_ext_lcd_row_list'
             || blockType.includes('func_') // Functions
             || blockCategory === 'arduino' // HW blocks
             
