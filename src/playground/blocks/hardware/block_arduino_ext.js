@@ -94,6 +94,7 @@ Entry.ArduinoExt = {
         TIME_200ms: 200, 
         TIME_500ms: 500,    
         TIME_600ms: 600,   
+        TIME_100ms: 1000,   
     },
     BlockState: {},
     monitorTemplate: {
@@ -242,7 +243,7 @@ Entry.ArduinoExt.setLanguage = function() {
         },
         uz: {
           template: {
-                arduino_ext_get_analog_value: "Analog %1 pin sensor qiymati",
+                arduino_ext_get_analog_value: "Analog %1 pin qiymati",
                 arduino_ext_get_analog_value_map: "%1ning doirasini %2 ~ %3 dan %4 ~ %5 ga o'zgartirgan qiymati",
                 arduino_ext_get_ultrasonic_value: "Ultrasonik sensor trig %1 eko %2 sensor qiymati",
                 arduino_ext_toggle_led: "Raqamli %1 pinini %2 %3",
@@ -277,9 +278,9 @@ Entry.ArduinoExt.setLanguage = function() {
                 arduino_ext_set_stepper: "Установить шаговый пин %1 %2 %3 %4 об/мин как %5 и шаги как %6 %7",
                 arduino_ext_set_irremote_init: "Инициализировать пин ИК-приемника %1 %2",
                 arduino_ext_get_irremote_value: 'Полученное значение ИК-сигнала',
-                arduino_ext_set_lcd_init: 'LCD 초기화 하기',
-                arduino_ext_set_lcd_print: 'LCD %1 줄 %2 칸에 %3 을 쓰기 %4',
-                arduino_ext_set_lcd_clear: 'LCD 화면 지우기 %1',
+                arduino_ext_set_lcd_init: 'Инициализировать LCD экран %1',
+                arduino_ext_set_lcd_print: 'Написать %3 в стороке %1 в столбце %2 LCD %4',
+                arduino_ext_set_lcd_clear: 'Очистить LCD экран %1',
             },
           },
     };
@@ -1956,15 +1957,37 @@ Entry.ArduinoExt.getBlocks = function() {
             isNotFor: ['ArduinoExt'],
             func: function(sprite, script) 
 			{
-                if (!Entry.hw.sendQueue.SET) {
-                    Entry.hw.sendQueue.SET = {};
+                // 아래코드에서 보조 변수들(script.isStart, script.timeFlag등)이 들어간 이유는 fps(초당프레임)를 위해서입니다.
+                // 해당 코드가 없을 경우 최소 딜레이가 없기때문에 흐리게 나오는 문제가 발생합니다.
+                var sq = Entry.hw.sendQueue;
+                if (!script.isStart) {
+                    if (!sq['SET']) {
+                        sq['SET'] = {};
+                    }
+
+                    script.isStart = true;
+                    script.timeFlag = 1;
+                    var fps = Entry.FPS || 60;
+                    var timeValue = 60 / fps * Entry.ArduinoExt.TIME_1000ms;
+
+                    sq['SET'][15] = {
+                        type: Entry.ArduinoExt.sensorTypes.LCD_INIT,
+                        data: 255,
+                        time: new Date().getTime(),
+                    };
+
+                    setTimeout(function() {
+                        script.timeFlag = 0;
+                    }, timeValue);
+                    return script;
+                } else if (script.timeFlag == 1) {
+                    return script;
+                } else {
+                    delete script.timeFlag;
+                    delete script.isStart;
+                    Entry.engine.isContinue = false;
+                    return script.callReturn();
                 }
-                Entry.hw.sendQueue.SET[15] = {
-                    type: Entry.ArduinoExt.sensorTypes.LCD_INIT,
-                    data: 255,
-                    time: new Date().getTime(),
-                };
-                return script.callReturn();
             },
             syntax: { 
                 js: [], 
@@ -2042,7 +2065,7 @@ Entry.ArduinoExt.getBlocks = function() {
                     script.isStart = true;
                     script.timeFlag = 1;
                     var fps = Entry.FPS || 60;
-                    var timeValue = 60 / fps * 50;
+                    var timeValue = 60 / fps * Entry.ArduinoExt.TIME_50ms;
 
                     sq['SET'][15] = {
                         type: Entry.ArduinoExt.sensorTypes.LCD_PRINT,
