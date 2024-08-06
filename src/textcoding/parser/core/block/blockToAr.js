@@ -65,7 +65,7 @@ Entry.BlockToArParser = class {
         results = this.indent();
         console.log(results.join('\n'));
         return results.join('\n');
-    };
+    }
 
     isOver2StartBlk(code) { 
         const threads = code.getThreads();
@@ -87,7 +87,7 @@ Entry.BlockToArParser = class {
         }
 
         if (this._parseMode === Entry.Parser.PARSE_GENERAL) {
-            blocks.map((block) => {
+            blocks.forEach((block) => {
                 if (Entry.TextCodingUtil.hasUnSupportedBlkInAr(block)) {
                     this.throwErr('error', 'UnsupportedBlk', block);
                 } else {
@@ -110,7 +110,7 @@ Entry.BlockToArParser = class {
                         // When escape loop or condition, add closed frame
                         if (idx === block.statements.length - 1 && (
                             block.statements[idx].parent.type !== 'repeat_inf' ||
-                            block.thread.parent.type === 'repeat_basic' || 
+                            block.thread.parent.type === 'repeat_basic' ||
                             block.thread.parent.type === '_if' ||
                             block.thread.parent.type === 'if_else'
                         )) {
@@ -124,7 +124,7 @@ Entry.BlockToArParser = class {
         }
 
         return this._source;
-    };
+    }
 
     // If possilbe, find at early stage
     isUnsupportedBlkInTopLvl(blocks) {
@@ -337,13 +337,14 @@ byte findI2CAddress() {
             if (this.isRegisteredFunc(block)) {
                 this.funcSyntax = this.makeFuncSyntax(block);
             }
-        } 
+        }
 
         // Currently Not supported if the func has a argument
         if (this.funcSyntax.includes('%')) {
             this.throwErr('error', 'UnsupportedBlk', block);
         }
 
+        let resultTextCode = '';
         const val = this.getValueFromParam(block);
         val.length && (this._pramVal = val);
 
@@ -374,13 +375,36 @@ byte findI2CAddress() {
             block.type === '_if' ||
             block.type === 'if_else' 
         ) {
-            return `if (${val.pop()}) {`;
+            resultTextCode = `if (${val.pop()}) {`;
 
         } else {
-            return this.createSource(block);
+            resultTextCode = this.createSource(block);
         }
-        
-    };
+
+        // statement 를 포함하는 경우
+        if (block.statements.length) {
+            let midTextCode = '';
+            midTextCode = block.statements.map((thread) => {
+                let innerTextCode = '';
+                const statementTextCodes = [];
+                thread.getBlocks().forEach((block) => {
+                    if (this.getFuncInfo(block)) {
+                        statementTextCodes.push(this.makeFuncDef(block, true));
+                    } else {
+                        statementTextCodes.push(this.Block(block).concat('\n'));
+                    }
+                });
+                statementTextCodes.forEach((statementTextCode) => {
+                    innerTextCode += Entry.TextCodingUtil.indent(statementTextCode).concat('\n');
+                });
+                return innerTextCode;
+            });
+            resultTextCode = resultTextCode.concat('\n');
+            resultTextCode = resultTextCode.concat(midTextCode);
+            resultTextCode = resultTextCode.concat('}');
+        }
+        return resultTextCode;
+    }
 
     getValueFromParam(block) {
         let rtn = [];
@@ -415,7 +439,8 @@ byte findI2CAddress() {
                 if (
                     block.thread.parent.type === 'repeat_basic' || 
                     block.thread.parent.type === '_if' ||
-                    block.thread.parent.type === 'if_else'
+                    block.thread.parent.type === 'if_else' ||
+                    block.thread._event === 'funcDef'
                 ) {
                     stat = block._schema.syntax.ar[0].syntax;
                 } else {
@@ -1066,4 +1091,4 @@ byte findI2CAddress() {
 
         return result;
     }
-};
+}
