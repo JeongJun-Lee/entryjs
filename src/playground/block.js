@@ -257,6 +257,10 @@ Entry.Block = class Block {
         return this.thread;
     }
 
+    getStatements() {
+        return this.statements[0];
+    }
+
     insertAfter(blocks) {
         this.thread.insertByBlock(this, blocks);
     }

@@ -1012,6 +1012,11 @@ byte findI2CAddress() {
             .getEventMap('funcDef')[0]
             .getThread()
             .getBlocks();
+        const statements = func.content
+            .getEventMap('funcDef')[0]
+            .getStatements()
+            .getBlocks();
+        statements.forEach((s) => funcContents.push(s));
         const defBlock = funcContents.shift();
 
         const funcComment = defBlock.getCommentValue();
