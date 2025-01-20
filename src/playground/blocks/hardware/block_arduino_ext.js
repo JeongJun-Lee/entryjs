@@ -247,7 +247,7 @@ Entry.ArduinoExt.setLanguage = function() {
                 arduino_ext_get_analog_value_map: "%1ning doirasini %2 ~ %3 dan %4 ~ %5 ga o'zgartirgan qiymati",
                 arduino_ext_get_ultrasonic_value: "Ultrasonik sensor trig %1 eko %2 sensor qiymati",
                 arduino_ext_toggle_led: "Raqamli %1 pinini %2 %3",
-                arduino_ext_digital_pwm: "PWM %1 pinini %2 ga solzash %3",
+                arduino_ext_digital_pwm: "PWM %1 pinini %2 ga sozlash %3",
                 arduino_ext_set_tone: "Raqamli %1 pinni buzzerni %2 %3 oktavada %4 soniya yangrash %5",
                 arduino_ext_set_servo: "Raqamli %1 pinning servo motorini %2 gradusiga sozlash %3",
                 arduino_ext_get_digital: "Raqamli %1 pin sensor qiymati",

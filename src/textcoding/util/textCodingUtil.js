@@ -600,6 +600,7 @@ class TextCodingUtil {
             || blockType === 'set_variable'
             || blockType === 'change_variable'
             || blockType === 'get_variable'
+            || blockType === 'combine_something'
             || blockType === 'arduino_ext_lcd_column_list'
             || blockType === 'arduino_ext_lcd_row_list'
             || blockType.includes('func_') // Functions
@@ -1040,13 +1041,13 @@ class TextCodingUtil {
                 } else {
                     value = '"()"'.replace('"()"', value);
                     if (Number.isInteger(Number(value))) {
-                        name = 'int ' + name;
-                    } else { 
-                        name = 'float ' + name;
+                        name = 'int ' + '__' + name;
+                    } else {
+                        name = 'float ' + '__' + name;
                     }
                 }
             } else { // default
-                name = 'int ' + name;
+                name = 'int ' + '__' + name;
             }
 
             result += `${name} = ${value};\n`;

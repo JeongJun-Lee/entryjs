@@ -214,7 +214,7 @@ byte findI2CAddress() {
         error = Wire.endTransmission();
     
         if (error == 0) {
-        foundAddress =  address;
+          foundAddress =  address;
         } 
     }
     return foundAddress;
@@ -392,7 +392,7 @@ byte findI2CAddress() {
             if (!param.length) {
                 this.throwErr('error', Lang.TextCoding.message_conv_no_variable, block);
             } else {
-                rtn.push(param[0][0]);
+                rtn.push('__' + param[0][0]);
             }
         }
 
@@ -512,6 +512,22 @@ byte findI2CAddress() {
                 }
 
                 stat = value + operator + value2;
+                break;
+
+            case 'combine_something':
+                value = this._pramVal[0].toString();
+                if (value.includes('__') || value.includes('(')) { // If variable, wrap it by String()
+                    value = 'String(' + value + ')';
+                } else { // Wrap first string by String() to meet C++ syntax
+                    value = 'String("' + value + '")';
+                }
+                value2 = this._pramVal[1].toString();
+                if (value2.includes('__') || value2.includes('(')) { // If variable, wrap it by String()
+                    value2 = 'String(' + value2 + ')';
+                } else {
+                    value2 = '"' + value2 + '"';
+                }
+                stat = '(' + value + ' + ' + value2 + ')';
                 break;
 
             case 'calc_basic':
@@ -800,16 +816,29 @@ byte findI2CAddress() {
                     }
                 }
                 value3 = this._pramVal[2]; // text
+                if (Entry.Utils.isNumber(value3)) {
+                    value3 = value3.toString();
+                }
 
                 stat = stat.replace('%1', this._pramVal[0]);
                 stat = stat.replace('%2', this._pramVal[1]);
-                stat += `\n \tlcdObj->print("${value3}");`;
+                if (value3.includes('(') || value3.includes('__')) {
+                    stat += `\n \tlcdObj->print(${value3});`;
+                } else {
+                    stat += `\n \tlcdObj->print("${value3}");`;
+                }
                 break;
 
             case 'set_variable':
                 stat = block._schema.syntax.ar[0].syntax;
                 stat = stat.replace('%1', this._pramVal[0]);
-                stat = stat.replace('%2', this._pramVal[1]);
+                value = this._pramVal[1];
+                if (!Entry.Utils.isNumber(this._pramVal[1])) {
+                    value = '"' + value + '"';
+                } else {
+                    value = Number(value);
+                }
+                stat = stat.replace('%2', value);
                 break;
 
             case 'change_variable':
