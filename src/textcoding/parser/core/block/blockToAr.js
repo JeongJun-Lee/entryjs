@@ -145,6 +145,7 @@ Entry.BlockToArParser = class {
         if (block && (
             block._schema.class === 'variable' ||
             block.type === 'arduino_ext_set_servo' ||
+            block.type === 'ITPLE_set_servo' ||
             block.type === 'arduino_ext_set_stepper' ||
             block.type === 'arduino_ext_get_ultrasonic_value' ||
             block.type === 'ITPLE_get_ultrasonic_value' ||
@@ -188,7 +189,7 @@ Entry.BlockToArParser = class {
 
     insertIntoGlobal(blockType) {
         let stat = '';
-        if (blockType === 'arduino_ext_set_servo') {
+        if (blockType === 'arduino_ext_set_servo' || blockType === 'ITPLE_set_servo') {
             stat = '#include <Servo.h>\nServo myServo;\n';
         } else if (blockType === 'arduino_ext_set_stepper') {
             stat = `#include <Stepper.h>\nStepper myStepper(2048, ${this._pinNum}, ${this._pinNum2}, ${this._pinNum3}, ${this._pinNum4});\n`;
@@ -575,7 +576,8 @@ byte findI2CAddress() {
             case 'arduino_toggle_pwm': // pwm(anlogWrite)
             case 'arduino_ext_digital_pwm':
             case 'ITPLE_digital_pwm':
-            case 'ITPLE_set_motor_speed':
+            case 'ITPLE_set_motor_speed_old':
+            case 'ITPLE_set_motor_speed_new':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
                 this._pinNum = Number(this._pramVal[0]); // Arr to Number
@@ -703,6 +705,7 @@ byte findI2CAddress() {
                 break;
 
             case 'arduino_ext_set_servo':
+            case 'ITPLE_set_servo':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
                 this._pinNum = Number(this._pramVal[0]); // Arr to Number
