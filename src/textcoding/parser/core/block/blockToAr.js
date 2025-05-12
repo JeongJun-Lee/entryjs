@@ -568,7 +568,7 @@ byte findI2CAddress() {
                 this._pinNum = Number(this._pramVal[0]); // Arr to Number
                 this.errChkPinNum(this._pinNum, block);
 
-                on_off = this._pramVal[1] === 'on' ? 'HIGH' : 'LOW';
+                on_off = this._pramVal[1] === '0' ? 'LOW' : 'HIGH';
                 stat = stat.replace('%1', this._pinNum);
                 stat = stat.replace('%2', on_off);
                 break;
@@ -836,9 +836,9 @@ byte findI2CAddress() {
                 stat = block._schema.syntax.ar[0].syntax;
                 stat = stat.replace('%1', this._pramVal[0]);
                 value = this._pramVal[1];
-                if (!Entry.Utils.isNumber(this._pramVal[1])) {
+                if (!Entry.Utils.isNumber(this._pramVal[1]) && value.includes('String')) {
                     value = '"' + value + '"';
-                } else {
+                } else if (Entry.Utils.isNumber(this._pramVal[1])) {
                     value = Number(value);
                 }
                 stat = stat.replace('%2', value);
