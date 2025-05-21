@@ -562,6 +562,16 @@ byte findI2CAddress() {
             case 'arduino_toggle_led': // digitalWrite
             case 'arduino_ext_toggle_led':
             case 'ITPLE_toggle_led':
+                stat = block._schema.syntax.ar[0].syntax;
+                this._funcName = stat.split('(')[0];
+                this._pinNum = Number(this._pramVal[0]); // Arr to Number
+                this.errChkPinNum(this._pinNum, block);
+
+                on_off = this._pramVal[1] === 'on' ? 'HIGH' : 'LOW';
+                stat = stat.replace('%1', this._pinNum);
+                stat = stat.replace('%2', on_off);
+                break;
+
             case 'ITPLE_set_motor_direction':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
