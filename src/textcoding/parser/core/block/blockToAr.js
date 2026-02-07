@@ -558,7 +558,19 @@ byte findI2CAddress() {
 
                 stat = '('+ value + operator + value2 + ')';
                 break;
-
+            case 'calc_rand':
+                value = Number(this._pramVal[0]); // String to Number
+                if (isNaN(value)) { // In case the value is not a number
+                    value = this._pramVal[0];
+                }
+                value2 = Number(this._pramVal[1]); // String to Number
+                if (isNaN(value2)) { // In case the value is not a number
+                    value2 = this._pramVal[1];
+                }
+                // The 2nd parameter of random func doesn't include as max value itself
+                value2 += 1;
+                stat = `random(${value}, ${value2})`;
+                break;
             case 'arduino_toggle_led': // digitalWrite
             case 'arduino_ext_toggle_led':
             case 'ITPLE_toggle_led':

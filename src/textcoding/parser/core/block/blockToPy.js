@@ -294,6 +294,92 @@ Entry.BlockToPyParser = class {
                         }
                     }
 
+                    if (
+                        (block.type === 'calc_basic' || block.type === 'combine_something') &&
+                        dataParams[index] &&
+                        (dataParams[index].type === 'calc_basic' ||
+                            dataParams[index].type === 'combine_something')
+                    ) {
+                        let parentOp;
+                        if (block.type === 'combine_something') {
+                            parentOp = 'PLUS';
+                        } else {
+                            parentOp = dataParams[1];
+                        }
+
+                        const childBlock = dataParams[index];
+                        let childOp;
+
+                        if (childBlock.type === 'combine_something') {
+                            childOp = 'PLUS';
+                        } else {
+                            childOp =
+                                childBlock.data &&
+                                childBlock.data.params &&
+                                childBlock.data.params[1];
+                        }
+
+                        if (
+                            block.type === 'combine_something' &&
+                            childBlock.type === 'calc_basic'
+                        ) {
+                            param = `(${param})`;
+                        } else if (parentOp && childOp) {
+                            const getPriority = (op) => {
+                                if (op === 'PLUS' || op === 'MINUS') return 1;
+                                if (op === 'MULTI' || op === 'DIVIDE') return 2;
+                                return 0;
+                            };
+
+                            const parentP = getPriority(parentOp);
+                            const childP = getPriority(childOp);
+
+                            if (childP < parentP) {
+                                param = `(${param})`;
+                            } else if (
+                                childP === parentP &&
+                                templateIndex == 3 &&
+                                (parentOp === 'MINUS' || parentOp === 'DIVIDE')
+                            ) {
+                                param = `(${param})`;
+                            }
+                        }
+                    }
+
+                    if (
+                        (block.type === 'boolean_and_or' ||
+                            block.type === 'boolean_basic_operator') &&
+                        dataParams[index] &&
+                        (dataParams[index].type === 'boolean_and_or' ||
+                            dataParams[index].type === 'boolean_basic_operator')
+                    ) {
+                        const getBooleanPriority = (bType, op) => {
+                            if (bType === 'boolean_basic_operator') return 3;
+                            if (op === 'AND') return 2;
+                            if (op === 'OR') return 1;
+                            return 0;
+                        };
+
+                        const parentOp = dataParams[1];
+                        const parentP = getBooleanPriority(block.type, parentOp);
+
+                        const childBlock = dataParams[index];
+                        const childOp = childBlock.data.params[1];
+                        const childP = getBooleanPriority(childBlock.type, childOp);
+
+                        if (childP < parentP) {
+                            param = `(${param})`;
+                        }
+                    }
+
+                    if (
+                        block.type === 'boolean_not' &&
+                        dataParams[index] &&
+                        dataParams[index].type === 'boolean_and_or'
+                    ) {
+                        param = `(${param})`;
+                    }
+
                     result += param;
                     break;
                 }
@@ -319,7 +405,7 @@ Entry.BlockToPyParser = class {
                     ) {
                         if (
                             !Entry.KeyboardCode.map[
-                                typeof param === 'string' ? param.toLowerCase() : param
+                            typeof param === 'string' ? param.toLowerCase() : param
                             ]
                         ) {
                             Entry.toast.alert(Lang.Msgs.warn, Lang.Msgs.parameter_can_not_space);

@@ -572,7 +572,7 @@ module.exports = {
                     js: [],
                     py: [
                         {
-                            syntax: '(%1 %2 %3)',
+                            syntax: '%1 %2 %3',
                             template: '%1 %2 %3',
                             keyOption: 'boolean_basic_operator',
                             blockType: 'param',
@@ -684,7 +684,7 @@ module.exports = {
                     js: [],
                     py: [
                         {
-                            syntax: '(%1 %2 %3)',
+                            syntax: '%1 %2 %3',
                             template: '%1 %2 %3',
                             blockType: 'param',
                             textParams: [
@@ -753,7 +753,7 @@ module.exports = {
                     js: [],
                     py: [
                         {
-                            syntax: 'not (%2)',
+                            syntax: 'not %2',
                             template: 'not %2',
                             blockType: 'param',
                             textParams: [
