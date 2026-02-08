@@ -87,32 +87,32 @@
 }
 
 @keyframes foldBoard {
-    from {
-    }
+    from {}
+
     to {
         left: 61px;
     }
 }
 
 @-ms-keyframes foldBoard {
-    from {
-    }
+    from {}
+
     to {
         left: 61px;
     }
 }
 
 @-moz-keyframes foldBoard {
-    from {
-    }
+    from {}
+
     to {
         left: 61px;
     }
 }
 
 @-webkit-keyframes foldBoard {
-    from {
-    }
+    from {}
+
     to {
         left: 61px;
     }
@@ -129,40 +129,40 @@
     from {
         left: 64px;
     }
-    to {
-    }
+
+    to {}
 }
 
 @-o-keyframes foldOutBoard {
     from {
         left: 61px;
     }
-    to {
-    }
+
+    to {}
 }
 
 @-ms-keyframes foldOutBoard {
     from {
         left: 61px;
     }
-    to {
-    }
+
+    to {}
 }
 
 @-moz-keyframes foldOutBoard {
     from {
         left: 61px;
     }
-    to {
-    }
+
+    to {}
 }
 
 @-webkit-keyframes foldOutBoard {
     from {
         left: 61px;
     }
-    to {
-    }
+
+    to {}
 }
 
 #invisibleBoard {
@@ -170,4 +170,60 @@
     position: fixed;
     left: -1000px;
     top: -1000px;
+}
+
+.entryVimBoardZoomController {
+    position: absolute;
+    right: 22.5px;
+    top: 8px;
+    width: 128px;
+    height: 38px;
+    z-index: 5000;
+    pointer-events: auto;
+}
+
+.entryVimBoardZoomBg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.entryVimBoardZoomOut {
+    position: absolute;
+    left: 4px;
+    top: 3px;
+    width: 32px;
+    height: 32px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    cursor: zoom-out;
+}
+
+.entryVimBoardZoomReset {
+    position: absolute;
+    left: 44px;
+    top: 3px;
+    width: 40px;
+    height: 32px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    cursor: pointer;
+}
+
+.entryVimBoardZoomIn {
+    position: absolute;
+    left: 92px;
+    top: 3px;
+    width: 32px;
+    height: 32px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    cursor: zoom-in;
+}
+
+.CodeMirror-hints {
+    font-size: var(--vim-font-size, 16px) !important;
+    line-height: normal !important;
 }

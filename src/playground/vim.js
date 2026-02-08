@@ -21,6 +21,20 @@ class Vim {
     static PYTHON_IMPORT_ENTRY = 'import Entry';
     static PYTHON_IMPORT_HW = '';
 
+    get ZOOM_RANGE() {
+        return [0.6, 0.8, 1, 1.3, 1.6, 2];
+    }
+
+    get ZOOM_MODE() {
+        return {
+            RESET: 0,
+            OUT: 1,
+            IN: 2,
+        };
+    }
+
+    ZOOM_LEVEL = 2;
+
     constructor(dom) {
         if (typeof dom === 'string') {
             dom = $(`#${dom}`);
@@ -34,6 +48,7 @@ class Vim {
 
         this._parentView = dom;
         this.createDom(dom);
+        this.createZoomController();
 
         this._parser = new Entry.Parser(null, null, this.codeMirror);
 
@@ -129,6 +144,105 @@ class Vim {
         target.addEventListener('dragOver', this.#handleDragOver);
     }
 
+    createZoomController() {
+        const {
+            btn_zoom_bg = `${Entry.mediaFilePath}btn_zoom_bg.svg`,
+            btn_zoom_out = `${Entry.mediaFilePath}btn_zoom_out.svg`,
+            btn_zoom_reset = `${Entry.mediaFilePath}btn_zoom_reset.svg`,
+            btn_zoom_in = `${Entry.mediaFilePath}btn_zoom_in.svg`,
+        } = EntryStatic.images || {};
+
+        const zoomGroup = Entry.Dom('div', {
+            class: 'entryVimBoardZoomController',
+            parent: this.view,
+        });
+
+        this.zoomGroup = zoomGroup;
+
+        Entry.Dom('div', {
+            class: 'entryVimBoardZoomBg',
+            parent: zoomGroup,
+        }).css('background-image', `url(${btn_zoom_bg})`);
+
+        const zoomOut = Entry.Dom('div', {
+            class: 'entryVimBoardZoomOut',
+            parent: zoomGroup,
+        });
+        zoomOut.css('background-image', `url(${btn_zoom_out})`);
+
+        // Use native addEventListener for reliability
+        if (zoomOut[0]) {
+            zoomOut[0].addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.zoomChange(this.ZOOM_MODE.OUT);
+            });
+        }
+
+        const zoomReset = Entry.Dom('div', {
+            class: 'entryVimBoardZoomReset',
+            parent: zoomGroup,
+        });
+        zoomReset.css('background-image', `url(${btn_zoom_reset})`);
+
+        if (zoomReset[0]) {
+            zoomReset[0].addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.zoomChange(this.ZOOM_MODE.RESET);
+            });
+        }
+
+        const zoomIn = Entry.Dom('div', {
+            class: 'entryVimBoardZoomIn',
+            parent: zoomGroup,
+        });
+        zoomIn.css('background-image', `url(${btn_zoom_in})`);
+
+        if (zoomIn[0]) {
+            zoomIn[0].addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.zoomChange(this.ZOOM_MODE.IN);
+            });
+        }
+    }
+
+    zoomChange(mode) {
+        switch (mode) {
+            case this.ZOOM_MODE.OUT:
+                if (this.ZOOM_LEVEL > 0) {
+                    this.ZOOM_LEVEL -= 1;
+                    this.setZoom(this.ZOOM_RANGE[this.ZOOM_LEVEL]);
+                }
+                break;
+            case this.ZOOM_MODE.IN:
+                if (this.ZOOM_LEVEL < this.ZOOM_RANGE.length - 1) {
+                    this.ZOOM_LEVEL += 1;
+                    this.setZoom(this.ZOOM_RANGE[this.ZOOM_LEVEL]);
+                }
+                break;
+            case this.ZOOM_MODE.RESET:
+            default:
+                const resetIndex = this.ZOOM_RANGE.indexOf(1);
+                if (this.ZOOM_LEVEL !== resetIndex) {
+                    this.ZOOM_LEVEL = 2;
+                    this.setZoom(this.ZOOM_RANGE[this.ZOOM_LEVEL]);
+                }
+                break;
+        }
+    }
+
+    setZoom(scale) {
+        if (!this.codeMirror) {
+            return;
+        }
+        const fontSize = `${16 * scale}px`;
+        this.codeMirror.getWrapperElement().style.fontSize = fontSize;
+        document.documentElement.style.setProperty('--vim-font-size', fontSize);
+        this.codeMirror.refresh();
+    }
+
     hide() {
         this.view.addClass('entryRemove');
         this.view.remove();
@@ -154,7 +268,7 @@ class Vim {
         } else if (type === Vim.TEXT_TYPE_AR) {
             // Not need AR_TO_BLK parser, because read-only edting in AR codes
             return null;
-        } 
+        }
 
         let textCode = this.codeMirror.getValue();
         const cursor = this.doc.getCursor();
@@ -243,7 +357,7 @@ class Vim {
             doc.setCursor({ line: doc.lastLine() - 1 });
         } else if (textType === Vim.TEXT_TYPE_NEO) {
             var dataFrame = this._parser.parse(code, Entry.Parser.PARSE_GENERAL);
-            return {name: Entry.hw.hwModule.name, frame: dataFrame};
+            return { name: Entry.hw.hwModule.name, frame: dataFrame };
         } else if (textType === Vim.TEXT_TYPE_AR) {
             textCode = this._parser.parse(code, Entry.Parser.PARSE_GENERAL);
             if (mode.boardType != Entry.Workspace.MODE_UPLOAD) {
@@ -251,7 +365,7 @@ class Vim {
             }
             doc = this.codeMirror.getDoc();
             doc.setCursor({ line: doc.lastLine() - 1 });
-            return {name: Entry.hw.hwModule ? Entry.hw.hwModule.name : '', frame: textCode};
+            return { name: Entry.hw.hwModule ? Entry.hw.hwModule.name : '', frame: textCode };
         }
 
         if (Entry.isTextMode) {
