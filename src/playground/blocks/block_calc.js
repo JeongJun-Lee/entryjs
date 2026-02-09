@@ -1,3 +1,5 @@
+import _get from 'lodash/get';
+
 module.exports = {
     getBlocks() {
         return {
@@ -160,7 +162,7 @@ module.exports = {
                     js: [],
                     py: [
                         {
-                            syntax: '(%1 %2 %3)',
+                            syntax: '%1 %2 %3',
                             template: '%1 %2 %3',
                             keyOption: 'calc_basic',
                             blockType: 'param',
@@ -530,43 +532,6 @@ module.exports = {
                                     codeMap: 'Entry.CodeMap.Entry.coordinate_object[3]',
                                 },
                             ],
-                        },
-                    ],
-                },
-            },
-            get_sound_volume: {
-                color: EntryStatic.colorSet.block.default.CALC,
-                outerLine: EntryStatic.colorSet.block.darken.CALC,
-                skeleton: 'basic_string_field',
-                statements: [],
-                params: [
-                    {
-                        type: 'Text',
-                        text: Lang.Blocks.CALC_get_sound_volume,
-                        color: '#FFF',
-                    },
-                    {
-                        type: 'Text',
-                        text: '',
-                        color: '#FFF',
-                    },
-                ],
-                events: {},
-                def: {
-                    params: [null, null],
-                    type: 'get_sound_volume',
-                },
-                class: 'calc',
-                isNotFor: [],
-                func() {
-                    return Entry.Utils.getVolume() * 100;
-                },
-                syntax: {
-                    js: [],
-                    py: [
-                        {
-                            syntax: 'Entry.value_of_sound_volume()',
-                            blockType: 'param',
                         },
                     ],
                 },
@@ -1098,14 +1063,14 @@ module.exports = {
                 ],
                 events: {
                     viewAdd: [
-                        function() {
+                        function () {
                             if (Entry.engine) {
                                 Entry.engine.showProjectTimer();
                             }
                         },
                     ],
                     viewDestroy: [
-                        function(block, notIncludeSelf) {
+                        function (block, notIncludeSelf) {
                             if (Entry.engine) {
                                 Entry.engine.hideProjectTimer(block, notIncludeSelf);
                             }
@@ -1167,14 +1132,14 @@ module.exports = {
                 ],
                 events: {
                     viewAdd: [
-                        function() {
+                        function () {
                             if (Entry.engine) {
                                 Entry.engine.showProjectTimer();
                             }
                         },
                     ],
                     dataDestroy: [
-                        function(block) {
+                        function (block) {
                             if (Entry.engine) {
                                 Entry.engine.hideProjectTimer(block);
                             }
@@ -1305,14 +1270,14 @@ module.exports = {
                 ],
                 events: {
                     viewAdd: [
-                        function() {
+                        function () {
                             if (Entry.engine) {
                                 Entry.engine.showProjectTimer();
                             }
                         },
                     ],
                     viewDestroy: [
-                        function(block, notIncludeSelf) {
+                        function (block, notIncludeSelf) {
                             if (Entry.engine) {
                                 Entry.engine.hideProjectTimer(block, notIncludeSelf);
                             }
@@ -1460,6 +1425,7 @@ module.exports = {
                                         [Lang.Blocks.CALC_get_date_hour, 'HOUR'],
                                         [Lang.Blocks.CALC_get_date_minute, 'MINUTE'],
                                         [Lang.Blocks.CALC_get_date_second, 'SECOND'],
+                                        // [Lang.Blocks.CALC_get_date_day_of_week, 'DAY_OF_WEEK'], // #2676 issue
                                     ],
                                     value: 'YEAR',
                                     fontSize: 11,
@@ -1517,13 +1483,13 @@ module.exports = {
                         const mousePos = Entry.stage.mouseCoordinate;
                         return Math.sqrt(
                             Math.pow(sprite.getX() - mousePos.x, 2) +
-                                Math.pow(sprite.getY() - mousePos.y, 2)
+                            Math.pow(sprite.getY() - mousePos.y, 2)
                         );
                     } else {
                         const targetEntity = Entry.container.getEntity(targetId);
                         return Math.sqrt(
                             Math.pow(sprite.getX() - targetEntity.getX(), 2) +
-                                Math.pow(sprite.getY() - targetEntity.getY(), 2)
+                            Math.pow(sprite.getY() - targetEntity.getY(), 2)
                         );
                     }
                 },
@@ -1543,76 +1509,6 @@ module.exports = {
                                     arrowColor: EntryStatic.colorSet.arrow.default.CALC,
                                     converter: Entry.block.converters.returnStringKey,
                                     codeMap: 'Entry.CodeMap.Entry.distance_something[1]',
-                                },
-                            ],
-                        },
-                    ],
-                },
-            },
-            get_sound_duration: {
-                color: EntryStatic.colorSet.block.default.CALC,
-                outerLine: EntryStatic.colorSet.block.darken.CALC,
-                skeleton: 'basic_string_field',
-                statements: [],
-                params: [
-                    {
-                        type: 'Text',
-                        text: Lang.Blocks.CALC_get_sound_duration_1,
-                        color: '#FFF',
-                    },
-                    {
-                        type: 'DropdownDynamic',
-                        value: null,
-                        menuName: 'sounds',
-                        fontSize: 10,
-                        bgColor: EntryStatic.colorSet.block.darken.CALC,
-                        arrowColor: EntryStatic.colorSet.arrow.default.DEFAULT,
-                    },
-                    {
-                        type: 'Text',
-                        text: Lang.Blocks.CALC_get_sound_duration_2,
-                        color: '#FFF',
-                    },
-                ],
-                events: {},
-                def: {
-                    params: [null, null, null],
-                    type: 'get_sound_duration',
-                },
-                pyHelpDef: {
-                    params: [null, 'A&value', null],
-                    type: 'get_sound_duration',
-                },
-                paramsKeyMap: {
-                    VALUE: 1,
-                },
-                class: 'calc_duration',
-                isNotFor: [],
-                func(sprite, script) {
-                    const soundId = script.getField('VALUE', script);
-                    const soundsArr = sprite.parent.sounds;
-
-                    for (let i = 0; i < soundsArr.length; i++) {
-                        if (soundsArr[i].id === soundId) {
-                            return soundsArr[i].duration;
-                        }
-                    }
-                },
-                syntax: {
-                    js: [],
-                    py: [
-                        {
-                            syntax: 'Entry.value_of_sound_length_of(%2)',
-                            blockType: 'param',
-                            textParams: [
-                                undefined,
-                                {
-                                    type: 'DropdownDynamic',
-                                    value: null,
-                                    menuName: 'sounds',
-                                    fontSize: 11,
-                                    arrowColor: EntryStatic.colorSet.arrow.default.CALC,
-                                    converter: Entry.block.converters.returnStringKey,
                                 },
                             ],
                         },
@@ -1736,6 +1632,57 @@ module.exports = {
                     ],
                 },
             },
+            reverse_of_string: {
+                color: EntryStatic.colorSet.block.default.CALC,
+                outerLine: EntryStatic.colorSet.block.darken.CALC,
+                skeleton: 'basic_string_field',
+                statements: [],
+                params: [
+                    {
+                        type: 'Text',
+                        text: Lang.Blocks.CALC_reverse_of_string_1,
+                        color: '#FFF',
+                    },
+                    {
+                        type: 'Block',
+                        accept: 'string',
+                    },
+                    {
+                        type: 'Text',
+                        text: Lang.Blocks.CALC_reverse_of_string_2,
+                        color: '#FFF',
+                    },
+                ],
+                events: {},
+                def: {
+                    params: [
+                        null,
+                        {
+                            type: 'text',
+                            params: [Lang.Blocks.entry],
+                        },
+                        null,
+                    ],
+                    type: 'reverse_of_string',
+                },
+                paramsKeyMap: {
+                    STRING: 1,
+                },
+                class: 'calc_string',
+                isNotFor: ['python_disable'],
+                func(sprite, script) {
+                    const originStr = script.getStringValue('STRING', script);
+                    const reversedStr = originStr
+                        .split('')
+                        .reverse()
+                        .join('');
+                    return reversedStr;
+                },
+                syntax: {
+                    js: [],
+                    py: [],
+                },
+            },
             combine_something: {
                 color: EntryStatic.colorSet.block.default.CALC,
                 outerLine: EntryStatic.colorSet.block.darken.CALC,
@@ -1815,7 +1762,7 @@ module.exports = {
                     js: [],
                     py: [
                         {
-                            syntax: '(%2 + %4)',
+                            syntax: '%2 + %4',
                             template: '%2 + %4',
                             blockType: 'param',
                         },
@@ -2069,6 +2016,71 @@ module.exports = {
                             ],
                         },
                     ],
+                },
+            },
+            count_match_string: {
+                color: EntryStatic.colorSet.block.default.CALC,
+                outerLine: EntryStatic.colorSet.block.darken.CALC,
+                skeleton: 'basic_string_field',
+                statements: [],
+                params: [
+                    {
+                        type: 'Block',
+                        accept: 'string',
+                    },
+                    {
+                        type: 'Text',
+                        text: Lang.Blocks.CALC_count_match_string_1,
+                        color: '#FFF',
+                    },
+                    {
+                        type: 'Block',
+                        accept: 'string',
+                    },
+                    {
+                        type: 'Text',
+                        text: Lang.Blocks.CALC_count_match_string_2,
+                        color: '#FFF',
+                    },
+                ],
+                events: {},
+                def: {
+                    params: [
+                        {
+                            type: 'text',
+                            params: [Lang.Blocks.hi_entry_en],
+                        },
+                        null,
+                        {
+                            type: 'text',
+                            params: ['e'],
+                        },
+                        null,
+                    ],
+                    type: 'count_match_string',
+                },
+                paramsKeyMap: {
+                    STRING: 0,
+                    TARGET: 2,
+                },
+                class: 'calc_string',
+                isNotFor: ['python_disable'],
+                func(sprite, script) {
+                    const originStr = script.getStringValue('STRING', script);
+                    const targetStr = script.getStringValue('TARGET', script);
+
+                    let count = 0;
+                    const substrLength = targetStr.length;
+                    for (let i = 0; i <= originStr.length - substrLength; i++) {
+                        if (originStr.substring(i, i + substrLength) === targetStr) {
+                            count++;
+                        }
+                    }
+                    return count;
+                },
+                syntax: {
+                    js: [],
+                    py: [],
                 },
             },
             index_of_string: {
@@ -2340,7 +2352,7 @@ module.exports = {
                 func(sprite, script) {
                     return script
                         .getStringValue('STRING', script)
-                        [script.getField('CASE', script)]();
+                    [script.getField('CASE', script)]();
                 },
                 syntax: {
                     js: [],
@@ -2394,6 +2406,182 @@ module.exports = {
                             ],
                         },
                     ],
+                },
+            },
+            get_block_count: {
+                color: EntryStatic.colorSet.block.default.CALC,
+                outerLine: EntryStatic.colorSet.block.darken.CALC,
+                skeleton: 'basic_string_field',
+                statements: [],
+                params: [
+                    {
+                        type: 'DropdownDynamic',
+                        value: null,
+                        menuName: 'blockCount',
+                        fontSize: 10,
+                        textColor: '#fff',
+                        bgColor: EntryStatic.colorSet.block.darken.CALC,
+                        arrowColor: EntryStatic.colorSet.arrow.default.DEFAULT,
+                    },
+                ],
+                events: {},
+                def: {
+                    params: [null],
+                    type: 'get_block_count',
+                },
+                pyHelpDef: {
+                    params: ['A&value'],
+                    type: 'get_block_count',
+                },
+                paramsKeyMap: {
+                    OBJECT: 0,
+                },
+                class: 'block',
+                isNotFor: [],
+                async func(sprite, script) {
+                    const objectKey = script.getField('OBJECT', script);
+                    if (!objectKey) {
+                        return 0;
+                    }
+                    let object;
+                    if (objectKey.indexOf('scene-') === 0) {
+                        const blocks = await Entry.Utils.getObjectsBlocksBySceneId(
+                            objectKey.substr(6)
+                        );
+                        return _get(blocks, 'length', 0);
+                    } else if (objectKey === 'all') {
+                        object = undefined;
+                    } else if (objectKey === 'self') {
+                        object = sprite.parent;
+                    } else if (objectKey.indexOf('object-') === 0) {
+                        object = Entry.container.getObject(objectKey.substr(7));
+                    } else {
+                        return 0;
+                    }
+
+                    const blocks = await Entry.Utils.getObjectsBlocksForEventThread(object);
+                    const count = _get(blocks, 'length', 0);
+                    return count;
+                },
+                syntax: {
+                    js: [],
+                    py: [
+                        {
+                            syntax: 'Entry.get_block_count(%1)',
+                            blockType: 'param',
+                            textParams: [
+                                {
+                                    type: 'DropdownDynamic',
+                                    value: null,
+                                    menuName: 'blockCount',
+                                    fontSize: 11,
+                                    textColor: '#fff',
+                                    arrowColor: EntryStatic.colorSet.arrow.default.DEFAULT,
+                                    converter: Entry.block.converters.returnStringValue,
+                                    codeMap: 'Entry.CodeMap.Entry.get_block_count[0]',
+                                },
+                            ],
+                        },
+                    ],
+                },
+            },
+            change_rgb_to_hex: {
+                color: EntryStatic.colorSet.block.default.CALC,
+                outerLine: EntryStatic.colorSet.block.darken.CALC,
+                skeleton: 'basic_string_field',
+                statements: [],
+                params: [
+                    {
+                        type: 'Block',
+                        accept: 'string',
+                        defaultType: 'number',
+                    },
+                    {
+                        type: 'Block',
+                        accept: 'string',
+                        defaultType: 'number',
+                    },
+                    {
+                        type: 'Block',
+                        accept: 'string',
+                        defaultType: 'number',
+                    },
+                ],
+                events: {},
+                def: {
+                    params: [
+                        {
+                            type: 'number',
+                            params: ['255'],
+                        },
+                        {
+                            type: 'number',
+                            params: ['0'],
+                        },
+                        {
+                            type: 'number',
+                            params: ['0'],
+                        },
+                    ],
+                    type: 'change_rgb_to_hex',
+                },
+                paramsKeyMap: {
+                    RED: 0,
+                    GREEN: 1,
+                    BLUE: 2,
+                },
+                class: 'color',
+                isNotFor: [],
+                async func(sprite, script) {
+                    const red = script.getNumberValue('RED', script);
+                    const greeb = script.getNumberValue('GREEN', script);
+                    const blue = script.getNumberValue('BLUE', script);
+                    return Entry.rgb2hex(red, greeb, blue);
+                },
+            },
+            change_hex_to_rgb: {
+                color: EntryStatic.colorSet.block.default.CALC,
+                outerLine: EntryStatic.colorSet.block.darken.CALC,
+                skeleton: 'basic_string_field',
+                statements: [],
+                params: [
+                    {
+                        type: 'Block',
+                        accept: 'string',
+                    },
+                    {
+                        type: 'Dropdown',
+                        options: [
+                            ['R', 'r'],
+                            ['G', 'g'],
+                            ['B', 'b'],
+                        ],
+                        value: 'RED',
+                        fontSize: 10,
+                        bgColor: EntryStatic.colorSet.block.darken.CALC,
+                    },
+                ],
+                events: {},
+                def: {
+                    params: [
+                        {
+                            type: 'text',
+                            params: ['#ff0000'],
+                        },
+                        'r',
+                    ],
+                    type: 'change_hex_to_rgb',
+                },
+                paramsKeyMap: {
+                    HEX: 0,
+                    COLOR: 1,
+                },
+                class: 'color',
+                isNotFor: [],
+                async func(sprite, script) {
+                    const color = script.getField('COLOR', script);
+                    const value = script.getValue('HEX', script);
+                    return Entry.hex2rgb(value)[color];
                 },
             },
         };
