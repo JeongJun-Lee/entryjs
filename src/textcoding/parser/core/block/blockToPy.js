@@ -160,20 +160,22 @@ Entry.BlockToPyParser = class {
 
             // $1 과 같이 statement 를 포함하는 경우
             if (statements) {
-                statements.forEach((value) => {
-                    const [, index] = value.split('$');
+                statements.forEach((s) => {
+                    const index = Number(s.split('$')[1]) - 1;
+                    const thread = block.statements[index]; // statements 는 Thread
                     const statementTextCodes = [];
-                    const thread = block.statements[index - 1];
-                    thread.getBlocks().forEach((block) => {
-                        if (this.getFuncInfo(block)) {
-                            statementTextCodes.push(this.makeFuncDef(block, true));
-                        } else {
-                            statementTextCodes.push(this.Block(block));
-                        }
-                    });
-                    resultTextCode += Entry.TextCodingUtil.indent(
-                        statementTextCodes.join('\n').concat('\n')
-                    );
+                    if (thread) {
+                        const blocks = thread.getBlocks();
+                        blocks.forEach((b) => {
+                            const t = this.Block(b).trim();
+                            if (t) {
+                                statementTextCodes.push(t);
+                            }
+                        });
+                        resultTextCode += Entry.TextCodingUtil.indent(
+                            statementTextCodes.join('\n').concat('\n')
+                        );
+                    }
                 });
             }
 
@@ -659,6 +661,10 @@ Entry.BlockToPyParser = class {
      * @return {string} 파이선 함수 호출 syntax
      */
     makeFuncSyntax(funcBlock) {
+        if (!this.funcDefMap[funcBlock.data.type]) {
+            this.funcDefMap[funcBlock.data.type] = this.makeFuncDef(funcBlock, false);
+        }
+
         let schemaTemplate = '';
 
         if (funcBlock) {
@@ -672,12 +678,44 @@ Entry.BlockToPyParser = class {
             }
         }
 
-        const templateParams = schemaTemplate.trim().match(/%\d/gim);
-        templateParams.pop(); // pop() 이유는 맨 마지막 템플릿은 Indicator 로 판단할 것이기 때문이다.
+        const funcId = funcBlock.getFuncId();
+        const func = funcId && Entry.variableContainer.getFunction(funcId);
+        if (!func) {
+            return;
+        }
 
-        return Entry.TextCodingUtil.getFunctionNameFromTemplate(schemaTemplate)
-            .trim()
-            .concat(`(${templateParams.join(',')})`);
+        const funcInfo = this.getFuncInfo(funcBlock);
+        if (!funcInfo) {
+            return;
+        }
+
+        let result = funcInfo.name;
+        if (
+            this.recursiveCallBlockType &&
+            this.recursiveCallBlockType === funcBlock.data.type &&
+            funcBlock.data.type === this._rootFuncId
+        ) {
+            return result.concat('()');
+        }
+
+        const funcParams = funcBlock.params;
+        let paramsTemplate = '(';
+        if (funcParams && funcParams.length) {
+            for (let i = 0; i < funcParams.length; i++) {
+                const p = funcParams[i];
+                const param = this.Block(p);
+                if (param) {
+                    paramsTemplate += `${param}, `;
+                }
+            }
+            paramsTemplate = paramsTemplate.replace(/, $/, '');
+            paramsTemplate += ')';
+        } else {
+            paramsTemplate += ')';
+        }
+
+        result += paramsTemplate;
+        return result;
     }
 
     makeFuncDef(funcBlock, isExpression) {
@@ -748,8 +786,6 @@ Entry.BlockToPyParser = class {
             return null;
         }
 
-        const funcName = Entry.TextCodingUtil.getFunctionNameFromTemplate(func.block.template);
-
         Entry.TextCodingUtil.initQueue();
 
         const funcContents = func.content
@@ -758,14 +794,27 @@ Entry.BlockToPyParser = class {
             .getBlocks();
         const statements = func.content
             .getEventMap('funcDef')[0]
-            .getStatements()
-            .getBlocks();
-        statements.forEach((s) => funcContents.push(s));
+            .getStatements();
+
+        if (statements) {
+            if (statements.getBlocks) {
+                statements.getBlocks().forEach((s) => funcContents.push(s));
+            } else if (Array.isArray(statements)) {
+                statements.forEach((s) => {
+                    if (s instanceof Entry.Block) {
+                        funcContents.push(s);
+                    } else if (s.getBlocks) {
+                        s.getBlocks().forEach((b) => funcContents.push(b));
+                    }
+                });
+            }
+        }
         const defBlock = funcContents.shift();
 
         const funcComment = defBlock.getCommentValue();
 
         Entry.TextCodingUtil.gatherFuncDefParam(defBlock.getParam(0));
+        const funcName = Entry.TextCodingUtil._funcNameQ.dequeue();
 
         const that = this;
         const funcParams = [];
