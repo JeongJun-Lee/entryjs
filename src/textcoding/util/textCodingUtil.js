@@ -529,8 +529,8 @@ class TextCodingUtil {
     hasUnSupportedBlkInNeo(block) {
         const blockType = block.data.type;
         const blockCategory = EntryStatic.getCategoryByBlock(block.data.type);
-        const acceptBlocks =  
-            blockType === 'when_run_button_click' 
+        const acceptBlocks =
+            blockType === 'when_run_button_click'
             || blockType === 'wait_second'
             || blockType === 'repeat_basic'
             || blockType === 'repeat_inf'
@@ -539,16 +539,16 @@ class TextCodingUtil {
             || blockType === 'if_else'
             || blockType === 'wait_until_true'
             || blockType === 'number'
-            || blockType === 'text' 
-            || blockType === 'neobot_purple_arg_led_duration' 
-            || blockType === 'neobot_purple_sensor_value' 
-            || blockType === 'neobot_purple_arg_motor_speed' 
-            || blockType === 'neobot_purple_arg_motor_duration' 
+            || blockType === 'text'
+            || blockType === 'neobot_purple_arg_led_duration'
+            || blockType === 'neobot_purple_sensor_value'
+            || blockType === 'neobot_purple_arg_motor_speed'
+            || blockType === 'neobot_purple_arg_motor_duration'
             || blockType === 'get_servo_degree'
             || blockCategory === 'arduino' // HW blocks
-            
+
         // Not acceptable blocks
-        if (Entry.expansionBlocks.length > 0 
+        if (Entry.expansionBlocks.length > 0
             || blockCategory === 'moving'
             || blockCategory === 'looks'
             || blockCategory === 'brush'
@@ -564,7 +564,7 @@ class TextCodingUtil {
             || blockType === 'neobot_purple_sensor_convert_scale'
             || blockType === 'neobot_purple_set_output'
             || !acceptBlocks) {
-              return true;
+            return true;
         }
 
         return false;
@@ -573,8 +573,8 @@ class TextCodingUtil {
     hasUnSupportedBlkInAr(block) {
         const blockType = block.data.type;
         const blockCategory = EntryStatic.getCategoryByBlock(block.data.type);
-        const acceptBlocks =  
-            blockType === 'when_run_button_click' 
+        const acceptBlocks =
+            blockType === 'when_run_button_click'
             || blockType === 'repeat_basic'
             || blockType === 'repeat_inf'
             || blockType === 'stop_repeat'
@@ -582,7 +582,7 @@ class TextCodingUtil {
             || blockType === 'if_else'
             || blockType === 'wait_second'
             || blockType === 'number'
-            || blockType === 'text' 
+            || blockType === 'text'
             || blockType === 'arduino_get_sensor_number'
             || blockType === 'arduino_get_port_number'
             || blockType === 'arduino_get_pwm_port_number'
@@ -606,9 +606,9 @@ class TextCodingUtil {
             || blockType === 'arduino_ext_lcd_row_list'
             || blockType.includes('func_') // Functions
             || blockCategory === 'arduino' // HW blocks
-            
+
         // Not acceptable blocks
-        if (Entry.expansionBlocks.length > 0 
+        if (Entry.expansionBlocks.length > 0
             || blockCategory === 'moving'
             || blockCategory === 'looks'
             || blockCategory === 'brush'
@@ -618,12 +618,12 @@ class TextCodingUtil {
             || blockCategory === 'ai_utilize'
             || blockCategory === 'expansion'
             || !acceptBlocks) {
-              return true;
+            return true;
         }
 
         return false;
     }
-    
+
     getNotSupportedBlocks() {
         if (EntryStatic.pythonDisabled) {
             return EntryStatic.pythonDisabled;
@@ -959,8 +959,8 @@ class TextCodingUtil {
         if (keywords.includes(name)) {
             return this._generateErrorObject(
                 Lang.Menus[`textcoding_bookedError_1${errorSuffix}`] +
-                    name +
-                    Lang.Menus[`textcoding_bookedError_2${errorSuffix}`],
+                name +
+                Lang.Menus[`textcoding_bookedError_2${errorSuffix}`],
                 'error'
             );
         }
@@ -1004,7 +1004,12 @@ class TextCodingUtil {
             }
 
             if (typeof value === 'string') {
-                value = '"()"'.replace('()', value);
+                const isNumber = !isNaN(value) && value.trim() !== '';
+                const isLeadingZero = value.length > 1 && value.startsWith('0') && value[1] !== '.';
+
+                if (!isNumber || isLeadingZero) {
+                    value = '"()"'.replace('()', value);
+                }
             }
 
             result += `${name} = ${value}\n`;
@@ -1088,7 +1093,7 @@ class TextCodingUtil {
                 if (isNaN(data) || (data.length > 1 && String(data)[0] === '0')) {
                     data = `"${data.replace(/"/gi, '\\"')}"`;
                 }
-       
+
                 if (typeof data === 'number' || (data.trim && data.trim().length > 0)) {
                     value += data;
                 }
