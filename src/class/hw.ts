@@ -300,7 +300,7 @@ export default class Hardware {
     }
 
     upload() {
-        let option = {boardType: Entry.Workspace.MODE_UPLOAD};
+        let option = { boardType: Entry.Workspace.MODE_UPLOAD };
         option.runType = Entry.Vim.WORKSPACE_MODE;
         switch (this.hwModule.name) {
             case 'neosoco':
@@ -390,9 +390,14 @@ export default class Hardware {
             this.hwModule.name == 'neosoco' ||
             this.hwModule.name == 'ITPLE'
         ) {
-            Entry.options.uploadEnable = true;
+            // Check variation from data for ArduinoExt BT (ID: 010904 -> variation: 4)
+            if (data.variation === 4) {
+                Entry.options.uploadEnable = false;
+            } else {
+                Entry.options.uploadEnable = true;
+            }
         }
-        if (this.hwModule.name == 'arduino' || 
+        if (this.hwModule.name == 'arduino' ||
             this.hwModule.name == 'ArduinoExt' ||
             this.hwModule.name == 'ITPLE') {
             Entry.options.arEnable = true;
@@ -512,7 +517,7 @@ export default class Hardware {
 
                 if (recvData.upload.includes('success')) {
                     Entry.console.print('\nSince new firmware is uploded to HW, if you want to control the HW again by Entry, you have to make a reconnection with Entry by restarting HW.');
-                
+
                 } else if (this.hwModule.name.toLowerCase().includes('arduino') && recvData.upload.includes('failed')) {
                     // If compile fail, change mode to arduino code
                     if (Entry.getMainWS().getMode() != Entry.Workspace.MODE_ARBOARD) {
