@@ -31,16 +31,16 @@ class EntryFunc {
         this.content = content
             ? new Entry.Code(content)
             : new Entry.Code([
-                  [
-                      {
-                          type: codeType,
-                          copyable: false,
-                          deletable: false,
-                          x: 40,
-                          y: 40,
-                      },
-                  ],
-              ]);
+                [
+                    {
+                        type: codeType,
+                        copyable: false,
+                        deletable: false,
+                        x: 40,
+                        y: 40,
+                    },
+                ],
+            ]);
         this.block = null;
         this.blockMenuBlock = null;
         this.hashMap = {};
@@ -256,13 +256,11 @@ class EntryFunc {
     }
 
     static edit(func) {
-        console.log('func', func);
         let funcElement = func;
         if (typeof func === 'string') {
             funcElement = Entry.variableContainer.getFunction(/(func_)?(.*)/.exec(func)[2]);
         }
         if (!funcElement) {
-            console.error('no function');
             return;
         }
         this.unbindFuncChangeEvent();
@@ -519,7 +517,7 @@ class EntryFunc {
         const originalTypeFullName = /string/gi.test(originalType)
             ? 'function_param_string'
             : 'function_param_boolean';
-        let BlockSchema = function() {};
+        let BlockSchema = function () { };
         BlockSchema.prototype = blockPrototype;
         BlockSchema = new BlockSchema();
         BlockSchema.changeEvent = new Entry.Event();
@@ -545,8 +543,8 @@ class EntryFunc {
             } else {
                 blockMenu.banClass('useLocalVariables', true);
             }
-            Entry.variableContainer; /*&& // To disable rtn_val&local_var functionality
-                Entry.variableContainer.updateFuncSettingView(this.targetFunc);*/
+            Entry.variableContainer &&
+                Entry.variableContainer.updateFuncSettingView(this.targetFunc);
         } else {
             !workspace.isVimMode() && blockMenu.unbanClass('functionInit', true);
             blockMenu.banClass('functionEdit', true);
@@ -747,10 +745,12 @@ class EntryFunc {
 
     static bindFuncChangeEvent(targetFunc) {
         const selectedTargetFunc = targetFunc ? targetFunc : this.targetFunc;
-        if (!this._funcChangeEvent && selectedTargetFunc.content.getEventMap('funcDef')[0].view) {
-            this._funcChangeEvent = selectedTargetFunc.content
-                .getEventMap('funcDef')[0]
-                .view._contents[1].changeEvent.attach(this, this.generateWsBlock);
+        const view = selectedTargetFunc.content.getEventMap('funcDef')[0].view;
+        if (!this._funcChangeEvent && view && view._contents && view._contents[1]) {
+            this._funcChangeEvent = view._contents[1].changeEvent.attach(
+                this,
+                this.generateWsBlock
+            );
         }
     }
 
@@ -804,6 +804,20 @@ class EntryFunc {
                 ['function_create_value', 'function_create'].includes(target?.type)
             ) {
                 tempContent[idx][0].type = blockType;
+                const params = tempContent[idx][0].params;
+                if (blockType === 'function_create_value') {
+                    while (params.length < 3) {
+                        params.push(null);
+                    }
+                    if (params.length < 4) {
+                        params.push({
+                            type: 'number',
+                            params: ['10'],
+                        });
+                    }
+                } else if (blockType === 'function_create') {
+                    params.length = 2;
+                }
                 block = target;
                 return true;
             }
@@ -831,7 +845,7 @@ class EntryFunc {
         if (!isUpdate && Entry.block[prefixedFunctionId]) {
             return;
         }
-        let BlockSchema = function() {};
+        let BlockSchema = function () { };
         BlockSchema.prototype = Entry.block.function_general;
 
         if (type === 'value') {

@@ -773,6 +773,13 @@ Entry.BlockToPyParser = class {
                 result += Entry.TextCodingUtil.indent(stmtResult).concat('\n');
             }
 
+            if (func.returnValue) {
+                const returnText = `return ${func.returnValue}\n`;
+                result += Entry.TextCodingUtil.indent(returnText).concat('\n');
+            } else if (!func.statements || func.statements.length === 0) {
+                result += Entry.TextCodingUtil.indent('pass\n').concat('\n');
+            }
+
             return result.trim();
         }
     }
@@ -860,6 +867,16 @@ Entry.BlockToPyParser = class {
         }
         if (funcContents.length !== 0) {
             result.statements = funcContents;
+        }
+
+        if (defBlock && defBlock.data && defBlock.data.type === 'function_create_value') {
+            const returnValueParam = defBlock.params[3];
+            if (returnValueParam) {
+                result.returnValue = this.Block(returnValueParam);
+            }
+            if (!result.returnValue) {
+                result.returnValue = '10';
+            }
         }
 
         return result;

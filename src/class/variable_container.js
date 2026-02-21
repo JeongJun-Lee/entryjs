@@ -83,7 +83,7 @@ Entry.VariableContainer = class VariableContainer {
             .addClass('entryVariableSelectorWorkspace')
             .appendTo(this.view_);
 
-        $(selectView).on('click tab', 'td', function() {
+        $(selectView).on('click tab', 'td', function () {
             if (this.disabled) {
                 return;
             }
@@ -127,11 +127,11 @@ Entry.VariableContainer = class VariableContainer {
             .addClass('entryVariableAdd_box')
             .appendTo(listViewContainer);
 
-        $(listView).on('mouseenter', '.entryVariableListElementWorkspace', function() {
+        $(listView).on('mouseenter', '.entryVariableListElementWorkspace', function () {
             this.addClass('active');
         });
 
-        $(listView).on('mouseleave', '.entryVariableListElementWorkspace', function() {
+        $(listView).on('mouseleave', '.entryVariableListElementWorkspace', function () {
             this.removeClass('active');
         });
 
@@ -269,7 +269,7 @@ Entry.VariableContainer = class VariableContainer {
             }
         } else if (object instanceof Entry.Func) {
             this.generateFuncSettingView(object);
-            // this.updateFuncSettingView(object); // To disable rtn_val&local_var functionality
+            this.updateFuncSettingView(object);
         } else {
             this.renderMessageReference(object);
         }
@@ -319,9 +319,8 @@ Entry.VariableContainer = class VariableContainer {
                 element.appendChild(thumb);
                 Entry.createElement('span')
                     .addClass('text')
-                    .appendTo(element).textContent = `${caller.object.name} : ${
-                    Lang.Blocks[`START_${caller.block.type}`]
-                }`;
+                    .appendTo(element).textContent = `${caller.object.name} : ${Lang.Blocks[`START_${caller.block.type}`]
+                    }`;
                 element.bindOnClick((e) => {
                     e.stopPropagation();
                     if (Entry.playground.object !== caller.object) {
@@ -401,9 +400,8 @@ Entry.VariableContainer = class VariableContainer {
                 element.appendChild(thumb);
                 Entry.createElement('span')
                     .addClass('text')
-                    .appendTo(element).textContent = `${caller.object.name} : ${
-                    Lang.Blocks[`VARIABLE_${caller.block.type}`]
-                }`;
+                    .appendTo(element).textContent = `${caller.object.name} : ${Lang.Blocks[`VARIABLE_${caller.block.type}`]
+                    }`;
                 element.variable = variable;
                 element.bindOnClick((e) => {
                     e.stopPropagation();
@@ -456,24 +454,23 @@ Entry.VariableContainer = class VariableContainer {
         }
         this.funcSettingView = element;
 
-        // To disable rtn_val&local_var functionality
-        // const funcAttr = createElement('div')
-        //     .addClass('func_attr')
-        //     .appendTo(element);
-        // if (this._isPythonMode()) {
-        //     funcAttr.addClass('hidden');
-        // }
-        // const boxSubject = createElement('span')
-        //     .addClass('box_sjt')
-        //     .appendTo(funcAttr);
-        // boxSubject.textContent = Lang.Workspace.func_property;
+        const funcAttr = createElement('div')
+            .addClass('func_attr')
+            .appendTo(element);
+        if (this._isPythonMode()) {
+            funcAttr.addClass('hidden');
+        }
+        const boxSubject = createElement('span')
+            .addClass('box_sjt')
+            .appendTo(funcAttr);
+        boxSubject.textContent = Lang.Workspace.func_property;
 
-        // this.generateFuncDefaultView(funcAttr, func);
-        // this.generateFuncLocalVariableView(funcAttr, func);
-        // this.generateFuncValuesView(funcAttr, func);
+        this.generateFuncDefaultView(funcAttr, func);
+        this.generateFuncLocalVariableView(funcAttr, func);
+        this.generateFuncValuesView(funcAttr, func);
         this.renderFunctionReference(func);
 
-        // this.funcSettingView.func = funcAttr;
+        this.funcSettingView.func = funcAttr;
         func.listElement.appendChild(this.funcSettingView);
     }
 
@@ -635,7 +632,7 @@ Entry.VariableContainer = class VariableContainer {
     generateFuncValuesView(element, func) {
         const localVariables = func.getLocalVariables() || [];
 
-        if (localVariables?.length === 0) {
+        if (localVariables?.length === 0 || this.funcSettingView.countGroup) {
             return;
         }
 
@@ -649,33 +646,70 @@ Entry.VariableContainer = class VariableContainer {
             .appendTo(countGroup);
         countLabel.textContent = Lang.Workspace.local_variable;
         const scrollBox = createElement('div')
-            .addClass('scroll_box simplebar-content-wrapper')
+            .addClass('scroll_box') // Removed simplebar-content-wrapper to prevent SimpleBar initialization error
             .appendTo(countGroup);
-        const el = new SimpleBar(scrollBox, { autoHide: false });
+        // Initialize SimpleBar after DOM update to prevent setAttribute error
         const parent = /* html */ `<ol class="cnt_list">{1}</ol>`;
         this.funcSettingView.countGroup = countGroup;
         this.funcSettingView.scrollBox = scrollBox;
-        this.funcSettingView.simpleBar = el;
-        const listValues = el.getContentElement();
-        this.funcSettingView.listValues = listValues;
-        const infinityScroll = new Entry.VirtualScroll(listValues, {
-            dataWrapper: parent,
-            itemHeight: 24,
-            groupSize: 10,
+
+        // Initialize SimpleBar after DOM update to prevent setAttribute error
+        requestAnimationFrame(() => {
+            if (!this.funcSettingView) {
+                return;
+            }
+            const el = new SimpleBar(scrollBox, { autoHide: false });
+            this.funcSettingView.simpleBar = el;
+
+            const listValues = el.getContentElement();
+            this.funcSettingView.listValues = listValues;
+
+            const infinityScroll = new Entry.VirtualScroll(listValues, {
+                dataWrapper: parent,
+                itemHeight: 24,
+                groupSize: 10,
+            });
+            this.funcSettingView.infinityScroll = infinityScroll;
+
+            // Trigger update once initialized
+            this.updateFuncScrollBar(func);
         });
-        this.funcSettingView.infinityScroll = infinityScroll;
+    }
 
-        const $listValues = $(listValues);
-        $listValues.empty();
-        $listValues.off();
+    updateFuncScrollBar(func) {
+        const view = this.funcSettingView;
+        if (!view) return;
 
-        const data = localVariables?.map((data, i) => {
+        if (!view.infinityScroll) {
+            this.generateFuncValuesView(view.func, func);
+            return;
+        }
+
+        const localVariables = func.getLocalVariables() || [];
+        const { infinityScroll, countGroup, lengthInput, simpleBar, scrollBox, listValues } = view;
+
+        if (lengthInput) {
+            lengthInput.value = localVariables.length;
+        }
+
+        if (localVariables.length === 0) {
+            countGroup?.addClass('entryRemove');
+            return;
+        }
+        countGroup?.removeClass('entryRemove');
+
+        const data = localVariables.map((data, i) => {
             const value = String(data.name).replace(/\$/g, '&#36;');
             return this.createListValueElement(i, value, 1);
         });
 
+        const $listValues = $(listValues);
+        $listValues.off();
+        $listValues.empty();
+
         infinityScroll.assignData(data);
         infinityScroll.show();
+
         $listValues.on(
             'change',
             'input',
@@ -687,52 +721,21 @@ Entry.VariableContainer = class VariableContainer {
         );
         $listValues.on('focus', 'input', Entry.Utils.setFocused);
         $listValues.on('keypress', 'input', Entry.Utils.blurWhenEnter);
-        $listValues.on('click', 'a', function() {
+        $listValues.on('click', 'a', function () {
             const index = this.getAttribute('data-index');
             Entry.do('removeFuncLocalVariableByIndex', func, index);
             Entry.dispatchEvent('changeFuncVariableListSize');
         });
-    }
 
-    updateFuncScrollBar(func) {
-        const view = this.funcSettingView;
-        if (!view) {
-            return;
-        }
-
-        if (!view.infinityScroll) {
-            this.generateFuncValuesView(this.funcSettingView.func, func);
-            requestAnimationFrame(() => {
-                this.updateFuncScrollBar(func);
-            });
-            return;
-        }
-
-        const localVariables = func.getLocalVariables() || [];
-        const { infinityScroll, countGroup, lengthInput, simpleBar, scrollBox } = view;
-
-        lengthInput.value = func.localVariables?.length || 0;
-
-        if (localVariables?.length === 0) {
-            countGroup?.addClass('entryRemove');
-            return;
-        }
-        countGroup?.removeClass('entryRemove');
-
-        const data = localVariables?.map((data, i) => {
-            const value = String(data.name).replace(/\$/g, '&#36;');
-            return this.createListValueElement(i, value, 1);
-        });
-
-        infinityScroll.assignData(data);
-        infinityScroll.show();
-
-        if (localVariables?.length > 4) {
+        if (localVariables.length > 4) {
             scrollBox.addClass('on');
         } else {
             scrollBox.removeClass('on');
         }
-        simpleBar.recalculate();
+
+        if (simpleBar) {
+            simpleBar.recalculate();
+        }
     }
 
     updateFuncSettingView(func) {
@@ -892,13 +895,13 @@ Entry.VariableContainer = class VariableContainer {
             if (this._isPythonMode()) {
                 $(data.listElement)
                     .find('input')
-                    .each(function() {
+                    .each(function () {
                         $(this).attr('disabled', 'disabled');
                     });
             } else {
                 $(data.listElement)
                     .find('input')
-                    .each(function() {
+                    .each(function () {
                         $(this).removeAttr('disabled');
                     });
             }
@@ -1952,7 +1955,7 @@ Entry.VariableContainer = class VariableContainer {
         editBoxInput.setAttribute('type', 'text');
         editBoxInput.setAttribute('name', 'inpt_name');
         editBoxInput.value = variable.name_;
-        editBoxInput.onblur = function() {
+        editBoxInput.onblur = function () {
             const value = this.value.trim();
             if (!value) {
                 Entry.toast.alert(Lang.Msgs.warn, Lang.Msgs.variable_can_not_space);
@@ -2108,7 +2111,7 @@ Entry.VariableContainer = class VariableContainer {
         editBoxInput.setAttribute('type', 'text');
         editBoxInput.value = message.name;
         editBoxInput.onfocus = Entry.Utils.setFocused;
-        editBoxInput.onblur = Entry.Utils.setBlurredTimer(function() {
+        editBoxInput.onblur = Entry.Utils.setBlurredTimer(function () {
             const value = this.value;
             if (!value.trim()) {
                 Entry.toast.alert(Lang.Msgs.warn, Lang.Msgs.sign_can_not_space);
@@ -2223,7 +2226,7 @@ Entry.VariableContainer = class VariableContainer {
         editBoxInput.setAttribute('type', 'text');
         editBoxInput.setAttribute('name', 'inpt_name');
         editBoxInput.value = list.name_;
-        editBoxInput.onblur = function() {
+        editBoxInput.onblur = function () {
             const value = this.value.trim();
             if (!value) {
                 Entry.toast.alert(Lang.Msgs.warn, Lang.Msgs.list_can_not_space);
@@ -2368,7 +2371,7 @@ Entry.VariableContainer = class VariableContainer {
         addSpaceInput.id = 'entryVariableAddSpaceInputWorkspace';
         addSpaceInput.setAttribute('placeholder', Lang.Workspace.Variable_placeholder_content);
         addSpaceInput.variableContainer = this;
-        addSpaceInput.onkeypress = _whenEnter(function() {
+        addSpaceInput.onkeypress = _whenEnter(function () {
             if (this.enterKeyDisabled) {
                 this.blur();
             } else {
@@ -2376,7 +2379,7 @@ Entry.VariableContainer = class VariableContainer {
             }
         });
         addSpaceInput.onfocus = _setFocused;
-        const doBlur = _setBlurredTimer(function() {
+        const doBlur = _setBlurredTimer(function () {
             this.isBlurred = false;
             Entry.do('variableAddSetName', this.value);
             this.blurCallback && this.blurCallback();
@@ -2547,7 +2550,7 @@ Entry.VariableContainer = class VariableContainer {
         addSpaceInput.setAttribute('type', 'text');
         addSpaceInput.id = 'entryVariableAddSpaceInputWorkspace';
         addSpaceInput.setAttribute('placeholder', Lang.Workspace.list_create_placeholder);
-        addSpaceInput.onkeypress = Entry.Utils.whenEnter(function() {
+        addSpaceInput.onkeypress = Entry.Utils.whenEnter(function () {
             if (this.enterKeyDisabled) {
                 this.blur();
             } else {
@@ -2555,7 +2558,7 @@ Entry.VariableContainer = class VariableContainer {
             }
         });
         addSpaceInput.onfocus = _setFocused;
-        const doBlur = _setBlurredTimer(function() {
+        const doBlur = _setBlurredTimer(function () {
             this.isBlurred = false;
             Entry.do('listAddSetName', this.value);
             this.blurCallback && this.blurCallback();
@@ -2672,7 +2675,7 @@ Entry.VariableContainer = class VariableContainer {
         msgNameInput.setAttribute('autocomplete', 'off');
         msgNameInput.setAttribute('type', 'text');
         msgNameInput.setAttribute('placeholder', Lang.Workspace.message_create_placeholder);
-        msgNameInput.onkeydown = Entry.Utils.whenEnter(function() {
+        msgNameInput.onkeydown = Entry.Utils.whenEnter(function () {
             if (this.enterKeyDisabled) {
                 this.blur();
             } else {
@@ -2925,7 +2928,7 @@ Entry.VariableContainer = class VariableContainer {
         attrInput.value = 0;
         attrInput.onkeypress = Entry.Utils.blurWhenEnter;
         attrInput.onfocus = _setFocused;
-        attrInput.onblur = _setBlurredTimer(function() {
+        attrInput.onblur = _setBlurredTimer(function () {
             const v = that.selected;
             if (!v) {
                 console.error('error: not selected');
@@ -2979,7 +2982,7 @@ Entry.VariableContainer = class VariableContainer {
         }
         minValueInput.onkeypress = Entry.Utils.blurWhenEnter;
         minValueInput.onfocus = _setFocused;
-        minValueInput.onblur = _setBlurredTimer(function() {
+        minValueInput.onblur = _setBlurredTimer(function () {
             const v = that.selected;
             let value = this.value;
             value = Entry.Utils.isNumber(value) ? value : v.getMinValue();
@@ -3004,7 +3007,7 @@ Entry.VariableContainer = class VariableContainer {
 
         maxValueInput.onkeypress = Entry.Utils.blurWhenEnter;
         maxValueInput.onfocus = _setFocused;
-        maxValueInput.onblur = _setBlurredTimer(function() {
+        maxValueInput.onblur = _setBlurredTimer(function () {
             const v = that.selected;
             let value = this.value;
             value = Entry.Utils.isNumber(value) ? value : v.getMaxValue();
@@ -3160,7 +3163,7 @@ Entry.VariableContainer = class VariableContainer {
         countInput.setAttribute('type', 'text');
         countInput.setAttribute('maxlength', maxlength);
 
-        countInput.onblur = function() {
+        countInput.onblur = function () {
             const v = that.selected;
             let value = this.value;
             const array_ = v.getArray();
@@ -3239,8 +3242,8 @@ Entry.VariableContainer = class VariableContainer {
         <li>
             <span class="cnt">${+index + startIndex}</span>
             <input value="${xssFilters.inDoubleQuotedAttr(
-                value
-            )}" type="text" data-index="${index}"/>
+            value
+        )}" type="text" data-index="${index}"/>
             <a class="del" data-index="${index}"></a>
         </li>`.trim();
     }
@@ -3295,7 +3298,7 @@ Entry.VariableContainer = class VariableContainer {
             );
             $listValues.on('focus', 'input', Entry.Utils.setFocused);
             $listValues.on('keypress', 'input', Entry.Utils.blurWhenEnter);
-            $listValues.on('click', 'a', function() {
+            $listValues.on('click', 'a', function () {
                 const index = this.getAttribute('data-index');
                 arr.splice(index, 1);
                 that.updateListSettingView();

@@ -77,14 +77,10 @@ Entry.PyToBlockParser = class {
             astArrBody[0].expression.type === 'AssignmentExpression';
 
         if (hasVariable) {
-            const variableArr = this.getVariables(astArr[0]);
-            astArr.splice(0, 1);
-            const contentArr = astArr.map(this.Node, this);
-
-            result = variableArr.concat(contentArr);
-        } else {
-            result = astArr.map(this.Node, this);
+            const consumedCount = this.getVariables(astArr[0]);
+            astArr[0].body.splice(0, consumedCount);
         }
+        result = astArr.map(this.Node, this);
 
         return result.filter((t) => t.length > 0);
     }
@@ -95,7 +91,7 @@ Entry.PyToBlockParser = class {
             this.assert(typeof result === 'object', '', n, 'NO_SUPPORT', 'GENERAL');
             return result;
         }, this);
-        if (thread[0].constructor === Array) {
+        if (thread.length > 0 && thread[0] && thread[0].constructor === Array) {
             return thread[0];
         } else {
             return thread;
@@ -165,8 +161,7 @@ Entry.PyToBlockParser = class {
                 throw new Error(`${value} is not supported key name`);
             }
             obj.params = [
-                `${
-                    Entry.KeyboardCode.map[typeof value === 'string' ? value.toLowerCase() : value]
+                `${Entry.KeyboardCode.map[typeof value === 'string' ? value.toLowerCase() : value]
                 }`,
             ];
         }
@@ -180,6 +175,13 @@ Entry.PyToBlockParser = class {
         if (this._isInFuncDef && this._funcParamMap[name]) {
             return {
                 type: `stringParam_${this._funcParamMap[name]}`,
+            };
+        }
+
+        if (this._isInFuncDef && this._localVariableMap && this._localVariableMap[name]) {
+            return {
+                type: 'get_func_variable',
+                params: [this._localVariableMap[name]],
             };
         }
 
@@ -259,6 +261,16 @@ Entry.PyToBlockParser = class {
                     }
                     break;
                 case 'Identifier':
+                    if (this._isInFuncDef) {
+                        leftVar = Entry.variableContainer.getVariableByName(left.name, false);
+                        if (!leftVar) {
+                            const localId = this.getOrCreateLocalVariable(left.name);
+                            result.type = 'set_func_variable';
+                            result.params.push(localId);
+                            break;
+                        }
+                    }
+
                     result.type = 'set_variable';
                     leftVar = Entry.variableContainer.getVariableByName(left.name, false);
                     if (!leftVar) {
@@ -420,11 +432,13 @@ Entry.PyToBlockParser = class {
     }
 
     WhileStatement(component) {
+        this._loopDepth = (this._loopDepth || 0) + 1;
         const comment = component.body.comment;
         const blocks = component.body.body;
         const obj = {
             statements: [this.setParams(blocks)],
         };
+        this._loopDepth--;
         const test = component.test;
         if (test.raw === 'True') {
             obj.type = 'repeat_inf';
@@ -482,16 +496,8 @@ Entry.PyToBlockParser = class {
                 params: [this.Node(component.test)],
             };
         } else {
-            const consequent = component.consequent
-                ? component.consequent.body
-                      .map(this.Node, this)
-                      .map((b) => (Array.isArray(b) ? b[0] : b))
-                : [];
-            const alternates = component.alternate
-                ? component.alternate.body
-                      .map(this.Node, this)
-                      .map((b) => (Array.isArray(b) ? b[0] : b))
-                : [];
+            const consequent = this.setParams(component.consequent.body);
+            const alternates = this.setParams(component.alternate.body);
             alternate = {
                 type: 'if_else',
                 statements: [consequent, alternates],
@@ -512,6 +518,7 @@ Entry.PyToBlockParser = class {
     }
 
     ForInStatement(component) {
+        this._loopDepth = (this._loopDepth || 0) + 1;
         // let  expression = component.body.body[0] && 'expression' in component.body.body[0] ?
         //                     this.Node(component.body.body[0].expression) : null;
         const result = {
@@ -519,6 +526,7 @@ Entry.PyToBlockParser = class {
             params: [],
             statements: [],
         };
+        this._loopDepth--;
 
         if (component.body.comment) {
             result.comment = component.body.comment;
@@ -643,6 +651,8 @@ Entry.PyToBlockParser = class {
         this.assert(!this._isInFuncDef, funcName, component, 'NO_ENTRY_EVENT_FUNCTION', 'FUNCTION');
 
         this._isInFuncDef = true;
+        this._localVariableMap = {};
+        this._funcParamMap = {};
         this.assert(component.body.body[0], funcName, component, 'NO_OBJECT', 'OBJECT');
 
         if (funcName === 'when_press_key') {
@@ -658,10 +668,9 @@ Entry.PyToBlockParser = class {
                 }
                 startBlock.params = [
                     null,
-                    `${
-                        Entry.KeyboardCode.map[
-                            typeof value === 'string' ? value.toLowerCase() : value
-                        ]
+                    `${Entry.KeyboardCode.map[
+                    typeof value === 'string' ? value.toLowerCase() : value
+                    ]
                     }`,
                 ];
             }
@@ -687,7 +696,9 @@ Entry.PyToBlockParser = class {
                 startBlock.comment = comment;
             }
 
+            this._isInFuncDef = false; // Event blocks should use global scope
             const definedBlocks = this.setParams(blocks);
+            this._isInFuncDef = true; // Restore for cleanup
             definedBlocks.unshift(startBlock);
 
             this._isInFuncDef = false;
@@ -704,7 +715,31 @@ Entry.PyToBlockParser = class {
     }
 
     ReturnStatement(component) {
-        return component.argument.arguments.map(this.Node, this);
+        if (this._isInFuncDef && this._isCurrentFuncValue && this._funcResultVarId) {
+            const resultVarId = this._funcResultVarId;
+            const valueBlock = component.argument ? this.Node(component.argument) : { type: 'text', params: ['None'] };
+            const setVarBlock = {
+                type: 'set_func_variable',
+                params: [resultVarId, valueBlock, null],
+            };
+
+            if (this._loopDepth > 0) {
+                const stopBlock = {
+                    type: 'stop_object',
+                    params: ['thisThread', null],
+                };
+                return [setVarBlock, stopBlock];
+            }
+            return setVarBlock;
+        }
+
+        if (component.argument) {
+            if (component.argument.arguments && Array.isArray(component.argument.arguments)) {
+                return component.argument.arguments.map(this.Node, this);
+            }
+            return this.Node(component.argument);
+        }
+        return [];
     }
 
     // ThisExpression(component) {};
@@ -779,10 +814,10 @@ Entry.PyToBlockParser = class {
                     'VARIABLE'
                 );
 
-                if (paramSchema.type !== 'Block' && param && param.params) {
+                if (paramSchema && paramSchema.type !== 'Block' && param && param.params) {
                     // for list and variable dropdown
                     param = param.params[0];
-                } else if (paramSchema.type === 'Block' && paramSchema.isListIndex) {
+                } else if (paramSchema && paramSchema.type === 'Block' && paramSchema.isListIndex) {
                     param = this.ListIndex(param);
                 }
 
@@ -1083,15 +1118,55 @@ Entry.PyToBlockParser = class {
     }
 
     setParams(params) {
-        const definedBlocks = params.length
-            ? params.map(function(n) {
-                  const result = this.Node(n);
-                  this.assert(typeof result === 'object', '', n, 'NO_SUPPORT', 'GENERAL');
-                  return result;
-              }, this)
-            : [];
+        if (!params || params.length === 0) {
+            return [];
+        }
 
-        let results = [];
+        const definedBlocks = [];
+        for (let i = 0; i < params.length; i++) {
+            const n = params[i];
+
+            if (n.type === 'ReturnStatement') {
+                const result = this.Node(n);
+                if (Array.isArray(result)) {
+                    definedBlocks.push(...result);
+                } else {
+                    definedBlocks.push(result);
+                }
+                break; // Unreachable code after direct return
+            }
+
+            if (n.type === 'IfStatement' && this.hasReturnStatement(n.consequent)) {
+                if (i < params.length - 1) {
+                    const rest = params.slice(i + 1);
+                    if (!n.alternate) {
+                        n.alternate = {
+                            type: 'BlockStatement',
+                            body: rest,
+                        };
+                        const result = this.Node(n);
+                        definedBlocks.push(Array.isArray(result) ? result[0] : result);
+                        break;
+                    } else if (n.alternate.type === 'BlockStatement') {
+                        n.alternate.body = n.alternate.body.concat(rest);
+                        const result = this.Node(n);
+                        definedBlocks.push(Array.isArray(result) ? result[0] : result);
+                        break;
+                    }
+                }
+            }
+
+            const result = this.Node(n);
+            if (result) {
+                if (Array.isArray(result)) {
+                    definedBlocks.push(...result);
+                } else {
+                    definedBlocks.push(result);
+                }
+            }
+        }
+
+        const results = [];
         for (let i = 0; i < definedBlocks.length; i++) {
             const db = definedBlocks[i];
 
@@ -1102,13 +1177,18 @@ Entry.PyToBlockParser = class {
             }
         }
 
-        return results.filter((b) => b.constructor === Object);
+        return results.filter((b) => b && b.constructor === Object);
     }
 
     getVariables(program) {
         const nodes = program.body;
+        let count = 0;
 
-        nodes.map(function(n) {
+        for (let i = 0; i < nodes.length; i++) {
+            let n = nodes[i];
+            if (n.type !== 'ExpressionStatement' || n.expression.type !== 'AssignmentExpression') {
+                break;
+            }
             n = n.expression;
             let left = n.left;
             const right = n.right;
@@ -1119,7 +1199,7 @@ Entry.PyToBlockParser = class {
             let array;
 
             if (n.operator != '=') {
-                return;
+                break;
             }
 
             if (right.type === 'NewExpression' && right.callee.property.name == 'list') {
@@ -1181,20 +1261,20 @@ Entry.PyToBlockParser = class {
                 if (existVar) {
                     if (type == 'lists_') {
                         existVar.array_ = obj.array;
-                        return;
+                    } else {
+                        existVar.value_ = this.getValue(right);
                     }
-                    existVar.value_ = this.getValue(right);
-                    return;
                 } else {
-                    obj.variableType = type.slice(0, length - 2);
+                    obj.variableType = type.slice(0, type.length - 2);
                     obj.name = name;
                     obj.object = object;
                     Entry.variableContainer[functionType](obj);
                 }
             }
-        }, this);
+            count++;
+        }
 
-        return [];
+        return count;
     }
 
     variableExist(name, type) {
@@ -1324,8 +1404,10 @@ Entry.PyToBlockParser = class {
         let funcId = Entry.generateHash();
         for (const key in functions) {
             const funcSchema = Entry.block[`func_${key}`];
+            const funcEntry = functions[key];
+            const expectedLength = funcEntry.type === 'value' ? params.length : params.length + 1;
             if (
-                funcSchema.params.length === params.length + 1 &&
+                funcSchema.params.length === expectedLength &&
                 funcSchema.template
                     .trim()
                     .split(' ')[0]
@@ -1336,31 +1418,39 @@ Entry.PyToBlockParser = class {
             }
         }
 
+        this._currentFuncId = funcId;
+        this._localVariableMap = {};
+        this._collectedLocalVariables = [];
+
+        let returnStatement = null;
+        if (blocks.length > 0) {
+            const lastBlock = blocks[blocks.length - 1];
+            if (lastBlock.type === 'ReturnStatement') {
+                returnStatement = lastBlock;
+                blocks.pop();
+            }
+        }
+
+        const hasNestedReturn = this.hasReturnStatement(blocks);
+        const isValueFunc = !!returnStatement || hasNestedReturn;
+        this._isCurrentFuncValue = isValueFunc;
+        this._funcResultVarId = null;
+
+        if (isValueFunc && hasNestedReturn) {
+            this._funcResultVarId = this.getOrCreateLocalVariable('result');
+            if (returnStatement) {
+                blocks.push(returnStatement);
+                returnStatement = null;
+            }
+        }
+
         //함수 선언 블록 내 값블록
         let funcParamPointer = {
             type: 'function_field_label',
             params: [funcName],
         };
-        //함수 선언 블록
-        const funcDeclarationContent = {
-            type: 'function_create',
-            params: [funcParamPointer],
-        };
-        const func = {
-            id: funcId,
-            content: [[funcDeclarationContent]],
-        };
-
-        // 함수 선언 블록에 달린 코멘트 처리
-        const comment = component.body.body[0].argument.callee.object.body.comment;
-        if (comment) {
-            funcDeclarationContent.comment = comment;
-        }
-
-        if (!this._funcMap[funcName]) {
-            this._funcMap[funcName] = {};
-        }
-        this._funcMap[funcName][params.length] = func.id;
+        const funcParamStartPointer = funcParamPointer;
+        const paramLength = params.length;
 
         while (params.length) {
             // generate param
@@ -1383,17 +1473,119 @@ Entry.PyToBlockParser = class {
         const definedBlocks = this.setParams(blocks); // function content
         this._funcParamMap = {};
 
-        func.content[0] = func.content[0].concat(definedBlocks);
+        if (isValueFunc && hasNestedReturn) {
+            // Initialize result variable to None at the start
+            const initBlock = {
+                type: 'set_func_variable',
+                params: [this._funcResultVarId, { type: 'text', params: ['None'] }, null],
+            };
+            definedBlocks.unshift(initBlock);
+        }
 
+        let returnValueBlock = null;
+        if (this._funcResultVarId) {
+            returnValueBlock = {
+                type: 'get_func_variable',
+                params: [this._funcResultVarId],
+            };
+        } else if (returnStatement && returnStatement.argument) {
+            returnValueBlock = this.Node(returnStatement.argument);
+        }
+
+        //함수 선언 블록
+        const funcDeclarationContent = {
+            type: returnValueBlock ? 'function_create_value' : 'function_create',
+            params: returnValueBlock
+                ? [funcParamStartPointer, null, null, returnValueBlock]
+                : [funcParamStartPointer],
+        };
+
+        const func = {
+            id: funcId,
+            type: returnValueBlock ? 'value' : 'normal',
+            content: [[funcDeclarationContent]],
+            localVariables: this._collectedLocalVariables,
+            useLocalVariables: this._collectedLocalVariables.length > 0,
+        };
+
+        // 함수 선언 블록에 달린 코멘트 처리
+        const comment = component.body.body[0].argument.callee.object.body.comment;
+        if (comment) {
+            funcDeclarationContent.comment = comment;
+        }
+
+        if (!this._funcMap[funcName]) {
+            this._funcMap[funcName] = {};
+        }
+        this._funcMap[funcName][paramLength] = func.id;
+
+        funcDeclarationContent.statements = [definedBlocks];
         func.content = JSON.stringify(func.content);
+
         if (functions[funcId]) {
             const targetFunc = functions[funcId];
+            targetFunc.localVariables = func.localVariables;
+            targetFunc.useLocalVariables = func.useLocalVariables;
+            targetFunc.type = func.type;
             targetFunc.content = new Entry.Code(func.content);
             targetFunc.generateBlock(true);
             Entry.Func.generateWsBlock(targetFunc);
         } else {
             Entry.variableContainer.setFunctions([func]);
         }
+
+        this._isCurrentFuncValue = false;
+        this._funcResultVarId = null;
+    }
+
+    hasReturnStatement(nodes) {
+        if (!nodes) {
+            return false;
+        }
+
+        let body;
+        if (Array.isArray(nodes)) {
+            body = nodes;
+        } else if (nodes.type === 'BlockStatement') {
+            body = nodes.body;
+        } else if (nodes.body) {
+            return this.hasReturnStatement(nodes.body);
+        } else {
+            body = [nodes];
+        }
+
+        for (const n of body) {
+            if (n.type === 'ReturnStatement') {
+                return true;
+            }
+            if (n.consequent && this.hasReturnStatement(n.consequent)) {
+                return true;
+            }
+            if (n.alternate && this.hasReturnStatement(n.alternate)) {
+                return true;
+            }
+            if (n.body && this.hasReturnStatement(n.body)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    getOrCreateLocalVariable(name) {
+        if (!this._localVariableMap) {
+            this._localVariableMap = {};
+            this._collectedLocalVariables = [];
+        }
+        let localId = this._localVariableMap[name];
+        if (!localId) {
+            localId = `${this._currentFuncId}_${Entry.generateHash()}`;
+            this._localVariableMap[name] = localId;
+            this._collectedLocalVariables.push({
+                name: name,
+                id: localId,
+            });
+        }
+        return localId;
     }
 
     /**

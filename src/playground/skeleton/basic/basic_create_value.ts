@@ -1,39 +1,34 @@
-import _take from 'lodash/take';
-import _takeRight from 'lodash/takeRight';
-
-const getFirstBoxWidth = (blockView: any): number => {
-    const contents = _take(blockView._contents, 3);
-    return contents.reduce<number>((acc, content: any) => acc + content.box.width, 20);
-};
-
-const getSecondBoxWidth = (blockView: any): number => {
-    const contents = _takeRight(blockView._contents, 3);
-    return contents.reduce<number>((acc, content: any) => acc + content.box.width, 20);
-};
-
 Entry.skeleton.basic_create_value = {
     executable: true,
     path(blockView) {
-        let height = blockView.contentHeight % 1000000;
-        height = Math.max(30, height + 2);
-        const statements = blockView._statements;
-        let statementHeight = statements[0] ? statements[0].height : 20;
-        const halfHeight = height / 2;
+        // 1. Calculate Robust Width
+        // Use contentWidth but ensure minimum 150 to prevent crumpling
+        let width = blockView.contentWidth || 150;
+        width = Math.max(150, width + 10); // +10 buffer
 
-        statementHeight = Math.max(statementHeight, 20);
+        // 2. Calculate Statement Height
+        const statements = blockView._statements || [];
+        let statementHeight = (statements[0] && statements[0].height) || 30;
+        statementHeight = Math.max(30, statementHeight);
+
+        // 3. Define geometry
+        // Top Bar Height: fixed to wrap text nicely.
+        // We reduce the vertical gap by 3px to move the bottom bar UP.
+        // This fixes the "Return 10" text looking shifted top (by aligning the bar to the text).
+        const adjustedHeight = statementHeight - 3;
 
         return `M 0 0                
                 V 1
-                h ${getFirstBoxWidth(blockView)}
+                h ${width}
                 a 14 14 0 0 1 0 28
                 H 26
                 l -6 6
                 l -6 -6
-                v ${statementHeight}
+                v ${adjustedHeight}
                 l 6 6
                 l 6 -6
-                h ${getSecondBoxWidth(blockView) - 15}
-                a ${halfHeight} ${halfHeight} 0 0 1 0 ${height}
+                h ${width - 26}
+                a 14 14 0 0 1 0 28
                 H 0
                 z`;
     },
@@ -41,22 +36,32 @@ Entry.skeleton.basic_create_value = {
         return {};
     },
     box(blockView) {
-        const width = blockView ? blockView.contentWidth : 150;
-        const height = blockView ? blockView.height : 28;
+        // Match Width logic
+        let width = blockView.contentWidth || 150;
+        width = Math.max(150, width + 10);
+
+        const statements = blockView._statements || [];
+        let statementHeight = (statements[0] && statements[0].height) || 30;
+        statementHeight = Math.max(30, statementHeight);
+
+        // Reduce total height slightly to match the path adjustment
+        const totalHeight = 30 + statementHeight + 30 - 3;
+
         return {
             offsetX: -8,
             offsetY: 0,
-            width: width + 30,
-            height: Math.max(30, height),
+            width: width + 30, // Hitbox padding
+            height: totalHeight,
             marginBottom: 0,
         };
     },
     statementPos(blockView) {
-        const height1 = Math.max(30, (blockView.contentHeight % 1000000) + 2) + 1;
-        return [{ x: 14, y: height1 - 3 }];
+        // Statement starts immediately after Top Bar
+        return [{ x: 14, y: 30 }];
     },
     contentPos(blockView) {
-        const height = Math.max(blockView.contentHeight % 1000000, 28);
-        return { x: 14, y: height / 2 + 1 };
+        // Content (Function Name) MUST start in the Top Bar.
+        // Center of Top Bar (30px) is 15px.
+        return { x: 14, y: 15 };
     },
 };

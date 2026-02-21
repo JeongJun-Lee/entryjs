@@ -20,7 +20,7 @@ module.exports = {
                 },
                 events: {
                     mousedown: [
-                        function() {
+                        function () {
                             Entry.do('funcEditStart', Entry.generateHash());
                         },
                     ],
@@ -67,7 +67,7 @@ module.exports = {
                 },
                 events: {
                     mousedown: [
-                        function() {
+                        function () {
                             Entry.do(
                                 'playgroundChangeViewMode',
                                 'variable',
@@ -129,7 +129,7 @@ module.exports = {
                 ],
                 events: {
                     updateFuncVariableList: [
-                        function() {
+                        function () {
                             const func = Entry.Func.targetFunc || {};
                             func?.content
                                 ?.getBlockList(false, 'set_func_variable')
@@ -177,7 +177,7 @@ module.exports = {
                                 {
                                     type: 'DropdownDynamic',
                                     value: null,
-                                    menuName: 'variables',
+                                    menuName: 'func_variables',
                                     fontSize: 11,
                                     arrowColor: EntryStatic.colorSet.arrow.default.VARIABLE,
                                     converter: Entry.block.converters.returnRawStringKey,
@@ -237,7 +237,7 @@ module.exports = {
                 ],
                 events: {
                     updateFuncVariableList: [
-                        function() {
+                        function () {
                             const func = Entry.Func.targetFunc || {};
                             func?.content
                                 ?.getBlockList(false, 'get_func_variable')
@@ -264,7 +264,21 @@ module.exports = {
                 },
                 syntax: {
                     js: [],
-                    py: [],
+                    py: [
+                        {
+                            syntax: '%1',
+                            textParams: [
+                                {
+                                    type: 'DropdownDynamic',
+                                    value: null,
+                                    menuName: 'func_variables',
+                                    fontSize: 11,
+                                    arrowColor: EntryStatic.colorSet.arrow.default.VARIABLE,
+                                    converter: Entry.block.converters.returnRawStringKey,
+                                },
+                            ],
+                        },
+                    ],
                 },
             },
             function_create_value: {
@@ -341,7 +355,7 @@ module.exports = {
                 ],
                 events: {
                     dataAdd: [
-                        function(block) {
+                        function (block) {
                             const vc = Entry.variableContainer;
                             if (vc) {
                                 vc.addRef('_functionRefs', block);
@@ -349,7 +363,7 @@ module.exports = {
                         },
                     ],
                     dataDestroy: [
-                        function(block) {
+                        function (block) {
                             const vc = Entry.variableContainer;
                             if (vc) {
                                 vc.removeRef('_functionRefs', block);
@@ -357,7 +371,7 @@ module.exports = {
                         },
                     ],
                     dblclick: [
-                        function(blockView) {
+                        function (blockView) {
                             const mode = blockView.getBoard().workspace.getMode();
                             if (mode !== Entry.Workspace.MODE_BOARD) {
                                 return;
@@ -414,7 +428,7 @@ module.exports = {
                 params: [],
                 events: {
                     dataAdd: [
-                        function(block) {
+                        function (block) {
                             const vc = Entry.variableContainer;
                             if (vc) {
                                 vc.addRef('_functionRefs', block);
@@ -422,7 +436,7 @@ module.exports = {
                         },
                     ],
                     dataDestroy: [
-                        function(block) {
+                        function (block) {
                             const vc = Entry.variableContainer;
                             if (vc) {
                                 vc.removeRef('_functionRefs', block);
@@ -430,7 +444,7 @@ module.exports = {
                         },
                     ],
                     dblclick: [
-                        function(blockView) {
+                        function (blockView) {
                             const mode = blockView.getBoard().workspace.getMode();
                             if (mode !== Entry.Workspace.MODE_BOARD) {
                                 return;
@@ -576,7 +590,7 @@ module.exports = {
                 template: '%1 %2',
                 events: {
                     viewAdd: [
-                        function() {
+                        function () {
                             if (Entry.Func.isEdit) {
                                 Entry.Func.refreshMenuCode();
                             }
@@ -596,7 +610,7 @@ module.exports = {
                 template: '%1 %2',
                 events: {
                     viewAdd: [
-                        function() {
+                        function () {
                             if (Entry.Func.isEdit) {
                                 Entry.Func.refreshMenuCode();
                             }

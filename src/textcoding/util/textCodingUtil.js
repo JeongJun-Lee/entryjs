@@ -172,6 +172,29 @@ class TextCodingUtil {
                 }
                 break;
             }
+            case 'func_variables': {
+                const entryFunctions = Entry.variableContainer.functions_;
+                for (const funcKey in entryFunctions) {
+                    const entryFunction = entryFunctions[funcKey];
+                    const localVariables = entryFunction.localVariables;
+                    if (localVariables) {
+                        for (const i in localVariables) {
+                            const localVariable = localVariables[i];
+                            if (localVariable.id === id) {
+                                result = localVariable.name;
+                                if (/^[0-9]/.test(result)) {
+                                    result = `_${result}`;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    if (result) {
+                        break;
+                    }
+                }
+                break;
+            }
         }
 
         return result;
@@ -505,9 +528,7 @@ class TextCodingUtil {
         const activatedUtilizeBlock = Entry.aiUtilizeBlocks;
         const tables = Entry.playground.dataTable ? Entry.playground.dataTable.tables : [];
         const functions = Entry.variableContainer.functions_;
-        const isNotPythonSupportFunciton = Object.keys(functions).some(
-            (key) => functions[key].useLocalVariables || functions[key].type === 'value'
-        );
+        const isNotPythonSupportFunciton = false;
         const isNotSupportedUsed = this.getNotSupportedBlocks().some((name) =>
             Entry.Utils.isUsedBlockType(name)
         );

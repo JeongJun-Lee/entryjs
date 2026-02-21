@@ -2,7 +2,7 @@
 
 /* eslint-disable */
 var EntryStatic = {
-    fontFamily: "NanumGothic, 'Nanum Gothic'",
+    fontFamily: "NanumGothic, 'Nanum Gothic', sans-serif",
     exportBlockFontFamily:
         "NanumGothic, 'Nanum Gothic', 'NanumGothic', '나눔고딕','NanumGothicWeb', '맑은 고딕', 'Malgun Gothic', Dotum",
     fontOffsetY: -2.5,
@@ -177,7 +177,7 @@ EntryStatic.categoryProjectOption = [
     },
 ];
 
-EntryStatic.getAllBlocks = function() {
+EntryStatic.getAllBlocks = function () {
     return [
         {
             category: 'start',
@@ -782,7 +782,7 @@ EntryStatic.artPeriodOptions = [
     },
 ];
 
-EntryStatic.getCategoryByBlock = function(blockName) {
+EntryStatic.getCategoryByBlock = function (blockName) {
     if (!blockName) {
         return false;
     }
@@ -833,7 +833,7 @@ EntryStatic.objectSubCategories = {
 
 /* eslint-disable */
 Object.defineProperty(EntryStatic, 'fonts', {
-    get: function() {
+    get: function () {
         return [
             {
                 name: Lang.Fonts.batang,
@@ -1133,7 +1133,7 @@ EntryStatic.COMMAND_TYPES = {
     redo: 303,
 };
 
-EntryStatic.getQuestionCategoryData = function() {
+EntryStatic.getQuestionCategoryData = function () {
     return {
         category: 'dummy',
         blocks: [
@@ -1147,7 +1147,7 @@ EntryStatic.getQuestionCategoryData = function() {
     };
 };
 
-EntryStatic.getDefaultFontFamily = function() {
+EntryStatic.getDefaultFontFamily = function () {
     const localLang = Lang || {};
     const type = localLang.type;
     const fallbackType = localLang.fallbackType;
