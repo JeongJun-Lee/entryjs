@@ -9,6 +9,7 @@ Entry.BlockToArParser = class {
         this._funcParamMap = new Entry.Map();
         this.funcDefMap = {};
         this.funcSyntax = '';
+        this._funcParamTypeMap = new Entry.Map();
         this.init();
     }
 
@@ -24,6 +25,8 @@ Entry.BlockToArParser = class {
         this._pramVal = [];
         this._isInRepeat = false;
         this._hasRootFunc = false;
+        this.funcDefMap = {};
+        this._funcParamTypeMap.clear();
     }
 
     Code(code, parseMode) {
@@ -33,7 +36,7 @@ Entry.BlockToArParser = class {
         }
 
         if (this.isOver2StartBlk(code)) { // Start block should be only one in whole code
-          this.throwErr('error', 'TooManyStart');
+            this.throwErr('error', 'TooManyStart');
         }
         if (code instanceof Entry.Thread) {
             return this.Thread(code);
@@ -65,9 +68,9 @@ Entry.BlockToArParser = class {
         results = this.indent();
         console.log(results.join('\n'));
         return results.join('\n');
-    };
+    }
 
-    isOver2StartBlk(code) { 
+    isOver2StartBlk(code) {
         const threads = code.getThreads();
 
         let cnt = 0;
@@ -110,7 +113,7 @@ Entry.BlockToArParser = class {
                         // When escape loop or condition, add closed frame
                         if (idx === block.statements.length - 1 && (
                             block.statements[idx].parent.type !== 'repeat_inf' ||
-                            block.thread.parent.type === 'repeat_basic' || 
+                            block.thread.parent.type === 'repeat_basic' ||
                             block.thread.parent.type === '_if' ||
                             block.thread.parent.type === 'if_else'
                         )) {
@@ -124,7 +127,7 @@ Entry.BlockToArParser = class {
         }
 
         return this._source;
-    };
+    }
 
     // If possilbe, find at early stage
     isUnsupportedBlkInTopLvl(blocks) {
@@ -168,23 +171,29 @@ Entry.BlockToArParser = class {
             // Just pass adding the code
         } else {
             // In the setup();
+            const stats = stat.split('\n');
             if (!this._isInRepeat) { // If the block is Not in the repeat, locate it in the setup();
                 let idx = this._source.indexOf('}\n'); // At the end of the setup()
-                this._source.splice(idx, 0, stat);
+                stats.forEach(s => {
+                    const trimmed = s.trim();
+                    if (trimmed) {
+                        this._source.splice(idx++, 0, trimmed);
+                        this._curLine++;
+                    }
+                });
 
             } else { // In the loop()
-                this._source.splice(this._curLine, 0, stat);
+                stats.forEach(s => {
+                    const trimmed = s.trim();
+                    if (trimmed) {
+                        this._source.splice(this._curLine++, 0, trimmed);
+                    }
+                });
             }
-            this._curLine++;
         }
 
-        // init
-        // this._funcName = '';
-        // this._pinNum = -1;
-        // this._pinNum2 = -1;
         // this._pinNum3 = -1;
         // this._pinNum4 = -1;
-        this.funcDefMap = {};
     }
 
     insertIntoGlobal(blockType) {
@@ -193,8 +202,8 @@ Entry.BlockToArParser = class {
             stat = '#include <Servo.h>\nServo myServo;\n';
         } else if (blockType === 'arduino_ext_set_stepper') {
             stat = `#include <Stepper.h>\nStepper myStepper(2048, ${this._pinNum}, ${this._pinNum2}, ${this._pinNum3}, ${this._pinNum4});\n`;
-        } else if (blockType === 'arduino_ext_get_ultrasonic_value' || 
-                    blockType === 'ITPLE_get_ultrasonic_value') {
+        } else if (blockType === 'arduino_ext_get_ultrasonic_value' ||
+            blockType === 'ITPLE_get_ultrasonic_value') {
             stat = `int trig = ${this._pinNum};\nint echo = ${this._pinNum2};\n`;
         } else if (blockType === 'arduino_ext_set_temp_humi_init') {
             stat = `#include <DHT.h>\nDHT dht(${this._pinNum}, DHT11);\n`;
@@ -203,7 +212,7 @@ Entry.BlockToArParser = class {
         } else if (blockType === 'arduino_ext_set_lcd_init') {
             // Don't chagne the tab space of the codes below!!
             stat =
-`#include <LCDI2C_Multilingual.h>
+                `#include <LCDI2C_Multilingual.h>
 #include <Wire.h>\n
 LCDI2C_RussianLatin *lcdObj = NULL;\n
 byte findI2CAddress() {
@@ -245,14 +254,22 @@ byte findI2CAddress() {
             case 'tone':
                 pinStat = `pinMode(${this._pinNum}, OUTPUT);`; break;
             case 'myServo.write': pinStat = `myServo.attach(${this._pinNum});`; break;
-            case 'myStepper.step': pinStat = `myStepper.setSpeed(${this._pramVal[4]});`; break;
+            case 'myStepper.step':
+                if (this._pramVal && this._pramVal.length > 4) {
+                    pinStat = `myStepper.setSpeed(${this._pramVal[4]});`;
+                }
+                break;
             case 'distance': pinStat = `pinMode(${this._pinNum}, OUTPUT);\n\tpinMode(${this._pinNum2}, INPUT);`; break;
             case 'lcdObj->init':
                 pinStat = "lcdObj = new LCDI2C_RussianLatin(findI2CAddress(), 16, 2);\n    lcdObj->init();\n    lcdObj->backlight();\n    lcdObj->clear();";
                 break;
         }
 
-        if (!this._source.find(val => { // Don't allow duplicated additon
+        if (!pinStat) {
+            return;
+        }
+
+        if (!this._source.find(val => { // Don't allow duplicated addition
             return val.includes(pinStat);
         })) {
             let idx = this._source.indexOf('void setup() {');
@@ -267,46 +284,49 @@ byte findI2CAddress() {
         })) {
             let idx = this._source.lastIndexOf('}\n'); // At the end of the loop()
             this._source.splice(++idx, 0, stat);
+            this._source.splice(++idx, 0, ''); // Add a blank line
         }
     }
 
     indent() {
-        let tabCnt = 1, prevVal = '';
+        let tabCnt = 1;
 
         return this._source.map((val) => {
+            const trimmed = val.trim();
             if (
                 val.includes('//') ||
                 val.includes('#include') ||
-                (!val.includes('for') && !val.includes('print') && val.includes('int')) ||
-                val.includes('float') ||
+                (!val.includes('for') && !val.includes('print') && (val.includes('int') || val.includes('float') || val.includes('double') || val.includes('long'))) ||
                 val.includes('setup()') ||
                 val.includes('loop()') ||
                 val.includes('int distance()') ||  // ultrasonic
                 val.includes('int translateIR()') || // irremote
-                val.includes('void') || // user defined func doesn't have a return value
+                val.includes('void') ||
                 val === '}\n' // The end of the default func
             ) {
-                prevVal = val;
+                if (val.includes('void') || val.includes('setup()') || val.includes('loop()') || val === '}\n') {
+                    tabCnt = 1;
+                }
                 return val;
             }
 
-            // If the overlapped, add one more indentation
-            if (!(val === '}' || val.includes('else')) &&
-                (prevVal.includes('if') || prevVal.includes('else') || prevVal.includes('for') || prevVal.includes('while'))
-            ) {
-                tabCnt++;
-            } else if ((val === '}' || val.includes('else')) && 
-                !(prevVal.includes('if') || prevVal.includes('else') || prevVal.includes('for') || prevVal.includes('while'))
-            ) {
+            if (trimmed.startsWith('}') || (trimmed.includes('else') && !trimmed.includes('if'))) {
                 tabCnt--;
-            } 
-
-            for (let i = 0; i < tabCnt; i++) {
-                val = '\t' + val;
             }
 
-            prevVal = val;
-            return val;
+            if (tabCnt < 1) tabCnt = 1;
+
+            let result = '';
+            for (let i = 0; i < tabCnt; i++) {
+                result += '\t';
+            }
+            result += val;
+
+            if (trimmed.endsWith('{')) {
+                tabCnt++;
+            }
+
+            return result;
         });
     }
 
@@ -316,6 +336,13 @@ byte findI2CAddress() {
         ) {
             return '';
         }
+
+        this._funcName = '';
+        this._pinNum = -1;
+        this._pinNum2 = -1;
+        this._pinNum3 = -1;
+        this._pinNum4 = -1;
+        this._pramVal = [];
 
         // One more check in low level
         if (Entry.TextCodingUtil.hasUnSupportedBlkInAr(block)) {
@@ -332,30 +359,36 @@ byte findI2CAddress() {
         if (this.isFunc(block)) {
             if (!this.funcDefMap[block.data.type]) {
                 this._rootFuncId = block.data.type;
-                this.funcDefMap[block.data.type] = this.makeFuncDef(block, this._hasRootFunc);
+                const wasRoot = this._hasRootFunc;
+                const def = this.makeFuncDef(block, wasRoot);
+                this.funcDefMap[block.data.type] = def;
+                if (!wasRoot) {
+                    this.AddUserFunc(def);
+                }
                 this._hasRootFunc = false;
             }
-            if (this.isRegisteredFunc(block)) {
-                this.funcSyntax = this.makeFuncSyntax(block);
-            }
-        } 
-
-        // Currently Not supported if the func has a argument
-        if (this.funcSyntax.includes('%')) {
-            this.throwErr('error', 'UnsupportedBlk', block);
         }
 
         const val = this.getValueFromParam(block);
         val.length && (this._pramVal = val);
 
+        if (this.isRegisteredFunc(block)) {
+            let syntax = this.makeFuncSyntax(block);
+            this._pramVal.forEach((v, i) => {
+                const quotedV = this._wrapQuote(v);
+                syntax = syntax.replace(`%${i + 1}`, quotedV);
+            });
+            return syntax;
+        }
+
         if (
             block.type === 'number' ||
             block.type === 'text' ||
             block.type === 'get_variable' ||
-            block.type === 'arduino_text' ||                 // Value for analogWrite
-            block.type === 'arduino_get_port_number' ||      // Digital port
-            block.type === 'arduino_get_pwm_port_number' ||  // PWM port
-            block.type === 'arduino_get_sensor_number' ||    // Port for analogRead
+            block.type === 'arduino_text' || // Value for analogWrite
+            block.type === 'arduino_get_port_number' || // Digital port
+            block.type === 'arduino_get_pwm_port_number' || // PWM port
+            block.type === 'arduino_get_sensor_number' || // Port for analogRead
             block.type === 'arduino_get_digital_toggle' ||
             block.type === 'arduino_ext_analog_list' ||
             block.type === 'ITPLE_analog_list' ||
@@ -370,37 +403,35 @@ byte findI2CAddress() {
                 this.insertIntoGlobal(block.type);
             }
             return val[0];
-
-        } else if (
-            block.type === '_if' ||
-            block.type === 'if_else' 
-        ) {
+        } else if (block.type === '_if' || block.type === 'if_else') {
             return `if (${val.pop()}) {`;
-
         } else {
             return this.createSource(block);
         }
-        
-    };
+    }
 
     getValueFromParam(block) {
         let rtn = [];
 
-        if (block._schema.class === 'variable') {
-            const param = block._schema.params[0].options.filter((option => {
-                return option[1] === block.data.params[0];
-            }));
-            if (!param.length) {
-                this.throwErr('error', Lang.TextCoding.message_conv_no_variable, block);
-            } else {
-                rtn.push('__' + param[0][0]);
+        if (block._schema.class === 'variable' || block._schema.class === 'local_variable') {
+            const menuName = block._schema.class === 'variable' ? 'variables' : 'func_variables';
+            const paramId = block.data.params[0];
+            let name = Entry.TextCodingUtil.dropdownDynamicIdToNameConvertor(paramId, menuName);
+
+            if (!name) {
+                if (block._schema.class === 'variable') {
+                    this.throwErr('error', Lang.TextCoding.message_conv_no_variable, block);
+                } else {
+                    name = 'result';
+                }
             }
+            rtn.push('__' + name.replace(/self\./g, ''));
         }
 
-        block.data.params.forEach(param => {
+        block.data.params.forEach((param, index) => {
             if (param instanceof Entry.Block) {
                 rtn.push(this.Block(param));
-            } else if (param && block._schema.class !== 'variable') { // Skip if param is from 'variable'
+            } else if (param !== undefined && param !== null && block._schema.class !== 'variable' && block._schema.class !== 'local_variable') {
                 rtn.push(param);
             }
         });
@@ -411,10 +442,14 @@ byte findI2CAddress() {
         let value = 0, value2 = 0, value3 = 0, on_off = '';
         let stat = '', operator = '';
 
+        if (block.type.indexOf('stringParam') > -1 || block.type.indexOf('booleanParam') > -1) {
+            return this._funcParamMap.get(block.data.type) || block.data.type;
+        }
+
         switch (block.type) {
             case 'repeat_inf':
                 if (
-                    block.thread.parent.type === 'repeat_basic' || 
+                    block.thread.parent.type === 'repeat_basic' ||
                     block.thread.parent.type === '_if' ||
                     block.thread.parent.type === 'if_else'
                 ) {
@@ -425,11 +460,10 @@ byte findI2CAddress() {
                 break;
 
             case 'repeat_basic':
-                value = Number(this._pramVal); // Arr to Number
+                value = this._writeInt(this._pramVal[0]);
                 this.isNumberOver1(value, block);
 
                 stat = `for (int ${this._iterVar} = 0; ${this._iterVar} < ${value}; ${this._iterVar}++) {`;
-                // this._iterVar = String.fromCharCode(this._iterVar.charCodeAt(0) + 1); // Move iterVar to the next
                 break;
 
             case 'stop_repeat':
@@ -437,21 +471,15 @@ byte findI2CAddress() {
                 break;
 
             case 'wait_second':
-                value = Number(this._pramVal); // String to Number
+                value = this._num(this._pramVal[0]);
                 this.errChkTime(value, block);
 
-                stat = `delay(${value*1000});`;
+                stat = `delay(${value} * 1000);`;
                 break;
 
             case 'boolean_basic_operator':
-                value = Number(this._pramVal[0]); // String to Number
-                if (isNaN(value)) { // In case the value is not a number
-                    value = this._pramVal[0];
-                }
-                value2 = Number(this._pramVal[2]); // String to Number
-                if (isNaN(value2)) { // In case the value is not a number
-                    value2 = this._pramVal[2];
-                }
+                value = this._wrapQuote(this._pramVal[0]);
+                value2 = this._wrapQuote(this._pramVal[2]);
 
                 switch (this._pramVal[1]) {
                     case 'EQUAL':
@@ -474,11 +502,34 @@ byte findI2CAddress() {
                         break;
                 }
 
-                stat = value + operator + value2;
+                const isStrLiteral = (v) => typeof v === 'string' && (v.startsWith('"') || v.startsWith("'"));
+                const isVarOrParam = (v) => typeof v === 'string' && (v.startsWith('__') || /^param\d+$/.test(v));
+                const isHardwareExpr = (v) => typeof v === 'string' && (v.includes('(') && !v.startsWith('String('));
+
+                const isNumeric1 = Entry.Utils.isNumber(value) || isHardwareExpr(value);
+                const isNumeric2 = Entry.Utils.isNumber(value2) || isHardwareExpr(value2);
+
+                if (isNumeric1 && isNumeric2) {
+                    // Both are numeric (literals or hardware calls), safe for direct comparison
+                    stat = value + operator + value2;
+                } else if (!isNumeric1 && !isNumeric2) {
+                    // Both are likely strings
+                    stat = value + operator + value2;
+                } else {
+                    // Mixed case: one side is numeric, the other is a variable/param.
+                    const processMixed = (v) => {
+                        if (Entry.Utils.isNumber(v)) return `"${v}"`;
+                        if (isHardwareExpr(v)) return `String(${v})`;
+                        return v;
+                    };
+                    const v1 = (isNumeric1 && !isVarOrParam(value)) ? processMixed(value) : value;
+                    const v2 = (isNumeric2 && !isVarOrParam(value2)) ? processMixed(value2) : value2;
+                    stat = v1 + operator + v2;
+                }
                 break;
 
             case 'boolean_not':
-                stat = '!' + this._pramVal[0];
+                stat = '!(' + this._pramVal[0] + ')';
                 break;
 
             case 'boolean_and_or':
@@ -494,14 +545,8 @@ byte findI2CAddress() {
                 break;
 
             case 'quotient_and_mod':
-                value = Number(this._pramVal[0]); // String to Number
-                if (isNaN(value)) { // In case the value is not a number
-                    value = this._pramVal[0];
-                }
-                value2 = Number(this._pramVal[1]); // String to Number
-                if (isNaN(value2)) { // In case the value is not a number
-                    value2 = this._pramVal[1];
-                }
+                value = this._wrapQuote(this._pramVal[0]);
+                value2 = this._wrapQuote(this._pramVal[1]);
 
                 switch (this._pramVal[2]) {
                     case 'QUOTIENT':
@@ -532,14 +577,8 @@ byte findI2CAddress() {
                 break;
 
             case 'calc_basic':
-                value = Number(this._pramVal[0]); // String to Number
-                if (isNaN(value)) { // In case the value is not a number
-                    value = this._pramVal[0];
-                }
-                value2 = Number(this._pramVal[2]); // String to Number
-                if (isNaN(value2)) { // In case the value is not a number
-                    value2 = this._pramVal[2];
-                }
+                value = this._wrapQuote(this._pramVal[0]);
+                value2 = this._wrapQuote(this._pramVal[2]);
 
                 switch (this._pramVal[1]) {
                     case 'PLUS':
@@ -556,19 +595,18 @@ byte findI2CAddress() {
                         break;
                 }
 
-                stat = '('+ value + operator + value2 + ')';
+                stat = '(' + value + operator + value2 + ')';
                 break;
             case 'calc_rand':
-                value = Number(this._pramVal[0]); // String to Number
-                if (isNaN(value)) { // In case the value is not a number
-                    value = this._pramVal[0];
-                }
-                value2 = Number(this._pramVal[1]); // String to Number
-                if (isNaN(value2)) { // In case the value is not a number
-                    value2 = this._pramVal[1];
-                }
+                value = this._wrapQuote(this._pramVal[0]);
+                value2 = this._wrapQuote(this._pramVal[1]);
+
                 // The 2nd parameter of random func doesn't include as max value itself
-                value2 += 1;
+                if (Entry.Utils.isNumber(value2)) {
+                    value2 = (Number(value2) + 1).toString();
+                } else {
+                    value2 = `(${value2} + 1)`;
+                }
                 stat = `random(${value}, ${value2})`;
                 break;
             case 'arduino_toggle_led': // digitalWrite
@@ -672,46 +710,46 @@ byte findI2CAddress() {
                     [0, 1046.5, 1108.7, 1174.7, 1244.5, 1318.5, 1396.9, 1480.0, 1568.0, 1661.2, 1760.0, 1864.7, 1975.5],
                 ];
                 const charToIdx = {
-                    '0': 0, C: 1, CS: 2, D: 3, DS: 4, E: 5, F: 6, FS: 7, G:8, GS: 9, A: 10, AS: 11, B: 12
+                    '0': 0, C: 1, CS: 2, D: 3, DS: 4, E: 5, F: 6, FS: 7, G: 8, GS: 9, A: 10, AS: 11, B: 12
                 }
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
-                this._pinNum = Number(this._pramVal[0]); // Arr to Number
+                this._pinNum = this._num(this._pramVal[0]); // Arr to Number
                 this.errChkPinNum(this._pinNum, block);
                 value2 = this._pramVal[1]; // tone
                 if (typeof value2 != 'string') { // Tone should be string
                     this.throwErr('error', 'WrongInputVal', block);
                 }
-                value = this._pramVal[2]; // octave
+                value = this._num(this._pramVal[2]); // octave
                 this.isNumberOver1(value, block);
                 if (value > 6) { // max is 6
                     this.throwErr('warn', 'ExcessiveInputVal', block);
                     value = 6;
                 }
-                value3 = this._pramVal[3]; // timer
-                this.errChkTime(value, block);
+                value3 = this._num(this._pramVal[3]); // timer
+                this.errChkTime(value3, block);
 
                 stat = stat.replace('%1', this._pinNum);
-                stat = stat.replace('%2', octave_tone_hz[value-1][charToIdx[value2]]);
-                stat = stat.replace('%3', value3 * 1000);
+                stat = stat.replace('%2', octave_tone_hz[value - 1][charToIdx[value2]]);
+                stat = stat.replace('%3', `(${value3} * 1000)`);
                 if (value2 == '0') {
                     stat = `noTone(${this._pinNum});`;
                 }
-                stat = stat + ` delay(${value3 * 1000});`;
+                stat = stat + ` delay(${value3} * 1000);`;
                 break;
 
             case 'arduino_ext_get_ultrasonic_value':
             case 'ITPLE_get_ultrasonic_value':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
-                this._pinNum = Number(this._pramVal[0]); // trig
+                this._pinNum = this._num(this._pramVal[0]); // trig
                 this.errChkPinNum(this._pinNum, block);
-                this._pinNum2 = Number(this._pramVal[1]); // echo
+                this._pinNum2 = this._num(this._pramVal[1]); // echo
                 this.errChkPinNum(this._pinNum2, block);
 
                 // Don't fix the tab spaces in the distance func below
                 this.insertIntoSrc(
-`int distance() {
+                    `int distance() {
     digitalWrite(${this._pinNum}, LOW);
     delayMicroseconds(2);
 
@@ -723,31 +761,31 @@ byte findI2CAddress() {
     int distance = (duration/2) * 0.034;
     return distance;
 }`
-                , block);
+                    , block);
                 break;
 
             case 'arduino_ext_set_servo':
             case 'ITPLE_set_servo':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
-                this._pinNum = Number(this._pramVal[0]); // Arr to Number
+                this._pinNum = this._num(this._pramVal[0]); // Arr to Number
                 this.errChkPinNum(this._pinNum, block);
-                value = this._pramVal[1];
+                value = this._num(this._pramVal[1]);
                 stat = stat.replace('%1', value);
                 break;
 
             case 'arduino_ext_set_stepper':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
-                this._pinNum = Number(this._pramVal[0]); // Arr to Number
+                this._pinNum = this._num(this._pramVal[0]); // Arr to Number
                 this.errChkPinNum(this._pinNum, block);
-                this._pinNum2 = Number(this._pramVal[1]); // Arr to Number
-                this.errChkPinNum(this._pinNum, block);
-                this._pinNum3 = Number(this._pramVal[2]); // Arr to Number
-                this.errChkPinNum(this._pinNum, block);
-                this._pinNum4 = Number(this._pramVal[3]); // Arr to Number
-                this.errChkPinNum(this._pinNum, block);
-                value = this._pramVal[5];
+                this._pinNum2 = this._num(this._pramVal[1]); // Arr to Number
+                this.errChkPinNum(this._pinNum2, block);
+                this._pinNum3 = this._num(this._pramVal[2]); // Arr to Number
+                this.errChkPinNum(this._pinNum3, block);
+                this._pinNum4 = this._num(this._pramVal[3]); // Arr to Number
+                this.errChkPinNum(this._pinNum4, block);
+                value = this._num(this._pramVal[5]);
                 stat = stat.replace('%1', value);
                 break;
 
@@ -755,14 +793,17 @@ byte findI2CAddress() {
             case 'arduino_ext_set_irremote_init':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
-                this._pinNum = Number(this._pramVal[0]); // Arr to Number
+                this._pinNum = this._num(this._pramVal[0]); // Arr to Number
                 this.errChkPinNum(this._pinNum, block);
-                value = this._pramVal[1];
+                value = this._num(this._pramVal[1]);
                 stat = stat.replace('%1', value);
                 break;
 
             case 'arduino_ext_get_temp_value':
             case 'arduino_ext_get_humi_value':
+                stat = block._schema.syntax.ar[0].syntax;
+                this._funcName = stat.split('(')[0];
+                break;
             case 'arduino_ext_set_lcd_init':
             case 'arduino_ext_set_lcd_clear':
                 stat = block._schema.syntax.ar[0].syntax;
@@ -775,7 +816,7 @@ byte findI2CAddress() {
 
                 // Don't fix the tab spaces in the distance func below
                 this.insertIntoSrc(
-`int translateIR() {
+                    `int translateIR() {
     int value = -1;
     
     if (irrecv.decode(&results)) {
@@ -816,13 +857,13 @@ byte findI2CAddress() {
     irrecv.resume();
     return value;
 }`
-                , block);
+                    , block);
                 break;
 
             case 'arduino_ext_set_lcd_print':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
-                value = this._pramVal[0];
+                value = this._num(this._pramVal[0]);
                 if (Entry.Utils.isNumber(value)) {
                     if (value < 0) { // min is 0
                         this.throwErr('error', 'MinusInputVal', block);
@@ -831,13 +872,13 @@ byte findI2CAddress() {
                         value = 1;
                     }
                 }
-                value2 = this._pramVal[1];
-                if (Entry.Utils.isNumber(value)) {
-                    if (value < 0) { // min is 0
+                value2 = this._num(this._pramVal[1]);
+                if (Entry.Utils.isNumber(value2)) {
+                    if (value2 < 0) { // min is 0
                         this.throwErr('error', 'MinusInputVal', block);
-                    } else if (value > 15) { // max is 15
+                    } else if (value2 > 15) { // max is 15
                         this.throwErr('warn', 'ExcessiveInputVal', block);
-                        value = 15;
+                        value2 = 15;
                     }
                 }
                 value3 = this._pramVal[2]; // text
@@ -855,21 +896,33 @@ byte findI2CAddress() {
                 break;
 
             case 'set_variable':
+            case 'set_func_variable':
                 stat = block._schema.syntax.ar[0].syntax;
                 stat = stat.replace('%1', this._pramVal[0]);
-                value = this._pramVal[1];
-                if (!Entry.Utils.isNumber(this._pramVal[1]) && value.includes('String')) {
-                    value = '"' + value + '"';
-                } else if (Entry.Utils.isNumber(this._pramVal[1])) {
-                    value = Number(value);
-                }
+                value = this._wrapQuote(this._pramVal[1]);
                 stat = stat.replace('%2', value);
+                if (!stat.endsWith(';')) stat += ';';
+                break;
+
+            case 'get_func_variable':
+                stat = this._pramVal[0];
                 break;
 
             case 'change_variable':
                 stat = block._schema.syntax.ar[0].syntax;
                 stat = stat.replace('%1', this._pramVal[0]);
-                stat = stat.replace('%2', this._pramVal[1]);
+                stat = stat.replace('%2', this._wrapQuote(this._pramVal[1]));
+                if (!stat.endsWith(';')) stat += ';';
+                break;
+
+            case 'stop_object':
+                if (this._pramVal[0] === 'thisThread') {
+                    if (this._isCurrentFuncValue) {
+                        stat = 'return __result;';
+                    } else {
+                        stat = 'return;';
+                    }
+                }
                 break;
         }
 
@@ -905,6 +958,7 @@ byte findI2CAddress() {
 
     extractNum(val) {
         if (typeof val === 'string') {
+            if (val.includes('param')) return val;
             return Number(val.replace(/[^0-9]/g, ''));
         } else if (typeof val === 'number') {
             return val;
@@ -913,16 +967,18 @@ byte findI2CAddress() {
         }
     }
 
-    errChkPinNum(pinNum, block) {
-        if (isNaN(pinNum)) { // In case the value is not a number
+    errChkPinNum(value, block) {
+        if (typeof value === 'string' && value.includes('param')) return;
+        if (isNaN(value)) { // If not number
             this.throwErr('error', 'WrongInputVal', block);
         }
-        if (pinNum < 0) { // min is 0
+        if (value < 0) { // min is 0
             this.throwErr('error', 'MinusInputVal', block);
         }
     }
 
     errChkTime(value, block) {
+        if (typeof value === 'string' && value.includes('param')) return;
         if (isNaN(value)) { // If not number
             this.throwErr('error', 'WrongInputVal', block);
         } else if (value <= 0) { // min is 1
@@ -931,6 +987,7 @@ byte findI2CAddress() {
     }
 
     isNumberOver1(value, block) {
+        if (typeof value === 'string' && value.includes('param')) return;
         if (isNaN(value)) { // In case the value is not a number
             this.throwErr('error', 'WrongInputVal', block);
         }
@@ -1016,37 +1073,130 @@ byte findI2CAddress() {
             // 선언된 함수 사용하는 블록의 경우
             const expBlockComment = funcBlock.getCommentValue();
             if (expBlockComment || expBlockComment === '') {
-                result += ` # ${expBlockComment}`;
+                result += ` // ${expBlockComment}`;
             }
             return result;
         } else {
             // 함수 선언 중인 경우
             this._hasRootFunc = true;
+            const defBlock = func.defBlock;
+            const isValue = defBlock && (defBlock.type === 'function_create_value' || defBlock.type === 'function_create_boolean_value');
+            this._isCurrentFuncValue = isValue;
 
-            result = `void ${result}`;
+            let returnType = 'void';
+            if (isValue) {
+                returnType = defBlock.type === 'function_create_boolean_value' ? 'boolean' : 'String';
+            }
+
+            result = `${returnType} ${result}`;
             result = result.concat(' {');
             if (func.comment || func.comment === '') {
-                result += ` # ${func.comment}`;
+                result += ` // ${func.comment}`;
             }
             result += '\n';
 
-            if (func.statements && func.statements.length) {
-                let stmtResult = '';
-                for (const s in func.statements) {
-                    const block = func.statements[s];
-
-                    if (this.getFuncInfo(block)) {
-                        stmtResult += this.makeFuncDef(block, true).concat('\n');
-                    } else {
-                        stmtResult += this.Block(block).concat('\n');
-                    }
-                }
-                result += Entry.TextCodingUtil.indent(stmtResult).concat('\n');
+            let stmtResult = '';
+            // Local variables declaration
+            if (func.localVariables && func.localVariables.length) {
+                func.localVariables.forEach(lv => {
+                    stmtResult += `String __${lv.name} = "0";\n`;
+                });
             }
+
+            const that = this;
+            const processBlocks = (blocks, depth) => {
+                let res = '';
+                if (!blocks) return res;
+                const indent = Array(depth).fill('\t').join('');
+                blocks.forEach((block) => {
+                    if (that.isFunc(block)) {
+                        res += that.makeFuncDef(block, true).concat('\n');
+                    } else {
+                        const bStat = that.Block(block);
+                        if (bStat) {
+                            const trimmed = bStat.trim();
+                            res += indent + trimmed;
+                            if (
+                                !trimmed.endsWith(';') &&
+                                !trimmed.endsWith('}') &&
+                                !trimmed.endsWith('{') &&
+                                !trimmed.endsWith('\n')
+                            ) {
+                                res += ';';
+                            }
+                            res += '\n';
+                        }
+                        if (block.statements && block.statements.length) {
+                            block.statements.forEach((stmt, idx) => {
+                                res += processBlocks(stmt.getBlocks(), depth + 1);
+                                if (idx === block.statements.length - 2) {
+                                    res += indent + '} else {\n';
+                                }
+                                if (idx === block.statements.length - 1) {
+                                    res += indent + '}\n';
+                                }
+                            });
+                        }
+                    }
+                });
+                return res;
+            };
+
+            stmtResult += processBlocks(func.statements, 0);
+
+            if (isValue) {
+                const returnValue = this._wrapQuote(this.Block(defBlock.data.params[3]));
+                stmtResult += `return ${returnValue};\n`;
+            }
+
+            const indentedResult = Entry.TextCodingUtil.indent(stmtResult);
+            result += indentedResult.concat('\n');
             result = result.concat('}');
 
+            this._isCurrentFuncValue = false;
             return result.trim();
         }
+    }
+
+    _num(val) {
+        if (typeof val === 'string' && val.includes('param')) {
+            return `(${val}.toDouble())`;
+        }
+        return isNaN(Number(val)) ? val : Number(val);
+    }
+
+    _writeInt(val) {
+        if (typeof val === 'string' && val.includes('param')) {
+            return `(${val}.toInt())`;
+        }
+        return isNaN(Number(val)) ? val : Number(val);
+    }
+
+    _wrapQuote(val) {
+        if (typeof val !== 'string' || val === '') {
+            return val;
+        }
+
+        if (
+            Entry.Utils.isNumber(val) ||
+            val.includes('__') ||
+            val.includes('(') ||
+            /^param\d+$/.test(val) ||
+            /Param_/.test(val) ||
+            val === 'true' ||
+            val === 'false' ||
+            (val.startsWith('"') && val.endsWith('"')) ||
+            (val.startsWith("'") && val.endsWith("'")) ||
+            val === 'HIGH' ||
+            val === 'LOW' ||
+            val === 'INPUT' ||
+            val === 'OUTPUT' ||
+            val === 'INPUT_PULLUP'
+        ) {
+            return val;
+        }
+
+        return `"${val}"`;
     }
 
     getFuncInfo(funcBlock) {
@@ -1091,8 +1241,10 @@ byte findI2CAddress() {
                 if (/(string|boolean)Param/.test(value)) {
                     index += 1;
                     const name = `param${index}`;
+                    const type = value.includes('string') ? 'String' : 'boolean';
                     funcParams.push(name);
                     that._funcParamMap.put(value, name);
+                    that._funcParamTypeMap.put(name, type);
                 }
             });
         } else {
@@ -1117,11 +1269,16 @@ byte findI2CAddress() {
             result.comment = funcComment;
         }
         if (funcParams.length !== 0) {
-            result.params = funcParams;
+            result.params = funcParams.map(p => {
+                const type = this._funcParamTypeMap.get(p) || 'String';
+                return `${type} ${p}`;
+            });
         }
         if (funcContents.length !== 0) {
             result.statements = funcContents;
         }
+        result.defBlock = defBlock;
+        result.localVariables = func.localVariables || [];
 
         return result;
     }

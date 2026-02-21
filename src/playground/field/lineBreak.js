@@ -22,6 +22,15 @@ Entry.FieldLineBreak = class FieldLineBreak extends Entry.Field {
             return;
         }
 
+        const skeleton = blockView.getSkeleton();
+        if (skeleton && typeof skeleton.lineBreakPos === 'function') {
+            const pos = skeleton.lineBreakPos(blockView);
+            if (pos !== undefined && pos !== null) {
+                this.box.set({ y: pos.y !== undefined ? pos.y : pos });
+                return;
+            }
+        }
+
         this.box.set({
             y:
                 (blockView._statements[targetStatementIndex].height || 20) +

@@ -626,6 +626,9 @@ class TextCodingUtil {
             || blockType === 'arduino_ext_lcd_column_list'
             || blockType === 'arduino_ext_lcd_row_list'
             || blockType.includes('func_') // Functions
+            || blockType.includes('function_create')
+            || blockType.includes('stringParam')
+            || blockType.includes('booleanParam')
             || blockCategory === 'arduino' // HW blocks
 
         // Not acceptable blocks

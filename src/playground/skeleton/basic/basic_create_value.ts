@@ -2,9 +2,21 @@ Entry.skeleton.basic_create_value = {
     executable: true,
     path(blockView) {
         // 1. Calculate Robust Width
-        // Use contentWidth but ensure minimum 150 to prevent crumpling
-        let width = blockView.contentWidth || 150;
-        width = Math.max(150, width + 10); // +10 buffer
+        let topWidth = 0;
+        let bottomWidth = 0;
+        (blockView._contents || []).forEach((c) => {
+            if (c.box) {
+                const rightEdge = c.box.x + c.box.width;
+                if (c.box.y < 10) {
+                    topWidth = Math.max(topWidth, rightEdge);
+                } else {
+                    bottomWidth = Math.max(bottomWidth, rightEdge);
+                }
+            }
+        });
+
+        topWidth = Math.max(150, topWidth + 10);
+        bottomWidth = Math.max(150, bottomWidth + 10);
 
         // 2. Calculate Statement Height
         const statements = blockView._statements || [];
@@ -12,14 +24,11 @@ Entry.skeleton.basic_create_value = {
         statementHeight = Math.max(30, statementHeight);
 
         // 3. Define geometry
-        // Top Bar Height: fixed to wrap text nicely.
-        // We reduce the vertical gap by 3px to move the bottom bar UP.
-        // This fixes the "Return 10" text looking shifted top (by aligning the bar to the text).
-        const adjustedHeight = statementHeight - 3;
+        const adjustedHeight = statementHeight;
 
         return `M 0 0                
                 V 1
-                h ${width}
+                h ${topWidth}
                 a 14 14 0 0 1 0 28
                 H 26
                 l -6 6
@@ -27,7 +36,7 @@ Entry.skeleton.basic_create_value = {
                 v ${adjustedHeight}
                 l 6 6
                 l 6 -6
-                h ${width - 26}
+                h ${bottomWidth - 26}
                 a 14 14 0 0 1 0 28
                 H 0
                 z`;
@@ -45,7 +54,7 @@ Entry.skeleton.basic_create_value = {
         statementHeight = Math.max(30, statementHeight);
 
         // Reduce total height slightly to match the path adjustment
-        const totalHeight = 30 + statementHeight + 30 - 3;
+        const totalHeight = 30 + statementHeight + 30;
 
         return {
             offsetX: -8,
@@ -63,5 +72,11 @@ Entry.skeleton.basic_create_value = {
         // Content (Function Name) MUST start in the Top Bar.
         // Center of Top Bar (30px) is 15px.
         return { x: 14, y: 15 };
+    },
+    lineBreakPos(blockView) {
+        const statements = blockView._statements || [];
+        let statementHeight = (statements[0] && statements[0].height) || 30;
+        statementHeight = Math.max(30, statementHeight);
+        return statementHeight + 28;
     },
 };
