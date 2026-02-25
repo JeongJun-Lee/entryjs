@@ -375,6 +375,14 @@ export default class Hardware {
             return;
         }
 
+        if (this.hwModule && (
+            (typeof this.hwModule.id === 'string' && this.hwModule.id === key) ||
+            (Array.isArray(this.hwModule.id) && this.hwModule.id.indexOf(key) > -1)
+        )) {
+            this.currentDeviceKey = key;
+            return;
+        }
+
         this.currentDeviceKey = key;
         this.hwModule = Entry.HARDWARE_LIST[key];
         if (!this.hwModule) {

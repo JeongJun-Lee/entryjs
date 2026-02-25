@@ -3,13 +3,13 @@
 const { monitorTemplate } = require("./block_arduino");
 
 Entry.ArduinoNanoExt = {
-    id: '1.13',
+    id: ['1.13', '1.64', '1.10', '1A.1'],
     name: 'ArduinoNanoExt',
     url: 'http://www.arduino.cc/',
-    imageName: 'arduinoNanoExt.png',
+    imageName: 'rauf_nano.png',
     title: {
-        ko: '아두이노 Nano 확장모드',
-        en: 'Arduino Nano Ext',
+        ko: 'Rauf 나노보드',
+        en: 'Rauf NanoBoard',
     },
     setZero() {
         if (!Entry.hw.sendQueue.SET) {
@@ -51,7 +51,8 @@ Entry.ArduinoNanoExt = {
         LCD_INIT: 15,  //f
         LCD_PRINT: 16,  //g
         LCD_CLEAR: 17,  //h
-
+        MPU: 18,
+        MOTOR: 19,
     },
     toneTable: {
         '0': 0,
@@ -98,110 +99,33 @@ Entry.ArduinoNanoExt = {
     },
     BlockState: {},
     monitorTemplate: {
-        imgPath: 'hw/arduino.png',
+        imgPath: 'hw/rauf_nano.png',
         width: 605,
         height: 434,
         listPorts: {
-            '2': {
-                name: `${Lang.Hw.port_en} 2 ${Lang.Hw.port_ko}`,
-                type: 'input',
-                pos: { x: 0, y: 0 },
-            },
-            '3': {
-                name: `${Lang.Hw.port_en} 3 ${Lang.Hw.port_ko}`,
-                type: 'input',
-                pos: { x: 0, y: 0 },
-            },
-            '4': {
-                name: `${Lang.Hw.port_en} 4 ${Lang.Hw.port_ko}`,
-                type: 'input',
-                pos: { x: 0, y: 0 },
-            },
-            '5': {
-                name: `${Lang.Hw.port_en} 5 ${Lang.Hw.port_ko}`,
-                type: 'input',
-                pos: { x: 0, y: 0 },
-            },
-            '6': {
-                name: `${Lang.Hw.port_en} 6 ${Lang.Hw.port_ko}`,
-                type: 'input',
-                pos: { x: 0, y: 0 },
-            },
-            '7': {
-                name: `${Lang.Hw.port_en} 7 ${Lang.Hw.port_ko}`,
-                type: 'input',
-                pos: { x: 0, y: 0 },
-            },
-            '8': {
-                name: `${Lang.Hw.port_en} 8 ${Lang.Hw.port_ko}`,
-                type: 'input',
-                pos: { x: 0, y: 0 },
-            },
-            '9': {
-                name: `${Lang.Hw.port_en} 9 ${Lang.Hw.port_ko}`,
-                type: 'input',
-                pos: { x: 0, y: 0 },
-            },
-            '10': {
-                name: `${Lang.Hw.port_en} 10 ${Lang.Hw.port_ko}`,
-                type: 'input',
-                pos: { x: 0, y: 0 },
-            },
-            '11': {
-                name: `${Lang.Hw.port_en} 11 ${Lang.Hw.port_ko}`,
-                type: 'input',
-                pos: { x: 0, y: 0 },
-            },
-            '12': {
-                name: `${Lang.Hw.port_en} 12 ${Lang.Hw.port_ko}`,
-                type: 'input',
-                pos: { x: 0, y: 0 },
-            },
-            '13': {
-                name: `${Lang.Hw.port_en} 13 ${Lang.Hw.port_ko}`,
-                type: 'input',
-                pos: { x: 0, y: 0 },
-            },
-            a0: {
-                name: `${Lang.Hw.port_en} A0 ${Lang.Hw.port_ko}`,
-                type: 'input',
-                pos: { x: 0, y: 0 },
-            },
-            a1: {
-                name: `${Lang.Hw.port_en} A1 ${Lang.Hw.port_ko}`,
-                type: 'input',
-                pos: { x: 0, y: 0 },
-            },
-            a2: {
-                name: `${Lang.Hw.port_en} A2 ${Lang.Hw.port_ko}`,
-                type: 'input',
-                pos: { x: 0, y: 0 },
-            },
-            a3: {
-                name: `${Lang.Hw.port_en} A3 ${Lang.Hw.port_ko}`,
-                type: 'input',
-                pos: { x: 0, y: 0 },
-            },
-            a4: {
-                name: `${Lang.Hw.port_en} A4 ${Lang.Hw.port_ko}`,
-                type: 'input',
-                pos: { x: 0, y: 0 },
-            },
-            a5: {
-                name: `${Lang.Hw.port_en} A5 ${Lang.Hw.port_ko}`,
-                type: 'input',
-                pos: { x: 0, y: 0 },
-            },
-            a6: {
-                name: `${Lang.Hw.port_en} A6 ${Lang.Hw.port_ko}`,
-                type: 'input',
-                pos: { x: 0, y: 0 },
-            },
-            a7: {
-                name: `${Lang.Hw.port_en} A7 ${Lang.Hw.port_ko}`,
-                type: 'input',
-                pos: { x: 0, y: 0 },
-            },
+            'accelX': { name: 'accelX', type: 'input', pos: { x: 0, y: 0 } },
+            'accelY': { name: 'accelY', type: 'input', pos: { x: 0, y: 0 } },
+            'accelZ': { name: 'accelZ', type: 'input', pos: { x: 0, y: 0 } },
+            'gyroX': { name: 'gyroX', type: 'input', pos: { x: 0, y: 0 } },
+            'gyroY': { name: 'gyroY', type: 'input', pos: { x: 0, y: 0 } },
+            'gyroZ': { name: 'gyroZ', type: 'input', pos: { x: 0, y: 0 } },
+        },
+        ports: {
+            'a0': { name: 'IN1', type: 'input', pos: { x: 130, y: 280 } },
+            'a1': { name: 'IN2', type: 'input', pos: { x: 130, y: 325 } },
+            'a2': { name: 'IN3', type: 'input', pos: { x: 130, y: 370 } },
+            'a3': { name: 'Pot', type: 'input', pos: { x: 310, y: 350 } },
+            'a6': { name: 'JoyX', type: 'input', pos: { x: 480, y: 325 } },
+            'a7': { name: 'JoyY', type: 'input', pos: { x: 480, y: 375 } },
+            '11': { name: 'OUT1', type: 'output', pos: { x: 130, y: 60 } },
+            '12': { name: 'OUT2', type: 'output', pos: { x: 130, y: 105 } },
+            '13': { name: 'OUT3', type: 'output', pos: { x: 130, y: 150 } },
+            '4': { name: 'LED R', type: 'output', pos: { x: 310, y: 145 } },
+            '3': { name: 'LED Y', type: 'output', pos: { x: 310, y: 200 } },
+            '2': { name: 'LED G', type: 'output', pos: { x: 310, y: 255 } },
+            '7': { name: 'Buzzer', type: 'output', pos: { x: 420, y: 165 } },
+            '5': { name: 'Motor1', type: 'output', pos: { x: 535, y: 65 } },
+            '6': { name: 'Motor2', type: 'output', pos: { x: 535, y: 120 } },
         },
         mode: 'both',
     },
@@ -211,132 +135,369 @@ Entry.ArduinoNanoExt.setLanguage = function () {
     return {
         ko: {
             template: {
-                arduino_nano_ext_get_analog_value: '아날로그 %1 번 센서값',
-                arduino_nano_ext_get_analog_value_map: '%1 의 범위를 %2 ~ %3 에서 %4 ~ %5 로 바꾼값',
-                arduino_nano_ext_get_ultrasonic_value: '울트라소닉 Trig %1 Echo %2 센서값',
-                arduino_nano_ext_toggle_led: '디지털 %1 번 핀 %2 %3',
-                arduino_nano_ext_digital_pwm: '디지털 %1 번 핀을 %2 (으)로 정하기 %3',
-                arduino_nano_ext_set_tone: '디지털 %1 번 핀의 버저를 %2 %3 음으로 %4 초 연주하기 %5',
-                arduino_nano_ext_set_servo: '디지털 %1 번 핀의 서보모터를 %2 의 각도로 정하기 %3',
-                arduino_nano_ext_get_digital: '디지털 %1 번 센서값',
-                arduino_nano_ext_set_temp_humi_init: "디지털 %1 번 핀에 연결된 온습도센서 사용하기 %2",
-                arduino_nano_ext_get_temp_value: '온습도센서 온도값',
-                arduino_nano_ext_get_humi_value: '온습도센서 습도값',
-                arduino_nano_ext_set_stepper: '디지털 %1 %2 %3 %4 번 핀의 스텝모터를 %5 RPM으로 %6 스텝 이동하기 %7',
-                arduino_nano_ext_set_irremote_init: "디지털 %1 번 핀에 연결된 적외선 수신기 사용하기 %2",
-                arduino_nano_ext_get_irremote_value: '수신된 적외선 신호값',
-                arduino_nano_ext_set_lcd_init: 'LCD 초기화 하기 %1',
-                arduino_nano_ext_set_lcd_print: 'LCD %1 줄 %2 칸에 %3 을 쓰기 %4',
-                arduino_nano_ext_set_lcd_clear: 'LCD 화면 지우기 %1',
+                // Header
+                arduino_nano_ext_sensor_title: '센서',
+                arduino_nano_ext_led_title: 'LED',
+                arduino_nano_ext_buzzer_title: '버저',
+                arduino_nano_ext_output_title: '출력',
+                arduino_nano_ext_motor_title: '회전모터',
+
+                // Sensor
+                arduino_nano_ext_get_sensor_value: '%1 센서값',
+                arduino_nano_ext_get_potentiometer: '가변저항 센서값',
+                arduino_nano_ext_get_joystick_value: '조이스틱 %1 축 센서값',
+                arduino_nano_ext_get_joystick_button: '조이스틱 버튼을 눌렀는가?',
+                arduino_nano_ext_get_mpu6050_value: 'MPU6050 %1 축 %2 값',
+
+                // LED
+                arduino_nano_ext_set_led: '%1 LED %2 %3',
+
+                // Buzzer
+                arduino_nano_ext_set_buzzer: '버저를 %1 옥타브, %2 음으로 %3 초 연주하기 %4',
+                arduino_nano_ext_stop_buzzer: '버저 멈추기 %1',
+
+                // Output
+                arduino_nano_ext_set_output: '%1 에 %2 값 출력하기 %3',
+
+                // Motor
+                arduino_nano_ext_set_motor: '%1 모터를 %2 방향 %3 속도로 %4 회전하기 %5',
+                arduino_nano_ext_stop_motor: '%1 모터 멈추기 %2',
             },
+            Blocks: {
+                arduino_nano_ext_joystick_x: 'X',
+                arduino_nano_ext_joystick_y: 'Y',
+                arduino_nano_ext_motor1: '1번(왼쪽)',
+                arduino_nano_ext_motor2: '2번(오른쪽)',
+                arduino_nano_ext_motor_fw: '정',
+                arduino_nano_ext_motor_bw: '역',
+                arduino_nano_ext_led_green: '초록',
+                arduino_nano_ext_led_yellow: '노랑',
+                arduino_nano_ext_led_red: '빨강',
+                arduino_nano_ext_mpu_accel: '가속도',
+                arduino_nano_ext_mpu_gyro: '자이로',
+                arduino_nano_ext_duration_cont: '계속',
+                arduino_nano_ext_duration_1s: '1초',
+                arduino_nano_ext_duration_2s: '2초',
+                arduino_nano_ext_duration_3s: '3초',
+                arduino_nano_ext_duration_4s: '4초',
+                arduino_nano_ext_duration_5s: '5초',
+                arduino_nano_ext_duration_6s: '6초',
+                arduino_nano_ext_duration_7s: '7초',
+                arduino_nano_ext_duration_8s: '8초',
+                arduino_nano_ext_duration_9s: '9초',
+            }
         },
         en: {
             template: {
-                arduino_nano_ext_get_analog_value: 'Analog %1 Sensor value',
-                arduino_nano_ext_get_analog_value_map: 'Map Value %1 %2 ~ %3 to %4 ~ %5',
-                arduino_nano_ext_get_ultrasonic_value: 'Read ultrasonic sensor trig pin %1 echo pin %2',
-                arduino_nano_ext_toggle_led: 'Digital %1 Pin %2 %3',
-                arduino_nano_ext_digital_pwm: 'Digital %1 Pin %2 %3',
-                arduino_nano_ext_set_tone: 'Play tone pin %1 on note %2 octave %3 beat %4 %5',
-                arduino_nano_ext_set_servo: 'Set servo pin %1 angle as %2 %3',
-                arduino_nano_ext_get_digital: 'Digital %1 Sensor value',
-                arduino_nano_ext_set_temp_humi_init: "Init temp-humid pin %1 %2",
-                arduino_nano_ext_get_temp_value: 'Temp sensor value',
-                arduino_nano_ext_get_humi_value: 'Humidity sensor value',
-                arduino_nano_ext_set_stepper: 'Set stepper pin %1 %2 %3 %4 RPM as %5 and steps as %6 %7',
-                arduino_nano_ext_set_irremote_init: "Init IR receiver pin %1  %2",
-                arduino_nano_ext_get_irremote_value: 'Received IR signal value',
-                arduino_nano_ext_set_lcd_init: 'Init LCD screen %1',
-                arduino_nano_ext_set_lcd_print: 'Write %3 on %1 line %2 column of LCD %4',
-                arduino_nano_ext_set_lcd_clear: 'Clear LCD screen %1',
+                // Header
+                arduino_nano_ext_sensor_title: 'Sensor',
+                arduino_nano_ext_led_title: 'LED',
+                arduino_nano_ext_buzzer_title: 'Buzzer',
+                arduino_nano_ext_output_title: 'Output',
+                arduino_nano_ext_motor_title: 'Motor',
+
+                // Sensor
+                arduino_nano_ext_get_sensor_value: '%1 sensor value',
+                arduino_nano_ext_get_potentiometer: 'potentiometer value',
+                arduino_nano_ext_get_joystick_value: 'joystick %1 axis value',
+                arduino_nano_ext_get_joystick_button: 'is joystick button pressed?',
+                arduino_nano_ext_get_mpu6050_value: 'MPU6050 %1 axis %2 value',
+
+                // LED
+                arduino_nano_ext_set_led: 'Set %1 LED %2 %3',
+
+                // Buzzer
+                arduino_nano_ext_set_buzzer: 'Play %1 octave, %2 note on buzzer for %3 sec %4',
+                arduino_nano_ext_stop_buzzer: 'Stop buzzer %1',
+
+                // Output
+                arduino_nano_ext_set_output: 'Output %2 to %1 %3',
+
+                // Motor
+                arduino_nano_ext_set_motor: 'Set motor %1 direction %2 speed %3 for %4 %5',
+                arduino_nano_ext_stop_motor: 'Stop motor %1 %2',
             },
-        },
-        uz: {
-            template: {
-                arduino_nano_ext_get_analog_value: "Analog %1 pin qiymati",
-                arduino_nano_ext_get_analog_value_map: "%1ning doirasini %2 ~ %3 dan %4 ~ %5 ga o'zgartirgan qiymati",
-                arduino_nano_ext_get_ultrasonic_value: "Ultrasonik sensor trig %1 eko %2 sensor qiymati",
-                arduino_nano_ext_toggle_led: "Raqamli %1 pinini %2 %3",
-                arduino_nano_ext_digital_pwm: "PWM %1 pinini %2 ga solzash %3",
-                arduino_nano_ext_set_tone: "Raqamli %1 pinni buzzerni %2 %3 oktavada %4 soniya yangrash %5",
-                arduino_nano_ext_set_servo: "Raqamli %1 pinning servo motorini %2 gradusiga sozlash %3",
-                arduino_nano_ext_get_digital: "Raqamli %1 pin sensor qiymati",
-                arduino_nano_ext_set_temp_humi_init: "Harorat-namlik sensorni %1 pindan foydalanish %2",
-                arduino_nano_ext_get_temp_value: 'Harorat sensor qiymati',
-                arduino_nano_ext_get_humi_value: 'Namlik sensor qiymati',
-                arduino_nano_ext_set_stepper: "Raqamli %1 %2 %3 %4 pinning stepper motorini %5 RPMdan %6 qadam ko'chirish %7",
-                arduino_nano_ext_set_irremote_init: "Pult signali qabul qiluvchini %1 pindan foydalanish %2",
-                arduino_nano_ext_get_irremote_value: 'Pultdan bosilgan raqam',
-                arduino_nano_ext_set_lcd_init: 'LCDni qaytadan tiklash %1',
-                arduino_nano_ext_set_lcd_print: 'LCDning %1 -qatorida %2 -ustuniga %3 yozish %4',
-                arduino_nano_ext_set_lcd_clear: 'LCD ekranni tozalash %1',
-            },
+            Blocks: {
+                arduino_nano_ext_joystick_x: 'X',
+                arduino_nano_ext_joystick_y: 'Y',
+                arduino_nano_ext_motor1: '1(Left)',
+                arduino_nano_ext_motor2: '2(Right)',
+                arduino_nano_ext_motor_fw: 'FW',
+                arduino_nano_ext_motor_bw: 'BW',
+                arduino_nano_ext_led_green: 'Green',
+                arduino_nano_ext_led_yellow: 'Yellow',
+                arduino_nano_ext_led_red: 'Red',
+                arduino_nano_ext_mpu_accel: 'Accel',
+                arduino_nano_ext_mpu_gyro: 'Gyro',
+                arduino_nano_ext_duration_cont: 'cont.',
+                arduino_nano_ext_duration_1s: '1s',
+                arduino_nano_ext_duration_2s: '2s',
+                arduino_nano_ext_duration_3s: '3s',
+                arduino_nano_ext_duration_4s: '4s',
+                arduino_nano_ext_duration_5s: '5s',
+                arduino_nano_ext_duration_6s: '6s',
+                arduino_nano_ext_duration_7s: '7s',
+                arduino_nano_ext_duration_8s: '8s',
+                arduino_nano_ext_duration_9s: '9s',
+            }
         },
         ru: {
             template: {
-                arduino_nano_ext_get_analog_value: "Аналоговое значение датчика %1",
-                arduino_nano_ext_get_analog_value_map: "Изменить диапазон %1 с %2 на %3, на %4 и на %5.",
-                arduino_nano_ext_get_ultrasonic_value: "Чтение триггерного пина ультразвукового датчика %1, эхо-пина %2",
-                arduino_nano_ext_toggle_led: "Цифровой пин %1 %2 %3",
-                arduino_nano_ext_digital_pwm: "Установить цифровой вывод %1 на %2 %3",
-                arduino_nano_ext_set_tone: "Включите пищалку на цифровом выводе %1 звуковым сигналом %2 %3 в течение %4 секунд %5",
-                arduino_nano_ext_set_servo: "Установить сервомотор %1 на угол %2 %3.",
-                arduino_nano_ext_get_digital: "Цифровое значение датчика %1",
-                arduino_nano_ext_set_temp_humi_init: "Инициализация датчика температуры и влажности, подключенного к цифровому выводу %1 %2",
-                arduino_nano_ext_get_temp_value: 'Значение температуры датчика температуры',
-                arduino_nano_ext_get_humi_value: 'Значение влажности датчика влажности',
-                arduino_nano_ext_set_stepper: "Установить шаговый пин %1 %2 %3 %4 об/мин как %5 и шаги как %6 %7",
-                arduino_nano_ext_set_irremote_init: "Инициализировать пин ИК-приемника %1 %2",
-                arduino_nano_ext_get_irremote_value: 'Полученное значение ИК-сигнала',
-                arduino_nano_ext_set_lcd_init: 'Инициализировать LCD экран %1',
-                arduino_nano_ext_set_lcd_print: 'Написать %3 в стороке %1 в столбце %2 LCD %4',
-                arduino_nano_ext_set_lcd_clear: 'Очистить LCD экран %1',
+                // Header
+                arduino_nano_ext_sensor_title: 'Сенсор',
+                arduino_nano_ext_led_title: 'LED',
+                arduino_nano_ext_buzzer_title: 'Пищалка',
+                arduino_nano_ext_output_title: 'Вывод',
+                arduino_nano_ext_motor_title: 'Мотор',
+
+                // Sensor
+                arduino_nano_ext_get_sensor_value: 'значение сенсора %1',
+                arduino_nano_ext_get_potentiometer: 'значение потенциометра',
+                arduino_nano_ext_get_joystick_value: 'значение оси %1 джойстика',
+                arduino_nano_ext_get_joystick_button: 'нажата ли кнопка джойстика?',
+                arduino_nano_ext_get_mpu6050_value: 'MPU6050 ось %1 %2 значение',
+
+                // LED
+                arduino_nano_ext_set_led: 'установить %1 LED %2 %3',
+
+                // Buzzer
+                arduino_nano_ext_set_buzzer: 'играть на пищалке %1 октаву, %2 ноту в течение %3 сек %4',
+                arduino_nano_ext_stop_buzzer: 'остановить пищалку %1',
+
+                // Output
+                arduino_nano_ext_set_output: 'вывести значение %2 на %1 %3',
+
+                // Motor
+                arduino_nano_ext_set_motor: 'вращать мотор %1 направление %2 скорость %3 в течение %4 %5',
+                arduino_nano_ext_stop_motor: 'остановить мотор %1 %2',
             },
+            Blocks: {
+                arduino_nano_ext_joystick_x: 'X',
+                arduino_nano_ext_joystick_y: 'Y',
+                arduino_nano_ext_motor1: '1(Левый)',
+                arduino_nano_ext_motor2: '2(Правый)',
+                arduino_nano_ext_motor_fw: 'Вперёд',
+                arduino_nano_ext_motor_bw: 'Назад',
+                arduino_nano_ext_led_green: 'Зелёный',
+                arduino_nano_ext_led_yellow: 'Жёлтый',
+                arduino_nano_ext_led_red: 'Красный',
+                arduino_nano_ext_mpu_accel: 'Ускорение',
+                arduino_nano_ext_mpu_gyro: 'Гироскоп',
+                arduino_nano_ext_duration_cont: 'постоянно',
+                arduino_nano_ext_duration_1s: '1 сек',
+                arduino_nano_ext_duration_2s: '2 сек',
+                arduino_nano_ext_duration_3s: '3 сек',
+                arduino_nano_ext_duration_4s: '4 сек',
+                arduino_nano_ext_duration_5s: '5 сек',
+                arduino_nano_ext_duration_6s: '6 сек',
+                arduino_nano_ext_duration_7s: '7 сек',
+                arduino_nano_ext_duration_8s: '8 сек',
+                arduino_nano_ext_duration_9s: '9 сек',
+            }
+        },
+        uz: {
+            template: {
+                // Header
+                arduino_nano_ext_sensor_title: 'Sensor',
+                arduino_nano_ext_led_title: 'LED',
+                arduino_nano_ext_buzzer_title: 'Buzzer',
+                arduino_nano_ext_output_title: 'Chiqarish',
+                arduino_nano_ext_motor_title: 'Motor',
+
+                // Sensor
+                arduino_nano_ext_get_sensor_value: '%1 sensor qiymati',
+                arduino_nano_ext_get_potentiometer: 'potentiometr qiymati',
+                arduino_nano_ext_get_joystick_value: 'joystick %1 o\'qi qiymati',
+                arduino_nano_ext_get_joystick_button: 'joystick tugmasi bosildimi?',
+                arduino_nano_ext_get_mpu6050_value: 'MPU6050 %1 o\'qi %2 qiymati',
+
+                // LED
+                arduino_nano_ext_set_led: '%1 LEDni %2 %3 holatga sozlash',
+
+                // Buzzer
+                arduino_nano_ext_set_buzzer: 'buzzerni %1 oktava, %2 nota bilan %3 soniya yangratish %4',
+                arduino_nano_ext_stop_buzzer: 'buzzerni to\'xtatish %1',
+
+                // Output
+                arduino_nano_ext_set_output: '%1 ga %2 qiymatini chiqarish %3',
+
+                // Motor
+                arduino_nano_ext_set_motor: '%1 motorni %2 yo\'nalishi %3 tezligi bilan %4 davomida aylantirish %5',
+                arduino_nano_ext_stop_motor: '%1 motorni to\'xtatish %2',
+            },
+            Blocks: {
+                arduino_nano_ext_joystick_x: 'X',
+                arduino_nano_ext_joystick_y: 'Y',
+                arduino_nano_ext_motor1: '1(Chap)',
+                arduino_nano_ext_motor2: '2(O\'ng)',
+                arduino_nano_ext_motor_fw: 'To\'g\'ri',
+                arduino_nano_ext_motor_bw: 'Orqa',
+                arduino_nano_ext_led_green: 'Yashil',
+                arduino_nano_ext_led_yellow: 'Sariq',
+                arduino_nano_ext_led_red: 'Qizil',
+                arduino_nano_ext_mpu_accel: 'Tezlanish',
+                arduino_nano_ext_mpu_gyro: 'Giroскоп',
+                arduino_nano_ext_duration_cont: 'davomli',
+                arduino_nano_ext_duration_1s: '1 soniya',
+                arduino_nano_ext_duration_2s: '2 soniya',
+                arduino_nano_ext_duration_3s: '3 soniya',
+                arduino_nano_ext_duration_4s: '4 soniya',
+                arduino_nano_ext_duration_5s: '5 soniya',
+                arduino_nano_ext_duration_6s: '6 soniya',
+                arduino_nano_ext_duration_7s: '7 soniya',
+                arduino_nano_ext_duration_8s: '8 soniya',
+                arduino_nano_ext_duration_9s: '9 soniya',
+            }
         },
     };
 };
 
 Entry.ArduinoNanoExt.blockMenuBlocks = [
-    'arduino_nano_ext_get_analog_value',
-    'arduino_nano_ext_get_analog_value_map',
-    'arduino_nano_ext_get_digital',
-    'arduino_nano_ext_toggle_led',
-    'arduino_nano_ext_digital_pwm',
-    'arduino_nano_ext_get_ultrasonic_value',
-    'arduino_nano_ext_set_tone',
-    'arduino_nano_ext_set_servo',
-    'arduino_nano_ext_set_stepper',
-    'arduino_nano_ext_set_temp_humi_init',
-    'arduino_nano_ext_get_temp_value',
-    'arduino_nano_ext_get_humi_value',
-    'arduino_nano_ext_set_irremote_init',
-    'arduino_nano_ext_get_irremote_value',
-    'arduino_nano_ext_set_lcd_init',
-    'arduino_nano_ext_set_lcd_print',
-    'arduino_nano_ext_set_lcd_clear',
+    // sensor
+    'arduino_nano_ext_sensor_title',
+    'arduino_nano_ext_get_sensor_value',
+    'arduino_nano_ext_get_potentiometer',
+    'arduino_nano_ext_get_joystick_value',
+    'arduino_nano_ext_get_joystick_button',
+    'arduino_nano_ext_get_mpu6050_value',
+
+    // led
+    'arduino_nano_ext_led_title',
+    'arduino_nano_ext_set_led',
+
+    // motor
+    'arduino_nano_ext_motor_title',
+    'arduino_nano_ext_set_motor',
+    'arduino_nano_ext_stop_motor',
+
+    // buzzer
+    'arduino_nano_ext_buzzer_title',
+    'arduino_nano_ext_set_buzzer',
+    'arduino_nano_ext_stop_buzzer',
+
+    // output
+    'arduino_nano_ext_output_title',
+    'arduino_nano_ext_set_output',
 ];
 
 //region arduinoNanoExt 아두이노 확장모드
 Entry.ArduinoNanoExt.getBlocks = function () {
     return {
-        arduino_nano_ext_analog_list: {
+        // Headers
+        arduino_nano_ext_sensor_title: {
+            color: EntryStatic.colorSet.common.TRANSPARENT,
+            fontColor: '#191970',
+            skeleton: 'basic_text',
+            skeletonOptions: {
+                contentPos: { x: 5 },
+            },
+            params: [
+                {
+                    type: 'Text',
+                    text: Lang.template.arduino_nano_ext_sensor_title,
+                    color: '#191970',
+                    align: 'left',
+                },
+            ],
+            def: { type: 'arduino_nano_ext_sensor_title' },
+            class: 'ArduinoNanoExtSensor',
+            isNotFor: ['ArduinoNanoExt'],
+            events: {},
+        },
+        arduino_nano_ext_led_title: {
+            color: EntryStatic.colorSet.common.TRANSPARENT,
+            fontColor: '#191970',
+            skeleton: 'basic_text',
+            skeletonOptions: {
+                contentPos: { x: 5 },
+            },
+            params: [
+                {
+                    type: 'Text',
+                    text: Lang.template.arduino_nano_ext_led_title,
+                    color: '#191970',
+                    align: 'left',
+                },
+            ],
+            def: { type: 'arduino_nano_ext_led_title' },
+            class: 'ArduinoNanoExtLed',
+            isNotFor: ['ArduinoNanoExt'],
+            events: {},
+        },
+        arduino_nano_ext_buzzer_title: {
+            color: EntryStatic.colorSet.common.TRANSPARENT,
+            fontColor: '#191970',
+            skeleton: 'basic_text',
+            skeletonOptions: {
+                contentPos: { x: 5 },
+            },
+            params: [
+                {
+                    type: 'Text',
+                    text: Lang.template.arduino_nano_ext_buzzer_title,
+                    color: '#191970',
+                    align: 'left',
+                },
+            ],
+            def: { type: 'arduino_nano_ext_buzzer_title' },
+            class: 'ArduinoNanoExtBuzzer',
+            isNotFor: ['ArduinoNanoExt'],
+            events: {},
+        },
+        arduino_nano_ext_output_title: {
+            color: EntryStatic.colorSet.common.TRANSPARENT,
+            fontColor: '#191970',
+            skeleton: 'basic_text',
+            skeletonOptions: {
+                contentPos: { x: 5 },
+            },
+            params: [
+                {
+                    type: 'Text',
+                    text: Lang.template.arduino_nano_ext_output_title,
+                    color: '#191970',
+                    align: 'left',
+                },
+            ],
+            def: { type: 'arduino_nano_ext_output_title' },
+            class: 'ArduinoNanoExtOutput',
+            isNotFor: ['ArduinoNanoExt'],
+            events: {},
+        },
+        arduino_nano_ext_motor_title: {
+            color: EntryStatic.colorSet.common.TRANSPARENT,
+            fontColor: '#191970',
+            skeleton: 'basic_text',
+            skeletonOptions: {
+                contentPos: { x: 5 },
+            },
+            params: [
+                {
+                    type: 'Text',
+                    text: Lang.template.arduino_nano_ext_motor_title,
+                    color: '#191970',
+                    align: 'left',
+                },
+            ],
+            def: { type: 'arduino_nano_ext_motor_title' },
+            class: 'ArduinoNanoExtMotor',
+            isNotFor: ['ArduinoNanoExt'],
+            events: {},
+        },
+
+        // Sensor blocks
+        arduino_nano_ext_get_sensor_value: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
             outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            fontColor: '#fff',
             skeleton: 'basic_string_field',
-            statements: [],
-            template: '%1',
             params: [
                 {
                     type: 'Dropdown',
                     options: [
-                        ['A0', '0'],
-                        ['A1', '1'],
-                        ['A2', '2'],
-                        ['A3', '3'],
-                        ['A4', '4'],
-                        ['A5', '5'],
-                        ['A6', '6'],
-                        ['A7', '7'],
+                        ['IN1', '0'],
+                        ['IN2', '1'],
+                        ['IN3', '2'],
                     ],
                     value: '0',
                     fontSize: 11,
@@ -344,325 +505,162 @@ Entry.ArduinoNanoExt.getBlocks = function () {
                     arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
                 },
             ],
-            events: {},
-            def: {
-                params: [null],
-            },
-            paramsKeyMap: {
-                PORT: 0,
-            },
-            func(sprite, script) {
-                return script.getField('PORT');
-            },
-            syntax: {
-                js: [],
-                py: [
-                    {
-                        syntax: '%1',
-                        blockType: 'param',
-                        textParams: [
-                            {
-                                type: 'Dropdown',
-                                options: [
-                                    ['A0', '0'],
-                                    ['A1', '1'],
-                                    ['A2', '2'],
-                                    ['A3', '3'],
-                                    ['A4', '4'],
-                                    ['A5', '5'],
-                                    ['A6', '6'],
-                                    ['A7', '7'],
-                                ],
-                                value: '0',
-                                fontSize: 11,
-                                converter: Entry.block.converters.returnStringKey,
-                                codeMap: 'Entry.CodeMap.Arduino.arduino_nano_ext_analog_list[0]',
-                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
-                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
-                            },
-                        ],
-                        keyOption: 'arduino_nano_ext_analog_list',
-                    },
-                ],
-            },
-        },
-        arduino_nano_ext_get_analog_value: {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            fontColor: '#fff',
-            skeleton: 'basic_string_field',
-            statements: [],
-            params: [
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-            ],
-            events: {},
-            def: {
-                params: [
-                    {
-                        type: 'arduino_nano_ext_analog_list',
-                    },
-                ],
-                type: 'arduino_nano_ext_get_analog_value',
-            },
-            paramsKeyMap: {
-                PORT: 0,
-            },
-            class: 'ArduinoNanoExtGet',
+            def: { params: [null], type: 'arduino_nano_ext_get_sensor_value' },
+            paramsKeyMap: { PORT: 0 },
+            class: 'ArduinoNanoExtSensor',
             isNotFor: ['ArduinoNanoExt'],
             func(sprite, script) {
-                let port = script.getValue('PORT', script);
-                if (!Entry.hw.sendQueue.GET) {
-                    Entry.hw.sendQueue.GET = {};
-                }
+                const port = script.getField('PORT');
+                if (!Entry.hw.sendQueue.GET) Entry.hw.sendQueue.GET = {};
                 Entry.hw.sendQueue.GET[Entry.ArduinoNanoExt.sensorTypes.ANALOG] = {
                     port,
                     time: new Date().getTime(),
                 };
-                return Entry.hw.portData[`a${port}`];
-            },
-            syntax: {
-                js: [],
-                py: [
-                    {
-                        syntax: 'ArduinoNanoExt.analogRead(%1)',
-                        blockType: 'param',
-                        textParams: [
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                        ],
-                    },
-                ],
-                ar: [{ syntax: 'analogRead(%1)' }]
+                return Entry.hw.portData[`a${port}`] || 0;
             },
         },
-        arduino_nano_ext_get_analog_value_map: {
+        arduino_nano_ext_get_potentiometer: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
             outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
             fontColor: '#fff',
             skeleton: 'basic_string_field',
-            statements: [],
-            params: [
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-            ],
-            events: {},
-            def: {
-                params: [
-                    {
-                        type: 'arduino_nano_ext_get_analog_value',
-                        params: [
-                            {
-                                type: 'arduino_nano_ext_analog_list',
-                            },
-                        ],
-                    },
-                    {
-                        type: 'number',
-                        params: ['0'],
-                    },
-                    {
-                        type: 'number',
-                        params: ['1023'],
-                    },
-                    {
-                        type: 'number',
-                        params: ['0'],
-                    },
-                    {
-                        type: 'number',
-                        params: ['100'],
-                    },
-                ],
-                type: 'arduino_nano_ext_get_analog_value_map',
-            },
-            paramsKeyMap: {
-                PORT: 0,
-                VALUE2: 1,
-                VALUE3: 2,
-                VALUE4: 3,
-                VALUE5: 4,
-            },
-            class: 'ArduinoNanoExtGet',
+            params: [],
+            def: { type: 'arduino_nano_ext_get_potentiometer' },
+            class: 'ArduinoNanoExtSensor',
             isNotFor: ['ArduinoNanoExt'],
             func(sprite, script) {
-                let result = script.getValue('PORT', script);
-                const ANALOG = Entry.hw.portData.ANALOG;
-                let value2 = script.getNumberValue('VALUE2', script);
-                let value3 = script.getNumberValue('VALUE3', script);
-                let value4 = script.getNumberValue('VALUE4', script);
-                let value5 = script.getNumberValue('VALUE5', script);
-                const stringValue4 = script.getValue('VALUE4', script);
-                const stringValue5 = script.getValue('VALUE5', script);
-                let isFloat = false;
-
-                if (
-                    (Entry.Utils.isNumber(stringValue4) && stringValue4.indexOf('.') > -1) ||
-                    (Entry.Utils.isNumber(stringValue5) && stringValue5.indexOf('.') > -1)
-                ) {
-                    isFloat = true;
-                }
-
-                if (value2 > value3) {
-                    var swap = value2;
-                    value2 = value3;
-                    value3 = swap;
-                }
-                if (value4 > value5) {
-                    var swap = value4;
-                    value4 = value5;
-                    value5 = swap;
-                }
-                result -= value2;
-                result = result * ((value5 - value4) / (value3 - value2));
-                result += value4;
-                result = Math.min(value5, result);
-                result = Math.max(value4, result);
-
-                if (isFloat) {
-                    result = Math.round(result * 100) / 100;
-                } else {
-                    result = Math.round(result);
-                }
-
-                return result;
-            },
-            syntax: {
-                js: [],
-                py: [
-                    {
-                        syntax: 'ArduinoNanoExt.map(%1, %2, %3, %4, %5)',
-                        blockType: 'param',
-                        textParams: [
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                        ],
-                    },
-                ],
-                ar: [{ syntax: 'map(%1, %2, %3, %4, %5)' }]
+                const port = '3'; // A3
+                if (!Entry.hw.sendQueue.GET) Entry.hw.sendQueue.GET = {};
+                Entry.hw.sendQueue.GET[Entry.ArduinoNanoExt.sensorTypes.ANALOG] = {
+                    port,
+                    time: new Date().getTime(),
+                };
+                return Entry.hw.portData[`a${port}`] || 0;
             },
         },
-        arduino_nano_ext_get_digital: {
+        arduino_nano_ext_get_joystick_value: {
+            color: EntryStatic.colorSet.block.default.HARDWARE,
+            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            fontColor: '#fff',
+            skeleton: 'basic_string_field',
+            params: [
+                {
+                    type: 'Dropdown',
+                    options: [
+                        [Lang.Blocks.arduino_nano_ext_joystick_x, '6'],
+                        [Lang.Blocks.arduino_nano_ext_joystick_y, '7'],
+                    ],
+                    value: '6',
+                    fontSize: 11,
+                    bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                    arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                },
+            ],
+            def: { params: [null], type: 'arduino_nano_ext_get_joystick_value' },
+            paramsKeyMap: { AXIS: 0 },
+            class: 'ArduinoNanoExtSensor',
+            isNotFor: ['ArduinoNanoExt'],
+            func(sprite, script) {
+                const port = script.getField('AXIS');
+                if (!Entry.hw.sendQueue.GET) Entry.hw.sendQueue.GET = {};
+                Entry.hw.sendQueue.GET[Entry.ArduinoNanoExt.sensorTypes.ANALOG] = {
+                    port,
+                    time: new Date().getTime(),
+                };
+                return Entry.hw.portData[`a${port}`] || 0;
+            },
+        },
+        arduino_nano_ext_get_joystick_button: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
             outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
             fontColor: '#fff',
             skeleton: 'basic_boolean_field',
-            params: [
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-            ],
-            events: {},
-            def: {
-                params: [
-                    {
-                        type: 'arduino_get_port_number',
-                        params: [2],
-                    },
-                ],
-                type: 'arduino_nano_ext_get_digital',
-            },
-            paramsKeyMap: {
-                PORT: 0,
-            },
-            class: 'ArduinoNanoExtGet',
+            params: [],
+            def: { type: 'arduino_nano_ext_get_joystick_button' },
+            class: 'ArduinoNanoExtSensor',
             isNotFor: ['ArduinoNanoExt'],
             func(sprite, script) {
-                const { hwModule = {} } = Entry.hw;
-                const { name } = hwModule;
-                if (name === 'ArduinoNanoExt' || name === 'ArduinoNano') {
-                    const port = script.getNumberValue('PORT', script);
-                    if (!Entry.hw.sendQueue.GET) {
-                        Entry.hw.sendQueue.GET = {};
-                    }
-                    Entry.hw.sendQueue.GET[Entry.ArduinoNanoExt.sensorTypes.DIGITAL] = {
-                        port,
-                        time: new Date().getTime(),
-                    };
-                    return port ? Entry.hw.portData[port] : 0;
-                } else {
-                    return Entry.block.arduino_get_digital_value.func(sprite, script);
-                }
-            },
-            syntax: {
-                js: [],
-                py: [
-                    {
-                        syntax: 'ArduinoNanoExt.digitalRead(%1)',
-                        blockType: 'param',
-                        textParams: [
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                        ],
-                    },
-                ],
-                ar: [{ syntax: 'digitalRead(%1)' }]
+                const port = '8'; // D8
+                if (!Entry.hw.sendQueue.GET) Entry.hw.sendQueue.GET = {};
+                Entry.hw.sendQueue.GET[Entry.ArduinoNanoExt.sensorTypes.DIGITAL] = {
+                    port,
+                    time: new Date().getTime(),
+                };
+                return Entry.hw.portData[port] || 0;
             },
         },
-        arduino_nano_ext_toggle_led: {
+        arduino_nano_ext_get_mpu6050_value: {
+            color: EntryStatic.colorSet.block.default.HARDWARE,
+            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            fontColor: '#fff',
+            skeleton: 'basic_string_field',
+            params: [
+                {
+                    type: 'Dropdown',
+                    options: [['X', 'X'], ['Y', 'Y'], ['Z', 'Z']],
+                    value: 'X',
+                    fontSize: 11,
+                    bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                    arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                },
+                {
+                    type: 'Dropdown',
+                    options: [
+                        [Lang.Blocks.arduino_nano_ext_mpu_accel, 'accel'],
+                        [Lang.Blocks.arduino_nano_ext_mpu_gyro, 'gyro'],
+                    ],
+                    value: 'accel',
+                    fontSize: 11,
+                    bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                    arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                },
+            ],
+            def: { params: [null, null], type: 'arduino_nano_ext_get_mpu6050_value' },
+            paramsKeyMap: { AXIS: 0, TYPE: 1 },
+            class: 'ArduinoNanoExtSensor',
+            isNotFor: ['ArduinoNanoExt'],
+            func(sprite, script) {
+                const axis = script.getField('AXIS');
+                const type = script.getField('TYPE');
+                const key = `${type}${axis}`; // accelX, gyroY etc.
+
+                if (!Entry.hw.sendQueue.GET) Entry.hw.sendQueue.GET = {};
+                Entry.hw.sendQueue.GET[Entry.ArduinoNanoExt.sensorTypes.MPU] = {
+                    time: new Date().getTime(),
+                };
+
+                return Entry.hw.portData[key] || 0;
+            },
+        },
+
+        // LED blocks
+        arduino_nano_ext_set_led: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
             outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
             skeleton: 'basic',
-            statements: [],
             params: [
                 {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
+                    type: 'Dropdown',
+                    options: [
+                        [Lang.Blocks.arduino_nano_ext_led_green, '2'],
+                        [Lang.Blocks.arduino_nano_ext_led_yellow, '3'],
+                        [Lang.Blocks.arduino_nano_ext_led_red, '4'],
+                    ],
+                    value: '2',
+                    fontSize: 11,
+                    bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                    arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
                 },
                 {
-                    type: 'Block',
-                    accept: 'string',
+                    type: 'Dropdown',
+                    options: [
+                        [Lang.Blocks.ARDUINO_on, 'on'],
+                        [Lang.Blocks.ARDUINO_off, 'off'],
+                    ],
+                    value: 'on',
+                    fontSize: 11,
+                    bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                    arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
                 },
                 {
                     type: 'Indicator',
@@ -670,83 +668,203 @@ Entry.ArduinoNanoExt.getBlocks = function () {
                     size: 12,
                 },
             ],
-            events: {},
-            def: {
-                params: [
-                    {
-                        type: 'arduino_get_port_number',
-                        params: [3],
-                    },
-                    {
-                        type: 'arduino_get_digital_toggle',
-                        params: ['on'],
-                    },
-                    null,
-                ],
-                type: 'arduino_nano_ext_toggle_led',
-            },
-            paramsKeyMap: {
-                PORT: 0,
-                VALUE: 1,
-            },
-            class: 'ArduinoNanoExtGet',
+            def: { params: [null, null, null], type: 'arduino_nano_ext_set_led' },
+            paramsKeyMap: { PORT: 0, VALUE: 1 },
+            class: 'ArduinoNanoExtLed',
             isNotFor: ['ArduinoNanoExt'],
             func(sprite, script) {
-                const port = script.getNumberValue('PORT');
-                let value = script.getValue('VALUE');
-
-                if (typeof value === 'string') {
-                    value = value.toLowerCase();
-                }
-                if (Entry.ArduinoNanoExt.highList.indexOf(value) > -1) {
-                    value = 255;
-                } else if (Entry.ArduinoNanoExt.lowList.indexOf(value) > -1) {
-                    value = 0;
-                } else {
-                    throw new Error();
-                }
-                if (!Entry.hw.sendQueue.SET) {
-                    Entry.hw.sendQueue.SET = {};
-                }
+                const port = script.getField('PORT');
+                const value = script.getField('VALUE') === 'on' ? 255 : 0;
+                if (!Entry.hw.sendQueue.SET) Entry.hw.sendQueue.SET = {};
                 Entry.hw.sendQueue.SET[port] = {
                     type: Entry.ArduinoNanoExt.sensorTypes.DIGITAL,
                     data: value,
                     time: new Date().getTime(),
                 };
-                // For legacy port writing
-                Entry.hw.sendQueue[port] = value;
                 return script.callReturn();
             },
-            syntax: {
-                js: [],
-                py: [
-                    {
-                        syntax: 'ArduinoNanoExt.digitalWrite(%1, %2)',
-                        textParams: [
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                        ],
-                    },
-                ],
-                ar: [{ syntax: 'digitalWrite(%1, %2);' }]
-            },
         },
-        arduino_nano_ext_digital_pwm: {
+
+        // Motor blocks
+        arduino_nano_ext_set_motor: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
             outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
             skeleton: 'basic',
-            statements: [],
             params: [
+                {
+                    type: 'Dropdown',
+                    options: [
+                        [Lang.Blocks.arduino_nano_ext_motor1, '1'],
+                        [Lang.Blocks.arduino_nano_ext_motor2, '2'],
+                    ],
+                    value: '1',
+                    fontSize: 11,
+                    bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                    arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                },
+                {
+                    type: 'Dropdown',
+                    options: [
+                        [Lang.Blocks.arduino_nano_ext_motor_fw, 'fw'],
+                        [Lang.Blocks.arduino_nano_ext_motor_bw, 'bw'],
+                    ],
+                    value: 'fw',
+                    fontSize: 11,
+                    bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                    arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                },
                 {
                     type: 'Block',
                     accept: 'string',
                     defaultType: 'number',
+                },
+                {
+                    type: 'Dropdown',
+                    options: [
+                        [Lang.Blocks.arduino_nano_ext_duration_cont, 'cont'],
+                        [Lang.Blocks.arduino_nano_ext_duration_1s, '1'],
+                        [Lang.Blocks.arduino_nano_ext_duration_2s, '2'],
+                        [Lang.Blocks.arduino_nano_ext_duration_3s, '3'],
+                        [Lang.Blocks.arduino_nano_ext_duration_4s, '4'],
+                        [Lang.Blocks.arduino_nano_ext_duration_5s, '5'],
+                        [Lang.Blocks.arduino_nano_ext_duration_6s, '6'],
+                        [Lang.Blocks.arduino_nano_ext_duration_7s, '7'],
+                        [Lang.Blocks.arduino_nano_ext_duration_8s, '8'],
+                        [Lang.Blocks.arduino_nano_ext_duration_9s, '9'],
+                    ],
+                    value: 'cont',
+                    fontSize: 11,
+                    bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                    arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                },
+                {
+                    type: 'Indicator',
+                    img: 'block_icon/hardware_icon.svg',
+                    size: 12,
+                },
+            ],
+            def: {
+                params: [
+                    null,
+                    null,
+                    { type: 'number', params: ['255'] },
+                    null,
+                    null
+                ],
+                type: 'arduino_nano_ext_set_motor',
+            },
+            paramsKeyMap: { MOTOR: 0, DIR: 1, SPEED: 2, DURATION: 3 },
+            class: 'ArduinoNanoExtMotor',
+            isNotFor: ['ArduinoNanoExt'],
+            func(sprite, script) {
+                if (!script.isStart) {
+                    const motor = script.getField('MOTOR');
+                    const dir = script.getField('DIR');
+                    let speed = script.getNumberValue('SPEED');
+                    speed = Math.max(0, Math.min(255, speed));
+                    let duration = script.getField('DURATION');
+
+                    const dirValue = dir === 'fw' ? 0 : 1;
+                    const combinedData = (dirValue << 8) | speed;
+
+                    if (!Entry.hw.sendQueue.SET) Entry.hw.sendQueue.SET = {};
+                    Entry.hw.sendQueue.SET[motor] = {
+                        type: Entry.ArduinoNanoExt.sensorTypes.MOTOR,
+                        data: combinedData,
+                        time: new Date().getTime(),
+                    };
+
+                    if (duration !== 'cont' && !isNaN(duration) && Number(duration) > 0) {
+                        script.isStart = true;
+                        script.timeFlag = 1;
+                        setTimeout(() => {
+                            if (!Entry.hw.sendQueue.SET) Entry.hw.sendQueue.SET = {};
+                            Entry.hw.sendQueue.SET[motor] = {
+                                type: Entry.ArduinoNanoExt.sensorTypes.MOTOR,
+                                data: 0,
+                                time: new Date().getTime(),
+                            };
+                            script.timeFlag = 0;
+                        }, Number(duration) * 1000);
+                        return script;
+                    } else {
+                        return script.callReturn();
+                    }
+                } else if (script.timeFlag === 1) {
+                    return script;
+                } else {
+                    delete script.isStart;
+                    delete script.timeFlag;
+                    return script.callReturn();
+                }
+            },
+        },
+        arduino_nano_ext_stop_motor: {
+            color: EntryStatic.colorSet.block.default.HARDWARE,
+            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            skeleton: 'basic',
+            params: [
+                {
+                    type: 'Dropdown',
+                    options: [
+                        [Lang.Blocks.arduino_nano_ext_motor1, '1'],
+                        [Lang.Blocks.arduino_nano_ext_motor2, '2'],
+                    ],
+                    value: '1',
+                    fontSize: 11,
+                    bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                    arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                },
+                {
+                    type: 'Indicator',
+                    img: 'block_icon/hardware_icon.svg',
+                    size: 12,
+                },
+            ],
+            def: { params: [null, null], type: 'arduino_nano_ext_stop_motor' },
+            paramsKeyMap: { MOTOR: 0 },
+            class: 'ArduinoNanoExtMotor',
+            isNotFor: ['ArduinoNanoExt'],
+            func(sprite, script) {
+                const motor = script.getField('MOTOR');
+                if (!Entry.hw.sendQueue.SET) Entry.hw.sendQueue.SET = {};
+                Entry.hw.sendQueue.SET[motor] = {
+                    type: Entry.ArduinoNanoExt.sensorTypes.MOTOR,
+                    data: 0,
+                    time: new Date().getTime(),
+                };
+                return script.callReturn();
+            },
+        },
+
+        // Buzzer blocks
+        arduino_nano_ext_set_buzzer: {
+            color: EntryStatic.colorSet.block.default.HARDWARE,
+            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            skeleton: 'basic',
+            params: [
+                {
+                    type: 'Dropdown',
+                    options: [
+                        ['1', '1'], ['2', '2'], ['3', '3'], ['4', '4'],
+                        ['5', '5'], ['6', '6'], ['7', '7'], ['8', '8'],
+                    ],
+                    value: '4',
+                    fontSize: 11,
+                    bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                    arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                },
+                {
+                    type: 'Dropdown',
+                    options: [
+                        ['무음', '0'], ['도', 'C'], ['도#', 'CS'], ['레', 'D'], ['레#', 'DS'],
+                        ['미', 'E'], ['파', 'F'], ['파#', 'FS'], ['솔', 'G'], ['솔#', 'GS'],
+                        ['라', 'A'], ['라#', 'AS'], ['시', 'B'],
+                    ],
+                    value: 'C',
+                    fontSize: 11,
+                    bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                    arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
                 },
                 {
                     type: 'Block',
@@ -759,35 +877,117 @@ Entry.ArduinoNanoExt.getBlocks = function () {
                     size: 12,
                 },
             ],
-            events: {},
             def: {
-                params: [
-                    {
-                        type: 'arduino_get_pwm_port_number',
-                    },
-                    {
-                        type: 'text',
-                        params: ['255'],
-                    },
-                    null,
-                ],
-                type: 'arduino_nano_ext_digital_pwm',
+                params: [null, null, { type: 'number', params: ['1'] }, null],
+                type: 'arduino_nano_ext_set_buzzer',
             },
-            paramsKeyMap: {
-                PORT: 0,
-                VALUE: 1,
-            },
-            class: 'ArduinoNanoExtGet',
+            paramsKeyMap: { OCTAVE: 0, NOTE: 1, DURATION: 2 },
+            class: 'ArduinoNanoExtBuzzer',
             isNotFor: ['ArduinoNanoExt'],
             func(sprite, script) {
-                const port = script.getNumberValue('PORT');
-                let value = script.getNumberValue('VALUE');
-                value = Math.round(value);
-                value = Math.max(value, 0);
-                value = Math.min(value, 255);
-                if (!Entry.hw.sendQueue.SET) {
-                    Entry.hw.sendQueue.SET = {};
+                if (!script.isStart) {
+                    const port = '7'; // D7
+                    const octave = script.getField('OCTAVE');
+                    const note = script.getField('NOTE');
+                    const duration = script.getNumberValue('DURATION');
+
+                    if (!Entry.hw.sendQueue.SET) Entry.hw.sendQueue.SET = {};
+
+                    if (note === '0') {
+                        Entry.hw.sendQueue.SET[port] = {
+                            type: Entry.ArduinoNanoExt.sensorTypes.TONE,
+                            data: 0,
+                            time: new Date().getTime(),
+                        };
+                    } else {
+                        Entry.hw.sendQueue.SET[port] = {
+                            type: Entry.ArduinoNanoExt.sensorTypes.TONE,
+                            data: {
+                                value: Entry.ArduinoNanoExt.toneMap[Entry.ArduinoNanoExt.toneTable[note]][octave - 1],
+                                duration: duration * 1000,
+                            },
+                            time: new Date().getTime(),
+                        };
+                    }
+
+                    script.isStart = true;
+                    script.timeFlag = 1;
+                    setTimeout(() => {
+                        script.timeFlag = 0;
+                    }, duration * 1000);
+                    return script;
+                } else if (script.timeFlag === 1) {
+                    return script;
+                } else {
+                    delete script.isStart;
+                    delete script.timeFlag;
+                    return script.callReturn();
                 }
+            },
+        },
+        arduino_nano_ext_stop_buzzer: {
+            color: EntryStatic.colorSet.block.default.HARDWARE,
+            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            skeleton: 'basic',
+            params: [
+                {
+                    type: 'Indicator',
+                    img: 'block_icon/hardware_icon.svg',
+                    size: 12,
+                },
+            ],
+            def: { params: [null, null], type: 'arduino_nano_ext_stop_buzzer' },
+            class: 'ArduinoNanoExtBuzzer',
+            isNotFor: ['ArduinoNanoExt'],
+            func(sprite, script) {
+                const port = '7'; // D7
+                if (!Entry.hw.sendQueue.SET) Entry.hw.sendQueue.SET = {};
+                Entry.hw.sendQueue.SET[port] = {
+                    type: Entry.ArduinoNanoExt.sensorTypes.TONE,
+                    data: 0,
+                    time: new Date().getTime(),
+                };
+                return script.callReturn();
+            },
+        },
+
+        // Output blocks
+        arduino_nano_ext_set_output: {
+            color: EntryStatic.colorSet.block.default.HARDWARE,
+            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            skeleton: 'basic',
+            params: [
+                {
+                    type: 'Dropdown',
+                    options: [['OUT1', '11'], ['OUT2', '12'], ['OUT3', '13']],
+                    value: '11',
+                    fontSize: 11,
+                    bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                    arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                },
+                {
+                    type: 'Block',
+                    accept: 'string',
+                    defaultType: 'number',
+                },
+                {
+                    type: 'Indicator',
+                    img: 'block_icon/hardware_icon.svg',
+                    size: 12,
+                },
+            ],
+            def: {
+                params: [null, { type: 'number', params: ['255'] }, null],
+                type: 'arduino_nano_ext_set_output',
+            },
+            paramsKeyMap: { PORT: 0, VALUE: 1 },
+            class: 'ArduinoNanoExtOutput',
+            isNotFor: ['ArduinoNanoExt'],
+            func(sprite, script) {
+                const port = script.getField('PORT');
+                let value = script.getNumberValue('VALUE');
+                value = Math.max(0, Math.min(255, value));
+                if (!Entry.hw.sendQueue.SET) Entry.hw.sendQueue.SET = {};
                 Entry.hw.sendQueue.SET[port] = {
                     type: Entry.ArduinoNanoExt.sensorTypes.PWM,
                     data: value,
@@ -795,1376 +995,8 @@ Entry.ArduinoNanoExt.getBlocks = function () {
                 };
                 return script.callReturn();
             },
-            syntax: {
-                js: [],
-                py: [
-                    {
-                        syntax: 'ArduinoNanoExt.analogWrite(%1, %2)',
-                        textParams: [
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                        ],
-                    },
-                ],
-                ar: [{ syntax: 'analogWrite(%1, %2);' }]
-            },
-        },
-        arduino_get_digital_toggle: {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            skeleton: 'basic_string_field',
-            statements: [],
-            params: [
-                {
-                    type: 'Dropdown',
-                    options: [[Lang.Blocks.ARDUINO_on, 'on'], [Lang.Blocks.ARDUINO_off, 'off']],
-                    value: 'on',
-                    fontSize: 11,
-                    bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
-                    arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
-                },
-            ],
-            events: {},
-            def: {
-                params: [null],
-            },
-            paramsKeyMap: {
-                OPERATOR: 0,
-            },
-            func(sprite, script) {
-                return script.getStringField('OPERATOR');
-            },
-            syntax: {
-                js: [],
-                py: [
-                    {
-                        syntax: '%1',
-                        textParams: [
-                            {
-                                type: 'Dropdown',
-                                options: [
-                                    [Lang.Blocks.ARDUINO_on, 'on'],
-                                    [Lang.Blocks.ARDUINO_off, 'off'],
-                                ],
-                                value: 'on',
-                                fontSize: 11,
-                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
-                                converter: Entry.block.converters.returnStringValueUpperCase,
-                                codeMap: 'Entry.CodeMap.Arduino.arduino_get_digital_toggle[0]',
-                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
-                            },
-                        ],
-                        keyOption: 'arduino_get_digital_toggle',
-                    },
-                ],
-            },
-        },
-        arduino_nano_ext_get_ultrasonic_value: {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            fontColor: '#fff',
-            skeleton: 'basic_string_field',
-            statements: [],
-            params: [
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-            ],
-            events: {},
-            def: {
-                params: [
-                    {
-                        type: 'arduino_get_port_number',
-                        params: ['2'],
-                    },
-                    {
-                        type: 'arduino_get_port_number',
-                        params: ['4'],
-                    },
-                ],
-                type: 'arduino_nano_ext_get_ultrasonic_value',
-            },
-            paramsKeyMap: {
-                PORT1: 0,
-                PORT2: 1,
-            },
-            class: 'ultra_tone',
-            isNotFor: ['ArduinoNanoExt'],
-            func(sprite, script) {
-                const port1 = script.getNumberValue('PORT1', script);
-                const port2 = script.getNumberValue('PORT2', script);
-
-                if (!Entry.hw.sendQueue.SET) {
-                    Entry.hw.sendQueue.SET = {};
-                }
-                delete Entry.hw.sendQueue.SET[port1];
-                delete Entry.hw.sendQueue.SET[port2];
-
-                if (!Entry.hw.sendQueue.GET) {
-                    Entry.hw.sendQueue.GET = {};
-                }
-                Entry.hw.sendQueue.GET[Entry.ArduinoNanoExt.sensorTypes.ULTRASONIC] = {
-                    port: [port1, port2],
-                    time: new Date().getTime(),
-                };
-                return Entry.hw.portData.ULTRASONIC || 0;
-            },
-            syntax: {
-                js: [],
-                py: [
-                    {
-                        syntax: 'ArduinoNanoExt.ultrasonicRead(%1, %2)',
-                        blockType: 'param',
-                        textParams: [
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                        ],
-                    },
-                ],
-                ar: [{ syntax: 'distance()' }]
-            },
-        },
-        arduino_nano_ext_tone_list: {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            skeleton: 'basic_string_field',
-            statements: [],
-            template: '%1',
-            params: [
-                {
-                    type: 'Dropdown',
-                    options: [
-                        [Lang.Blocks.silent, '0'],
-                        [Lang.Blocks.do_name, 'C'],
-                        [Lang.Blocks.do_sharp_name, 'CS'],
-                        [Lang.Blocks.re_name, 'D'],
-                        [Lang.Blocks.re_sharp_name, 'DS'],
-                        [Lang.Blocks.mi_name, 'E'],
-                        [Lang.Blocks.fa_name, 'F'],
-                        [Lang.Blocks.fa_sharp_name, 'FS'],
-                        [Lang.Blocks.sol_name, 'G'],
-                        [Lang.Blocks.sol_sharp_name, 'GS'],
-                        [Lang.Blocks.la_name, 'A'],
-                        [Lang.Blocks.la_sharp_name, 'AS'],
-                        [Lang.Blocks.si_name, 'B'],
-                    ],
-                    value: 'C',
-                    fontSize: 11,
-                    bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
-                    arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
-                },
-            ],
-            events: {},
-            def: {
-                params: [null],
-            },
-            paramsKeyMap: {
-                NOTE: 0,
-            },
-            func(sprite, script) {
-                return script.getField('NOTE');
-            },
-            syntax: {
-                js: [],
-                py: [
-                    {
-                        syntax: '%1',
-                        textParams: [
-                            {
-                                type: 'Dropdown',
-                                options: [
-                                    [Lang.Blocks.silent, '0'],
-                                    [Lang.Blocks.do_name, 'C'],
-                                    [Lang.Blocks.do_sharp_name, 'CS'],
-                                    [Lang.Blocks.re_name, 'D'],
-                                    [Lang.Blocks.re_sharp_name, 'DS'],
-                                    [Lang.Blocks.mi_name, 'E'],
-                                    [Lang.Blocks.fa_name, 'F'],
-                                    [Lang.Blocks.fa_sharp_name, 'FS'],
-                                    [Lang.Blocks.sol_name, 'G'],
-                                    [Lang.Blocks.sol_sharp_name, 'GS'],
-                                    [Lang.Blocks.la_name, 'A'],
-                                    [Lang.Blocks.la_sharp_name, 'AS'],
-                                    [Lang.Blocks.si_name, 'B'],
-                                ],
-                                value: 'C',
-                                fontSize: 11,
-                                converter: Entry.block.converters.returnStringValueUpperCase,
-                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
-                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
-                            },
-                        ],
-                        keyOption: 'arduino_nano_ext_tone_list',
-                    },
-                ],
-            },
-        },
-        arduino_nano_ext_tone_value: {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            skeleton: 'basic_string_field',
-            statements: [],
-            template: '%1',
-            params: [
-                {
-                    type: 'Block',
-                    accept: 'string',
-                },
-            ],
-            events: {},
-            def: {
-                params: [
-                    {
-                        type: 'arduino_nano_ext_tone_list',
-                    },
-                ],
-                type: 'arduino_nano_ext_tone_value',
-            },
-            paramsKeyMap: {
-                NOTE: 0,
-            },
-            func(sprite, script) {
-                return script.getNumberValue('NOTE');
-            },
-            syntax: {
-                js: [],
-                py: [
-                    {
-                        syntax: '%1',
-                        keyOption: 'arduino_nano_ext_tone_value',
-                    },
-                ],
-            },
-        },
-        arduino_nano_ext_octave_list: {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            skeleton: 'basic_string_field',
-            statements: [],
-            template: '%1',
-            params: [
-                {
-                    type: 'Dropdown',
-                    options: [
-                        ['1', '1'],
-                        ['2', '2'],
-                        ['3', '3'],
-                        ['4', '4'],
-                        ['5', '5'],
-                        ['6', '6'],
-                    ],
-                    value: '4',
-                    fontSize: 11,
-                    bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
-                    arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
-                },
-            ],
-            events: {},
-            def: {
-                params: [null],
-            },
-            paramsKeyMap: {
-                OCTAVE: 0,
-            },
-            func(sprite, script) {
-                return script.getField('OCTAVE');
-            },
-            syntax: {
-                js: [],
-                py: [
-                    {
-                        syntax: '%1',
-                        keyOption: 'arduino_nano_ext_octave_list',
-                    },
-                ],
-            },
-        },
-        arduino_nano_ext_set_tone: {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            skeleton: 'basic',
-            statements: [],
-            params: [
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-                {
-                    type: 'Block',
-                    accept: 'string',
-                },
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-                {
-                    type: 'Indicator',
-                    img: 'block_icon/hardware_icon.svg',
-                    size: 12,
-                },
-            ],
-            events: {},
-            def: {
-                params: [
-                    {
-                        type: 'arduino_get_port_number',
-                        params: [3],
-                    },
-                    {
-                        type: 'arduino_nano_ext_tone_list',
-                    },
-                    {
-                        type: 'arduino_nano_ext_octave_list',
-                    },
-                    {
-                        type: 'text',
-                        params: ['1'],
-                    },
-                    null,
-                ],
-                type: 'arduino_nano_ext_set_tone',
-            },
-            paramsKeyMap: {
-                PORT: 0,
-                NOTE: 1,
-                OCTAVE: 2,
-                DURATION: 3,
-            },
-            class: 'ultra_tone',
-            isNotFor: ['ArduinoNanoExt'],
-            func(sprite, script) {
-                const sq = Entry.hw.sendQueue;
-                const port = script.getNumberValue('PORT', script);
-
-                if (!script.isStart) {
-                    let note = script.getValue('NOTE', script);
-                    if (!Entry.Utils.isNumber(note)) {
-                        note = Entry.ArduinoNanoExt.toneTable[note];
-                    }
-
-                    if (note < 0) {
-                        note = 0;
-                    } else if (note > 12) {
-                        note = 12;
-                    }
-
-                    let duration = script.getNumberValue('DURATION', script);
-
-                    if (duration < 0) {
-                        duration = 0;
-                    }
-
-                    if (!sq.SET) {
-                        sq.SET = {};
-                    }
-
-                    if (duration === 0) {
-                        sq.SET[port] = {
-                            type: Entry.ArduinoNanoExt.sensorTypes.TONE,
-                            data: 0,
-                            time: new Date().getTime(),
-                        };
-                        return script.callReturn();
-                    }
-
-                    let octave = script.getNumberValue('OCTAVE', script) - 1;
-                    if (octave < 0) {
-                        octave = 0;
-                    } else if (octave > 5) {
-                        octave = 5;
-                    }
-
-                    let value = 0;
-
-                    if (note != 0) {
-                        value = Entry.ArduinoNanoExt.toneMap[note][octave];
-                    }
-
-                    duration = duration * 1000;
-                    script.isStart = true;
-                    script.timeFlag = 1;
-
-                    sq.SET[port] = {
-                        type: Entry.ArduinoNanoExt.sensorTypes.TONE,
-                        data: {
-                            value,
-                            duration,
-                        },
-                        time: new Date().getTime(),
-                    };
-
-                    setTimeout(() => {
-                        script.timeFlag = 0;
-                    }, duration + 32);
-                    return script;
-                } else if (script.timeFlag == 1) {
-                    return script;
-                } else {
-                    delete script.timeFlag;
-                    delete script.isStart;
-                    sq.SET[port] = {
-                        type: Entry.ArduinoNanoExt.sensorTypes.TONE,
-                        data: 0,
-                        time: new Date().getTime(),
-                    };
-                    Entry.engine.isContinue = false;
-                    return script.callReturn();
-                }
-            },
-            syntax: {
-                js: [],
-                py: [
-                    {
-                        syntax: 'ArduinoNanoExt.tone(%1, %2, %3, %4)',
-                        textParams: [
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                        ],
-                    },
-                ],
-                ar: [{ syntax: 'tone(%1, %2, %3);' }]
-            },
-        },
-        arduino_nano_ext_set_servo: {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            skeleton: 'basic',
-            statements: [],
-            params: [
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-                {
-                    type: 'Indicator',
-                    img: 'block_icon/hardware_icon.svg',
-                    size: 12,
-                },
-            ],
-            events: {},
-            def: {
-                params: [
-                    {
-                        type: 'arduino_get_port_number',
-                        params: ['3'],
-                    },
-                    null,
-                ],
-                type: 'arduino_nano_ext_set_servo',
-            },
-            paramsKeyMap: {
-                PORT: 0,
-                VALUE: 1,
-            },
-            class: 'motor',
-            isNotFor: ['ArduinoNanoExt'],
-            func(sprite, script) {
-                const sq = Entry.hw.sendQueue;
-                const port = script.getNumberValue('PORT', script);
-                let value = script.getNumberValue('VALUE', script);
-                value = Math.min(180, value);
-                value = Math.max(0, value);
-
-                if (!sq.SET) {
-                    sq.SET = {};
-                }
-                sq.SET[port] = {
-                    type: Entry.ArduinoNanoExt.sensorTypes.SERVO_PIN,
-                    data: value,
-                    time: new Date().getTime(),
-                };
-
-                return script.callReturn();
-            },
-            syntax: {
-                js: [],
-                py: [
-                    {
-                        syntax: 'ArduinoNanoExt.servomotorWrite(%1, %2)',
-                        textParams: [
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                        ],
-                    },
-                ],
-                ar: [{ syntax: 'myServo.write(%1);' }]
-            },
-        },
-        arduino_nano_ext_set_stepper: {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            skeleton: 'basic',
-            statements: [],
-            params: [
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-                {
-                    type: 'Indicator',
-                    img: 'block_icon/hardware_icon.svg',
-                    size: 12,
-                },
-            ],
-            events: {},
-            def: {
-                params: [
-                    {
-                        type: 'arduino_get_port_number',
-                        params: ['8'],
-                    },
-                    {
-                        type: 'arduino_get_port_number',
-                        params: ['10'],
-                    },
-                    {
-                        type: 'arduino_get_port_number',
-                        params: ['9'],
-                    },
-                    {
-                        type: 'arduino_get_port_number',
-                        params: ['11'],
-                    },
-                    {
-                        type: 'text',
-                        params: ['10'],
-                    },
-                    {
-                        type: 'text',
-                        params: ['2048'],
-                    },
-                    null,
-                ],
-                type: 'arduino_nano_ext_set_stepper',
-            },
-            paramsKeyMap: {
-                PORT1: 0,
-                PORT2: 1,
-                PORT3: 2,
-                PORT4: 3,
-                SPEED: 4,
-                STEPS: 5,
-            },
-            class: 'motor',
-            isNotFor: ['ArduinoNanoExt'],
-            func(sprite, script) {
-                const sq = Entry.hw.sendQueue;
-                const port1 = script.getNumberValue('PORT1', script);
-                const port2 = script.getNumberValue('PORT2', script);
-                const port3 = script.getNumberValue('PORT3', script);
-                const port4 = script.getNumberValue('PORT4', script);
-
-                let speed = script.getNumberValue('SPEED', script);
-                speed = Math.min(20, speed);
-                speed = Math.max(0, speed);
-
-                let steps = script.getNumberValue('STEPS', script);
-                steps = Math.min(2048, steps);
-                steps = Math.max(-2048, steps);
-
-                if (!sq.SET) {
-                    sq.SET = {};
-                }
-                sq.SET['14'] = {
-                    type: Entry.ArduinoNanoExt.sensorTypes.STEPPER,
-                    data: {
-                        port1,
-                        port2,
-                        port3,
-                        port4,
-                        speed,
-                        steps
-                    },
-                    time: new Date().getTime(),
-                };
-
-                return script.callReturn();
-            },
-            syntax: {
-                js: [],
-                py: [
-                    {
-                        syntax: 'ArduinoNanoExt.steppermotorWrite(%1, %2, %3, %4, %5, %6)',
-                        textParams: [
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                        ],
-                    },
-                ],
-                ar: [{ syntax: 'myStepper.step(%1);' }]
-            },
-        },
-        arduino_nano_ext_set_temp_humi_init: {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            fontColor: '#fff',
-            skeleton: 'basic',
-            statements: [],
-            params: [
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-                {
-                    type: 'Indicator',
-                    img: 'block_icon/hardware_icon.svg',
-                    size: 12,
-                },
-            ],
-            events: {},
-            def: {
-                params: [
-                    {
-                        type: 'arduino_get_port_number',
-                        params: [3],
-                    },
-                ],
-                type: 'arduino_nano_ext_set_temp_humi_init',
-            },
-            paramsKeyMap: {
-                PORT: 0,
-            },
-            class: 'dht',
-            isNotFor: ['ArduinoNanoExt'],
-            func(sprite, script) {
-                var sq = Entry.hw.sendQueue;
-                var port = script.getNumberValue('PORT', script);
-
-                if (!script.isStart) {
-                    if (!sq.SET) {
-                        sq.SET = {};
-                    }
-
-                    var duration = Entry.ArduinoNanoExt.TIME_500ms;
-                    script.isStart = true;
-                    script.timeFlag = 1;
-
-                    sq.SET[port] = {
-                        type: Entry.ArduinoNanoExt.sensorTypes.DHTINIT,
-                        data: port,
-                        time: new Date().getTime(),
-                    };
-                    setTimeout(function () {
-                        script.timeFlag = 0;
-                    }, duration);
-                    return script;
-                }
-                else if (script.timeFlag == 1) {
-                    return script;
-                }
-                else {
-                    delete script.timeFlag;
-                    delete script.isStart;
-
-                    Entry.engine.isContinue = false;
-                    return script.callReturn();
-                }
-            },
-            syntax: {
-                js: [],
-                py: [
-                    {
-                        syntax: 'ArduinoNanoExt.dhtTempHumiInit(%1)',
-                        blockType: 'param',
-                        textParams: [
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                        ],
-                    },
-                ],
-                ar: [{ syntax: 'dht.begin();' }]
-            },
-        },
-        arduino_nano_ext_get_temp_value: {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            fontColor: '#fff',
-            skeleton: 'basic_string_field',
-            statements: [],
-            params: [
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-            ],
-            events: {},
-            def: {
-                params: [
-                    '0',
-                ],
-                type: 'arduino_nano_ext_get_temp_value',
-            },
-            paramsKeyMap: {
-                TEMP: 0,
-            },
-            class: 'dht',
-            isNotFor: ['ArduinoNanoExt'],
-            func(sprite, script) {
-                const temp = script.getNumberValue('TEMP', script);
-
-                if (!Entry.hw.sendQueue.SET) {
-                    Entry.hw.sendQueue.SET = {};
-                }
-                delete Entry.hw.sendQueue.SET[temp];
-
-                if (!Entry.hw.sendQueue.GET) {
-                    Entry.hw.sendQueue.GET = {};
-                }
-
-                Entry.hw.sendQueue.GET[Entry.ArduinoNanoExt.sensorTypes.DHTTEMP] = {
-                    port: temp,
-                    time: new Date().getTime(),
-                };
-                return Entry.hw.portData.DHTTEMP || 0;
-            },
-            syntax: {
-                js: [],
-                py: [{ syntax: 'ArduinoNanoExt.temperatureRead()' }],
-                ar: [{ syntax: 'dht.readTemperature()' }]
-            },
-        },
-        arduino_nano_ext_get_humi_value: {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            fontColor: '#fff',
-            skeleton: 'basic_string_field',
-            statements: [],
-            params: [
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-            ],
-            events: {},
-            def: {
-                params: [
-                    '0',
-                ],
-                type: 'arduino_nano_ext_get_humi_value',
-            },
-            paramsKeyMap: {
-                HUMI: 0,
-            },
-            class: 'dht',
-            isNotFor: ['ArduinoNanoExt'],
-            func(sprite, script) {
-                const humi = script.getNumberValue('HUMI', script);
-
-                if (!Entry.hw.sendQueue.SET) {
-                    Entry.hw.sendQueue.SET = {};
-                }
-                delete Entry.hw.sendQueue.SET[humi];
-
-                if (!Entry.hw.sendQueue.GET) {
-                    Entry.hw.sendQueue.GET = {};
-                }
-
-                Entry.hw.sendQueue.GET[Entry.ArduinoNanoExt.sensorTypes.DHTHUMI] = {
-                    port: humi,
-                    time: new Date().getTime(),
-                };
-                return Entry.hw.portData.DHTHUMI || 0;
-            },
-            syntax: {
-                js: [],
-                py: [{ syntax: 'ArduinoNanoExt.humidityRead()' }],
-                ar: [{ syntax: 'dht.readHumidity()' }]
-            },
-        },
-        arduino_nano_ext_set_irremote_init: {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            fontColor: '#fff',
-            skeleton: 'basic',
-            statements: [],
-            params: [
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-                {
-                    type: 'Indicator',
-                    img: 'block_icon/hardware_icon.svg',
-                    size: 12,
-                },
-            ],
-            events: {},
-            def: {
-                params: [
-                    {
-                        type: 'arduino_get_port_number',
-                        params: [3],
-                    },
-                ],
-                type: 'arduino_nano_ext_set_irremote_init',
-            },
-            paramsKeyMap: {
-                PORT: 0,
-            },
-            class: 'irremote',
-            isNotFor: ['ArduinoNanoExt'],
-            func(sprite, script) {
-                var sq = Entry.hw.sendQueue;
-                var port = script.getNumberValue('PORT', script);
-
-                if (!script.isStart) {
-                    if (!sq.SET) {
-                        sq.SET = {};
-                    }
-
-                    var duration = Entry.ArduinoNanoExt.TIME_500ms;
-                    script.isStart = true;
-                    script.timeFlag = 1;
-
-                    sq.SET[port] = {
-                        type: Entry.ArduinoNanoExt.sensorTypes.IRRINIT,
-                        data: port,
-                        time: new Date().getTime(),
-                    };
-                    setTimeout(function () {
-                        script.timeFlag = 0;
-                    }, duration);
-                    return script;
-                }
-                else if (script.timeFlag == 1) {
-                    return script;
-                }
-                else {
-                    delete script.timeFlag;
-                    delete script.isStart;
-
-                    Entry.engine.isContinue = false;
-                    return script.callReturn();
-                }
-            },
-            syntax: {
-                js: [],
-                py: [
-                    {
-                        syntax: 'ArduinoNanoExt.irRemoteInit(%1)',
-                        blockType: 'param',
-                        textParams: [
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                        ],
-                    },
-                ],
-                ar: [{ syntax: 'irrecv.enableIRIn();' }]
-            },
-        },
-        arduino_nano_ext_get_irremote_value: {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            fontColor: '#fff',
-            skeleton: 'basic_string_field',
-            statements: [],
-            params: [
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-            ],
-            events: {},
-            def: {
-                params: [
-                    '0',
-                ],
-                type: 'arduino_nano_ext_get_irremote_value',
-            },
-            paramsKeyMap: {
-                RECV: 0,
-            },
-            class: 'irremote',
-            isNotFor: ['ArduinoNanoExt'],
-            func(sprite, script) {
-                const recv = script.getNumberValue('RECV', script);
-
-                if (!Entry.hw.sendQueue.SET) {
-                    Entry.hw.sendQueue.SET = {};
-                }
-                delete Entry.hw.sendQueue.SET[recv];
-
-                if (!Entry.hw.sendQueue.GET) {
-                    Entry.hw.sendQueue.GET = {};
-                }
-
-                Entry.hw.sendQueue.GET[Entry.ArduinoNanoExt.sensorTypes.IRREMOTE] = {
-                    port: recv,
-                    time: new Date().getTime(),
-                };
-                return Entry.hw.portData.IRREMOTE || 0;
-            },
-            syntax: {
-                js: [],
-                py: [{ syntax: 'ArduinoNanoExt.irRecvRead()' }],
-                ar: [{ syntax: 'translateIR()' }]
-            },
-        },
-        arduino_nano_ext_lcd_column_list: {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            skeleton: 'basic_string_field',
-            statements: [],
-            template: '%1',
-            params: [
-                {
-                    type: 'Dropdown',
-                    options: [
-                        ['1', '0'],
-                        ['2', '1'],
-                        ['3', '2'],
-                        ['4', '3'],
-                        ['5', '4'],
-                        ['6', '5'],
-                        ['7', '6'],
-                        ['8', '7'],
-                        ['9', '8'],
-                        ['10', '9'],
-                        ['11', '10'],
-                        ['12', '11'],
-                        ['13', '12'],
-                        ['14', '13'],
-                        ['15', '14'],
-                        ['16', '15'],
-                    ],
-                    value: '0',
-                    fontSize: 11,
-                    bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
-                    arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
-                },
-            ],
-            events: {},
-            def: {
-                params: [null],
-            },
-            paramsKeyMap: {
-                COLUMN: 0,
-            },
-            func: function (sprite, script) {
-                return script.getStringField('COLUMN');
-            },
-            syntax: {
-                js: [],
-                py: [
-                    {
-                        syntax: '%1',
-                        textParams: [
-                            {
-                                type: 'Dropdown',
-                                options: [
-                                    ['1', '0'],
-                                    ['2', '1'],
-                                    ['3', '2'],
-                                    ['4', '3'],
-                                    ['5', '4'],
-                                    ['6', '5'],
-                                    ['7', '6'],
-                                    ['8', '7'],
-                                    ['9', '8'],
-                                    ['10', '9'],
-                                    ['11', '10'],
-                                    ['12', '11'],
-                                    ['13', '12'],
-                                    ['14', '13'],
-                                    ['15', '14'],
-                                    ['16', '15'],
-                                ],
-                                value: '3',
-                                fontSize: 11,
-                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
-                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
-                                converter:
-                                    Entry.block.converters
-                                        .returnStringOrNumberByValue,
-                            },
-                        ],
-                    },
-                ],
-            },
-        },
-        arduino_nano_ext_lcd_row_list: {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            skeleton: 'basic_string_field',
-            statements: [],
-            template: '%1',
-            params: [
-                {
-                    type: 'Dropdown',
-                    options: [['1', '0'], ['2', '1']],
-                    value: '0',
-                    fontSize: 11,
-                    bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
-                    arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
-                },
-            ],
-            events: {},
-            def: {
-                params: [null],
-            },
-            paramsKeyMap: {
-                ROW: 0,
-            },
-            func: function (sprite, script) {
-                return script.getStringField('ROW');
-            },
-            syntax: {
-                js: [],
-                py: [
-                    {
-                        syntax: '%1',
-                        textParams: [
-                            {
-                                type: 'Dropdown',
-                                options: [['1', '0'], ['2', '1']],
-                                value: '3',
-                                fontSize: 11,
-                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
-                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
-                                converter:
-                                    Entry.block.converters
-                                        .returnStringOrNumberByValue,
-                            },
-                        ],
-                    },
-                ],
-            },
-        },
-        arduino_nano_ext_set_lcd_init:
-        {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            fontColor: '#fff',
-            skeleton: 'basic',
-            statements: [],
-            params: [
-                {
-                    type: 'Indicator',
-                    img: 'block_icon/hardware_icon.svg',
-                    size: 12,
-                },
-            ],
-            events: {},
-            def: {
-                params: [
-                    null
-                ],
-                type: 'arduino_nano_ext_set_lcd_init',
-            },
-            paramsKeyMap: {},
-            class: 'lcd',
-            isNotFor: ['ArduinoNanoExt'],
-            func: function (sprite, script) {
-                // 아래코드에서 보조 변수들(script.isStart, script.timeFlag등)이 들어간 이유는 fps(초당프레임)를 위해서입니다.
-                // 해당 코드가 없을 경우 최소 딜레이가 없기때문에 흐리게 나오는 문제가 발생합니다.
-                var sq = Entry.hw.sendQueue;
-                if (!script.isStart) {
-                    if (!sq['SET']) {
-                        sq['SET'] = {};
-                    }
-
-                    script.isStart = true;
-                    script.timeFlag = 1;
-                    var fps = Entry.FPS || 60;
-                    var timeValue = 60 / fps * Entry.ArduinoNanoExt.TIME_1000ms;
-
-                    sq['SET'][15] = {
-                        type: Entry.ArduinoNanoExt.sensorTypes.LCD_INIT,
-                        data: 255,
-                        time: new Date().getTime(),
-                    };
-
-                    setTimeout(function () {
-                        script.timeFlag = 0;
-                    }, timeValue);
-                    return script;
-                } else if (script.timeFlag == 1) {
-                    return script;
-                } else {
-                    delete script.timeFlag;
-                    delete script.isStart;
-                    Entry.engine.isContinue = false;
-                    return script.callReturn();
-                }
-            },
-            syntax: {
-                js: [],
-                py: [{ syntax: 'ArduinoNanoExt.lcdInit()' }],
-                ar: [{ syntax: 'lcdObj->init();' }]
-            },
-        },
-        arduino_nano_ext_set_lcd_print:
-        {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            fontColor: '#fff',
-            skeleton: 'basic',
-            statements: [],
-            params: [
-                {
-                    type: 'Block',
-                    accept: 'string',
-                },
-                {
-                    type: 'Block',
-                    accept: 'string',
-                },
-                {
-                    type: 'Block',
-                    accept: 'string',
-                },
-                {
-                    type: 'Indicator',
-                    img: 'block_icon/hardware_icon.svg',
-                    size: 12,
-                },
-            ],
-            events: {},
-            def: {
-                params: [
-                    {
-                        type: 'arduino_nano_ext_lcd_row_list',
-                    },
-                    {
-                        type: 'arduino_nano_ext_lcd_column_list',
-                    },
-                    {
-                        type: 'text',
-                        params: ['Hello, Entry'],
-                    },
-                    null,
-                ],
-                type: 'arduino_nano_ext_set_lcd_print',
-            },
-            paramsKeyMap: {
-                ROW: 0,
-                COLUMN: 1,
-                TEXT: 2,
-            },
-            class: 'lcd',
-            isNotFor: ['ArduinoNanoExt'],
-            func: function (sprite, script) {
-                var sq = Entry.hw.sendQueue;
-                var row = script.getNumberValue('ROW');
-                var column = script.getNumberValue('COLUMN');
-                if (column < 0) column = 0;
-                if (column > 15) column = 15;
-                if (row < 0) row = 0;
-                if (row > 1) row = 1;
-                var text = script.getValue('TEXT');
-
-                // 아래코드에서 보조 변수들(script.isStart, script.timeFlag등)이 들어간 이유는 fps(초당프레임)를 위해서입니다.
-                // 해당 코드가 없을 경우 최소 딜레이가 없기때문에 흐리게 나오는 문제가 발생합니다.
-                if (!script.isStart) {
-                    if (!sq['SET']) {
-                        sq['SET'] = {};
-                    }
-
-                    script.isStart = true;
-                    script.timeFlag = 1;
-                    var fps = Entry.FPS || 60;
-                    var timeValue = 60 / fps * Entry.ArduinoNanoExt.TIME_50ms;
-
-                    sq['SET'][15] = {
-                        type: Entry.ArduinoNanoExt.sensorTypes.LCD_PRINT,
-                        data: {
-                            row,
-                            column,
-                            text,
-                        },
-                        time: new Date().getTime(),
-                    };
-
-                    setTimeout(function () {
-                        script.timeFlag = 0;
-                    }, timeValue);
-                    return script;
-                } else if (script.timeFlag == 1) {
-                    return script;
-                } else {
-                    delete script.timeFlag;
-                    delete script.isStart;
-                    Entry.engine.isContinue = false;
-                    return script.callReturn();
-                }
-            },
-            syntax: {
-                js: [],
-                py: [
-                    {
-                        syntax: 'ArduinoNanoExt.lcdPrint(%1, %2, %3)',
-                        blockType: 'param',
-                        textParams: [
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                        ],
-                    }
-                ],
-                ar: [{ syntax: 'lcdObj->setCursor(%1, %2);' }]
-            },
-        },
-        arduino_nano_ext_set_lcd_clear:
-        {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            fontColor: '#fff',
-            skeleton: 'basic',
-            statements: [],
-            params: [
-                {
-                    type: 'Indicator',
-                    img: 'block_icon/hardware_icon.svg',
-                    size: 12,
-                },
-            ],
-            events: {},
-            def: {
-                params: [
-                    null
-                ],
-                type: 'arduino_nano_ext_set_lcd_clear',
-            },
-            paramsKeyMap: {},
-            class: 'lcd',
-            isNotFor: ['ArduinoNanoExt'],
-            func: function (sprite, script) {
-                if (!Entry.hw.sendQueue.SET) {
-                    Entry.hw.sendQueue.SET = {};
-                }
-                Entry.hw.sendQueue.SET[15] = {
-                    type: Entry.ArduinoNanoExt.sensorTypes.LCD_CLEAR,
-                    data: 255,
-                    time: new Date().getTime(),
-                };
-                return script.callReturn();
-            },
-            syntax: {
-                js: [],
-                py: [{ syntax: 'ArduinoNanoExt.lcdClear()' }],
-                ar: [{ syntax: 'lcdObj->clear();' }]
-            },
         },
     };
 };
-//endregion arduinoNanoExt 아두이노 확장모드
 
 module.exports = Entry.ArduinoNanoExt;
