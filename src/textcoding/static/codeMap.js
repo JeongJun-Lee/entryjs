@@ -234,6 +234,18 @@ Entry.CodeMap = {};
                 a5: '5',
             },
         ],
+        arduino_nano_ext_analog_list: [
+            {
+                a0: '0',
+                a1: '1',
+                a2: '2',
+                a3: '3',
+                a4: '4',
+                a5: '5',
+                a6: '6',
+                a7: '7',
+            },
+        ],
         arduino_get_digital_toggle: [
             {
                 on: 'high',

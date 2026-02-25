@@ -149,12 +149,18 @@ Entry.BlockToArParser = class {
             block._schema.class === 'variable' ||
             block.type === 'arduino_ext_set_servo' ||
             block.type === 'ITPLE_set_servo' ||
+            block.type === 'arduino_nano_ext_set_servo' ||
             block.type === 'arduino_ext_set_stepper' ||
+            block.type === 'arduino_nano_ext_set_stepper' ||
             block.type === 'arduino_ext_get_ultrasonic_value' ||
+            block.type === 'arduino_nano_ext_get_ultrasonic_value' ||
             block.type === 'ITPLE_get_ultrasonic_value' ||
             block.type === 'arduino_ext_set_temp_humi_init' ||
+            block.type === 'arduino_nano_ext_set_temp_humi_init' ||
             block.type === 'arduino_ext_set_irremote_init' ||
-            block.type === 'arduino_ext_set_lcd_init'
+            block.type === 'arduino_nano_ext_set_irremote_init' ||
+            block.type === 'arduino_ext_set_lcd_init' ||
+            block.type === 'arduino_nano_ext_set_lcd_init'
         )) {
             this.insertIntoGlobal(block.type);
         }
@@ -162,12 +168,15 @@ Entry.BlockToArParser = class {
         // Place UserFunc after loop()
         if (block && (
             block.type === 'arduino_ext_get_ultrasonic_value' ||
+            block.type === 'arduino_nano_ext_get_ultrasonic_value' ||
             block.type === 'ITPLE_get_ultrasonic_value' ||
             block.type === 'arduino_ext_get_irremote_value' ||
+            block.type === 'arduino_nano_ext_get_irremote_value' ||
             (this.isFunc(block) && addFunc) // User defined function
         )) {
             this.AddUserFunc(stat);
         } else if (block && (block.type === 'arduino_ext_set_lcd_init')) {
+        } else if (block && (block.type === 'arduino_nano_ext_set_lcd_init')) {
             // Just pass adding the code
         } else {
             // In the setup();
@@ -198,18 +207,19 @@ Entry.BlockToArParser = class {
 
     insertIntoGlobal(blockType) {
         let stat = '';
-        if (blockType === 'arduino_ext_set_servo' || blockType === 'ITPLE_set_servo') {
+        if (blockType === 'arduino_ext_set_servo' || blockType === 'ITPLE_set_servo' || blockType === 'arduino_nano_ext_set_servo') {
             stat = '#include <Servo.h>\nServo myServo;\n';
-        } else if (blockType === 'arduino_ext_set_stepper') {
+        } else if (blockType === 'arduino_ext_set_stepper' || blockType === 'arduino_nano_ext_set_stepper') {
             stat = `#include <Stepper.h>\nStepper myStepper(2048, ${this._pinNum}, ${this._pinNum2}, ${this._pinNum3}, ${this._pinNum4});\n`;
         } else if (blockType === 'arduino_ext_get_ultrasonic_value' ||
+            blockType === 'arduino_nano_ext_get_ultrasonic_value' ||
             blockType === 'ITPLE_get_ultrasonic_value') {
             stat = `int trig = ${this._pinNum};\nint echo = ${this._pinNum2};\n`;
-        } else if (blockType === 'arduino_ext_set_temp_humi_init') {
+        } else if (blockType === 'arduino_ext_set_temp_humi_init' || blockType === 'arduino_nano_ext_set_temp_humi_init') {
             stat = `#include <DHT.h>\nDHT dht(${this._pinNum}, DHT11);\n`;
-        } else if (blockType === 'arduino_ext_set_irremote_init') {
+        } else if (blockType === 'arduino_ext_set_irremote_init' || blockType === 'arduino_nano_ext_set_irremote_init') {
             stat = `#include <IRremote.h>\nIRrecv irrecv(${this._pinNum});\ndecode_results results;\n`;
-        } else if (blockType === 'arduino_ext_set_lcd_init') {
+        } else if (blockType === 'arduino_ext_set_lcd_init' || blockType === 'arduino_nano_ext_set_lcd_init') {
             // Don't chagne the tab space of the codes below!!
             stat =
                 `#include <LCDI2C_Multilingual.h>
@@ -310,11 +320,16 @@ byte findI2CAddress() {
                 return val;
             }
 
-            if (trimmed.startsWith('}') || (trimmed.includes('else') && !trimmed.includes('if'))) {
+            // If the overlapped, add one more indentation
+            if (!(val === '}' || val.includes('else')) &&
+                (prevVal.includes('if') || prevVal.includes('else') || prevVal.includes('for') || prevVal.includes('while'))
+            ) {
+                tabCnt++;
+            } else if ((val === '}' || val.includes('else')) &&
+                !(prevVal.includes('if') || prevVal.includes('else') || prevVal.includes('for') || prevVal.includes('while'))
+            ) {
                 tabCnt--;
             }
-
-            if (tabCnt < 1) tabCnt = 1;
 
             let result = '';
             for (let i = 0; i < tabCnt; i++) {
@@ -367,6 +382,14 @@ byte findI2CAddress() {
                 }
                 this._hasRootFunc = false;
             }
+            if (this.isRegisteredFunc(block)) {
+                this.funcSyntax = this.makeFuncSyntax(block);
+            }
+        }
+
+        // Currently Not supported if the func has a argument
+        if (this.funcSyntax.includes('%')) {
+            this.throwErr('error', 'UnsupportedBlk', block);
         }
 
         const val = this.getValueFromParam(block);
@@ -391,11 +414,16 @@ byte findI2CAddress() {
             block.type === 'arduino_get_sensor_number' || // Port for analogRead
             block.type === 'arduino_get_digital_toggle' ||
             block.type === 'arduino_ext_analog_list' ||
+            block.type === 'arduino_nano_ext_analog_list' ||
             block.type === 'ITPLE_analog_list' ||
             block.type === 'arduino_ext_octave_list' ||
+            block.type === 'arduino_nano_ext_octave_list' ||
             block.type === 'arduino_ext_tone_list' ||
+            block.type === 'arduino_nano_ext_tone_list' ||
             block.type === 'arduino_ext_lcd_row_list' ||
-            block.type === 'arduino_ext_lcd_column_list'
+            block.type === 'arduino_nano_ext_lcd_row_list' ||
+            block.type === 'arduino_ext_lcd_column_list' ||
+            block.type === 'arduino_nano_ext_lcd_column_list'
         ) {
             // Even usage of variable in the block without setting initial value(set_variable)
             // Declare the variable at global area, But in case of normal, just return with param value
@@ -403,12 +431,17 @@ byte findI2CAddress() {
                 this.insertIntoGlobal(block.type);
             }
             return val[0];
-        } else if (block.type === '_if' || block.type === 'if_else') {
+
+        } else if (
+            block.type === '_if' ||
+            block.type === 'if_else'
+        ) {
             return `if (${val.pop()}) {`;
         } else {
             return this.createSource(block);
         }
-    }
+
+    };
 
     getValueFromParam(block) {
         let rtn = [];
@@ -474,7 +507,7 @@ byte findI2CAddress() {
                 value = this._num(this._pramVal[0]);
                 this.errChkTime(value, block);
 
-                stat = `delay(${value} * 1000);`;
+                stat = `delay(${value * 1000});`;
                 break;
 
             case 'boolean_basic_operator':
@@ -611,6 +644,7 @@ byte findI2CAddress() {
                 break;
             case 'arduino_toggle_led': // digitalWrite
             case 'arduino_ext_toggle_led':
+            case 'arduino_nano_ext_toggle_led':
             case 'ITPLE_toggle_led':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
@@ -635,6 +669,7 @@ byte findI2CAddress() {
 
             case 'arduino_toggle_pwm': // pwm(anlogWrite)
             case 'arduino_ext_digital_pwm':
+            case 'arduino_nano_ext_digital_pwm':
             case 'ITPLE_digital_pwm':
             case 'ITPLE_set_motor_speed_old':
             case 'ITPLE_set_motor_speed_new':
@@ -658,6 +693,7 @@ byte findI2CAddress() {
 
             case 'arduino_get_digital_value': // digitalRead
             case 'arduino_ext_get_digital':
+            case 'arduino_nano_ext_get_digital':
             case 'ITPLE_get_digital':
             case 'ITPLE_get_digital_value':
                 stat = block._schema.syntax.ar[0].syntax;
@@ -670,6 +706,7 @@ byte findI2CAddress() {
 
             case 'arduino_get_number_sensor_value': // analogRead
             case 'arduino_ext_get_analog_value':
+            case 'arduino_nano_ext_get_analog_value':
             case 'ITPLE_get_analog_value':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
@@ -683,6 +720,7 @@ byte findI2CAddress() {
 
             case 'arduino_convert_scale': // map
             case 'arduino_ext_get_analog_value_map':
+            case 'arduino_nano_ext_get_analog_value_map':
             case 'ITPLE_value_mapping':
                 stat = block._schema.syntax.ar[0].syntax;
                 if (Entry.Utils.isNumber(this._pramVal[0])) {
@@ -700,6 +738,7 @@ byte findI2CAddress() {
                 break;
 
             case 'arduino_ext_set_tone': // tone
+            case 'arduino_nano_ext_set_tone': // tone
             case 'ITPLE_set_tone':
                 const octave_tone_hz = [
                     [0, 32.7, 34.6, 36.7, 38.9, 41.2, 43.7, 46.2, 49.0, 51.9, 55.0, 58.3, 61.7], // 1octave
@@ -731,7 +770,7 @@ byte findI2CAddress() {
 
                 stat = stat.replace('%1', this._pinNum);
                 stat = stat.replace('%2', octave_tone_hz[value - 1][charToIdx[value2]]);
-                stat = stat.replace('%3', `(${value3} * 1000)`);
+                stat = stat.replace('%3', value3 * 1000);
                 if (value2 == '0') {
                     stat = `noTone(${this._pinNum});`;
                 }
@@ -739,6 +778,7 @@ byte findI2CAddress() {
                 break;
 
             case 'arduino_ext_get_ultrasonic_value':
+            case 'arduino_nano_ext_get_ultrasonic_value':
             case 'ITPLE_get_ultrasonic_value':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
@@ -766,6 +806,7 @@ byte findI2CAddress() {
 
             case 'arduino_ext_set_servo':
             case 'ITPLE_set_servo':
+            case 'arduino_nano_ext_set_servo':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
                 this._pinNum = this._num(this._pramVal[0]); // Arr to Number
@@ -775,6 +816,7 @@ byte findI2CAddress() {
                 break;
 
             case 'arduino_ext_set_stepper':
+            case 'arduino_nano_ext_set_stepper':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
                 this._pinNum = this._num(this._pramVal[0]); // Arr to Number
@@ -790,7 +832,9 @@ byte findI2CAddress() {
                 break;
 
             case 'arduino_ext_set_temp_humi_init':
+            case 'arduino_nano_ext_set_temp_humi_init':
             case 'arduino_ext_set_irremote_init':
+            case 'arduino_nano_ext_set_irremote_init':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
                 this._pinNum = this._num(this._pramVal[0]); // Arr to Number
@@ -800,17 +844,19 @@ byte findI2CAddress() {
                 break;
 
             case 'arduino_ext_get_temp_value':
+            case 'arduino_nano_ext_get_temp_value':
             case 'arduino_ext_get_humi_value':
-                stat = block._schema.syntax.ar[0].syntax;
-                this._funcName = stat.split('(')[0];
-                break;
+            case 'arduino_nano_ext_get_humi_value':
             case 'arduino_ext_set_lcd_init':
+            case 'arduino_nano_ext_set_lcd_init':
             case 'arduino_ext_set_lcd_clear':
+            case 'arduino_nano_ext_set_lcd_clear':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
                 break;
 
             case 'arduino_ext_get_irremote_value':
+            case 'arduino_nano_ext_get_irremote_value':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
 
@@ -861,6 +907,7 @@ byte findI2CAddress() {
                 break;
 
             case 'arduino_ext_set_lcd_print':
+            case 'arduino_nano_ext_set_lcd_print':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
                 value = this._num(this._pramVal[0]);

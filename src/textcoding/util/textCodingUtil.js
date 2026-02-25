@@ -610,9 +610,12 @@ class TextCodingUtil {
             || blockType === 'arduino_text'
             || blockType === 'arduino_get_digital_toggle'
             || blockType === 'arduino_ext_analog_list'
+            || blockType === 'arduino_nano_ext_analog_list'
             || block.type === 'ITPLE_analog_list'
             || blockType === 'arduino_ext_octave_list'
+            || blockType === 'arduino_nano_ext_octave_list'
             || blockType === 'arduino_ext_tone_list'
+            || blockType === 'arduino_nano_ext_tone_list'
             || blockType === 'boolean_basic_operator'
             || blockType === 'boolean_and_or'
             || blockType === 'boolean_not'
@@ -624,7 +627,9 @@ class TextCodingUtil {
             || blockType === 'get_variable'
             || blockType === 'combine_something'
             || blockType === 'arduino_ext_lcd_column_list'
+            || blockType === 'arduino_nano_ext_lcd_column_list'
             || blockType === 'arduino_ext_lcd_row_list'
+            || blockType === 'arduino_nano_ext_lcd_row_list'
             || blockType.includes('func_') // Functions
             || blockType.includes('function_create')
             || blockType.includes('stringParam')
