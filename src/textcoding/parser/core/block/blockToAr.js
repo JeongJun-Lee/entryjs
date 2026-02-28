@@ -160,7 +160,9 @@ Entry.BlockToArParser = class {
             block.type === 'arduino_ext_set_irremote_init' ||
             block.type === 'arduino_nano_ext_set_irremote_init' ||
             block.type === 'arduino_ext_set_lcd_init' ||
-            block.type === 'arduino_nano_ext_set_lcd_init'
+            block.type === 'arduino_nano_ext_set_lcd_init' ||
+            block.type === 'arduino_nano_ext_get_mpu6050_value' ||
+            block.type === 'arduino_nano_ext_get_mpu_angle'
         )) {
             this.insertIntoGlobal(block.type);
         }
@@ -239,6 +241,8 @@ byte findI2CAddress() {
     }
     return foundAddress;
 }\n`;
+        } else if (blockType === 'arduino_nano_ext_get_mpu6050_value' || blockType === 'arduino_nano_ext_get_mpu_angle') {
+            stat = `#include <Wire.h>\n#define MPU_ADDR 0x68\nfloat mpuYaw = 0;\nunsigned long lastMpuTime = 0;\n`;
         } else { // variable
             stat = Entry.TextCodingUtil.generateVariablesDeclarationForAr();
         }
@@ -263,7 +267,7 @@ byte findI2CAddress() {
             case 'digitalWrite':
             case 'tone':
                 pinStat = `pinMode(${this._pinNum}, OUTPUT);`; break;
-            case 'myServo.write': pinStat = `myServo.attach(${this._pinNum});`; break;
+            case 'myServo.write': pinStat = `myServo.attach(${this._pinNum}, 500, 2500);`; break;
             case 'myStepper.step':
                 if (this._pramVal && this._pramVal.length > 4) {
                     pinStat = `myStepper.setSpeed(${this._pramVal[4]});`;
@@ -272,6 +276,9 @@ byte findI2CAddress() {
             case 'distance': pinStat = `pinMode(${this._pinNum}, OUTPUT);\n\tpinMode(${this._pinNum2}, INPUT);`; break;
             case 'lcdObj->init':
                 pinStat = "lcdObj = new LCDI2C_RussianLatin(findI2CAddress(), 16, 2);\n    lcdObj->init();\n    lcdObj->backlight();\n    lcdObj->clear();";
+                break;
+            case 'getMPUValue':
+                pinStat = "Wire.begin();\n    Wire.beginTransmission(MPU_ADDR);\n    Wire.write(0x6B);\n    Wire.write(0);\n    if (Wire.endTransmission(true) == 0) {\n        Wire.beginTransmission(MPU_ADDR);\n        Wire.write(0x1A);\n        Wire.write(0x03);\n        Wire.endTransmission(true);\n    }";
                 break;
         }
 
@@ -301,15 +308,17 @@ byte findI2CAddress() {
     indent() {
         let tabCnt = 1;
 
-        return this._source.map((val) => {
+        return this._source.map((val, idx, arr) => {
             const trimmed = val.trim();
+            const prevVal = idx > 0 ? arr[idx - 1] : '';
+
             if (
                 val.includes('//') ||
                 val.includes('#include') ||
                 (!val.includes('for') && !val.includes('print') && (val.includes('int') || val.includes('float') || val.includes('double') || val.includes('long'))) ||
                 val.includes('setup()') ||
                 val.includes('loop()') ||
-                val.includes('int distance()') ||  // ultrasonic
+                val.includes('int distance()') || // ultrasonic
                 val.includes('int translateIR()') || // irremote
                 val.includes('void') ||
                 val === '}\n' // The end of the default func
@@ -321,11 +330,14 @@ byte findI2CAddress() {
             }
 
             // If the overlapped, add one more indentation
-            if (!(val === '}' || val.includes('else')) &&
-                (prevVal.includes('if') || prevVal.includes('else') || prevVal.includes('for') || prevVal.includes('while'))
+            if (
+                !(val === '}' || val.includes('else')) &&
+                (prevVal.includes('if') || prevVal.includes('else') || prevVal.includes('for') || prevVal.includes('while')) &&
+                !prevVal.trim().endsWith('{')
             ) {
                 tabCnt++;
-            } else if ((val === '}' || val.includes('else')) &&
+            } else if (
+                (val === '}' || val.includes('else')) &&
                 !(prevVal.includes('if') || prevVal.includes('else') || prevVal.includes('for') || prevVal.includes('while'))
             ) {
                 tabCnt--;
@@ -645,6 +657,8 @@ byte findI2CAddress() {
             case 'arduino_toggle_led': // digitalWrite
             case 'arduino_ext_toggle_led':
             case 'arduino_nano_ext_toggle_led':
+            case 'arduino_nano_ext_set_led':
+            case 'arduino_nano_ext_set_output':
             case 'ITPLE_toggle_led':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
@@ -665,6 +679,69 @@ byte findI2CAddress() {
                 on_off = this._pramVal[1] === '0' ? 'LOW' : 'HIGH';
                 stat = stat.replace('%1', this._pinNum);
                 stat = stat.replace('%2', on_off);
+                break;
+
+            case 'arduino_nano_ext_set_led_pwm':
+                stat = block._schema.syntax.ar[0].syntax;
+                value = this._pramVal[0];
+                stat = stat.replace('%1', value);
+                break;
+
+            case 'arduino_nano_ext_set_motor':
+                stat = block._schema.syntax.ar[0].syntax;
+                this._funcName = 'setMotor';
+                value = this._pramVal[0]; // motor
+                value2 = this._pramVal[1]; // dir
+                value3 = this._pramVal[2]; // speed
+                stat = stat.replace('%1', value);
+                stat = stat.replace('%2', value2);
+                stat = stat.replace('%3', value3);
+
+                this.AddUserFunc(
+                    `void setMotor(int motor, String dir, int speed) {
+    int p1, p2;
+    if (motor == 0) {
+        setMotor(1, dir, speed);
+        setMotor(2, dir, speed);
+        return;
+    }
+    if (motor == 1) {
+        p1 = 5; p2 = 9;
+    } else {
+        p1 = 6; p2 = 10;
+    }
+    pinMode(p1, OUTPUT);
+    pinMode(p2, OUTPUT);
+    if (dir == "fw") {
+        analogWrite(p1, speed);
+        analogWrite(p2, 0);
+    } else {
+        analogWrite(p1, 0);
+        analogWrite(p2, speed);
+    }
+}`
+                    , block);
+                break;
+
+            case 'arduino_nano_ext_stop_motor':
+                stat = block._schema.syntax.ar[0].syntax;
+                this._funcName = 'stopMotor';
+                value = this._pramVal[0];
+                stat = stat.replace('%1', value);
+
+                this.AddUserFunc(
+                    `void stopMotor(int motor) {
+    if (motor == 0) {
+        stopMotor(1);
+        stopMotor(2);
+        return;
+    }
+    int p1 = (motor == 1) ? 5 : 6;
+    int p2 = (motor == 1) ? 9 : 10;
+    analogWrite(p1, 0);
+    analogWrite(p2, 0);
+}`
+                    , block);
                 break;
 
             case 'arduino_toggle_pwm': // pwm(anlogWrite)
@@ -704,9 +781,16 @@ byte findI2CAddress() {
                 stat = stat.replace('%1', this._pinNum);
                 break;
 
+            case 'arduino_nano_ext_get_joystick_button':
+                stat = block._schema.syntax.ar[0].syntax;
+                break;
+
             case 'arduino_get_number_sensor_value': // analogRead
             case 'arduino_ext_get_analog_value':
-            case 'arduino_nano_ext_get_analog_value':
+            case 'arduino_nano_ext_get_sensor_value':
+            case 'arduino_nano_ext_get_infrared_value':
+            case 'arduino_nano_ext_get_joystick_value':
+            case 'arduino_nano_ext_get_potentiometer':
             case 'ITPLE_get_analog_value':
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
@@ -716,6 +800,13 @@ byte findI2CAddress() {
                 }
 
                 stat = stat.replace('%1', this._pinNum);
+                break;
+
+            case 'arduino_nano_ext_is_sensor_value_compare':
+                stat = block._schema.syntax.ar[0].syntax;
+                stat = stat.replace('%1', this._pramVal[0]);
+                stat = stat.replace('%2', this._pramVal[1]);
+                stat = stat.replace('%3', this._pramVal[2]);
                 break;
 
             case 'arduino_convert_scale': // map
@@ -739,6 +830,7 @@ byte findI2CAddress() {
 
             case 'arduino_ext_set_tone': // tone
             case 'arduino_nano_ext_set_tone': // tone
+            case 'arduino_nano_ext_set_buzzer': // tone
             case 'ITPLE_set_tone':
                 const octave_tone_hz = [
                     [0, 32.7, 34.6, 36.7, 38.9, 41.2, 43.7, 46.2, 49.0, 51.9, 55.0, 58.3, 61.7], // 1octave
@@ -753,19 +845,28 @@ byte findI2CAddress() {
                 }
                 stat = block._schema.syntax.ar[0].syntax;
                 this._funcName = stat.split('(')[0];
-                this._pinNum = this._num(this._pramVal[0]); // Arr to Number
+
+                if (block.type === 'arduino_nano_ext_set_buzzer') {
+                    this._pinNum = 7;
+                    value2 = this._pramVal[1]; // NOTE
+                    value = this._num(this._pramVal[0]); // OCTAVE
+                    value3 = this._num(this._pramVal[2]); // DURATION
+                } else {
+                    this._pinNum = this._num(this._pramVal[0]); // Arr to Number
+                    value2 = this._pramVal[1]; // tone
+                    value = this._num(this._pramVal[2]); // octave
+                    value3 = this._num(this._pramVal[3]); // timer
+                }
+
                 this.errChkPinNum(this._pinNum, block);
-                value2 = this._pramVal[1]; // tone
                 if (typeof value2 != 'string') { // Tone should be string
                     this.throwErr('error', 'WrongInputVal', block);
                 }
-                value = this._num(this._pramVal[2]); // octave
                 this.isNumberOver1(value, block);
                 if (value > 6) { // max is 6
                     this.throwErr('warn', 'ExcessiveInputVal', block);
                     value = 6;
                 }
-                value3 = this._num(this._pramVal[3]); // timer
                 this.errChkTime(value3, block);
 
                 stat = stat.replace('%1', this._pinNum);
@@ -800,6 +901,58 @@ byte findI2CAddress() {
 
     int distance = (duration/2) * 0.034;
     return distance;
+}`
+                    , block);
+                break;
+
+            case 'arduino_nano_ext_get_ultrasonic_one_pin':
+                stat = block._schema.syntax.ar[0].syntax;
+                this._funcName = 'getDistance';
+                this._pinNum = this._num(this._pramVal[0]);
+                this.errChkPinNum(this._pinNum, block);
+                stat = stat.replace('%1', this._pinNum);
+
+                this.AddUserFunc(
+                    `int getDistance(int pin) {
+    pinMode(pin, OUTPUT);
+    digitalWrite(pin, LOW);
+    delayMicroseconds(2);
+    digitalWrite(pin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(pin, LOW);
+    pinMode(pin, INPUT);
+
+    long duration = pulseIn(pin, HIGH);
+    if (duration == 0 || duration > 30000) return 0;
+    
+    return duration / 58;
+}`
+                    , block);
+                break;
+
+            case 'arduino_nano_ext_get_sound_sensor':
+                stat = block._schema.syntax.ar[0].syntax;
+                this._funcName = 'getSoundLevel';
+                value = this._pramVal[0]; // port (0, 1, 2)
+                // A0-A7 are usually defined as 14-21, but analogRead(0) works.
+                // However, to be safe and consistent with IN1, IN2, IN3 labeling:
+                stat = stat.replace('%1', value);
+
+                this.AddUserFunc(
+                    `int getSoundLevel(int pin) {
+    unsigned long startMillis = millis();
+    unsigned int signalMax = 0;
+    unsigned int signalMin = 1024;
+
+    while (millis() - startMillis < 50) {
+        int sample = analogRead(pin);
+        if (sample < 1024) {
+            if (sample > signalMax) signalMax = sample;
+            else if (sample < signalMin) signalMin = sample;
+        }
+    }
+    
+    return signalMax - signalMin;
 }`
                     , block);
                 break;
@@ -940,6 +1093,61 @@ byte findI2CAddress() {
                 } else {
                     stat += `\n \tlcdObj->print("${value3}");`;
                 }
+                break;
+
+            case 'arduino_nano_ext_get_mpu6050_value':
+            // case 'arduino_nano_ext_get_mpu_temp':
+            case 'arduino_nano_ext_get_mpu_angle':
+                stat = block._schema.syntax.ar[0].syntax;
+                this._funcName = 'getMPUValue';
+                if (this._pramVal[0]) stat = stat.replace('%1', this._pramVal[0]);
+                if (this._pramVal[1]) stat = stat.replace('%2', this._pramVal[1]);
+
+                this.AddUserFunc(
+                    `float getMPUValue(String key) {
+    Wire.beginTransmission(MPU_ADDR);
+    if (Wire.endTransmission() != 0) return 0;
+    Wire.beginTransmission(MPU_ADDR);
+    Wire.write(0x3B);
+    Wire.endTransmission(true);
+    Wire.requestFrom(MPU_ADDR, 14);
+
+    if (Wire.available() >= 14) {
+        int16_t ax = Wire.read() << 8 | Wire.read();
+        int16_t ay = Wire.read() << 8 | Wire.read();
+        int16_t az = Wire.read() << 8 | Wire.read();
+        Wire.read(); Wire.read(); // temperature (unused)
+        int16_t gx = Wire.read() << 8 | Wire.read();
+        int16_t gy = Wire.read() << 8 | Wire.read();
+        int16_t gz = Wire.read() << 8 | Wire.read();
+
+        if (key == "accelX") return ax;
+        if (key == "accelY") return ay;
+        if (key == "accelZ") return az;
+        if (key == "gyroX") return gx;
+        if (key == "gyroY") return gy;
+        if (key == "gyroZ") return gz;
+        // if (key == "temp") return (tmp / 340.0) + 36.53;
+
+        float roll = atan2((float)ay, (float)az) * 57.29578;
+        float pitch = atan2(-(float)ax, sqrt((float)ay * ay + (float)az * az)) * 57.29578;
+        unsigned long now = millis();
+        if (lastMpuTime > 0) {
+            float dt = (now - lastMpuTime) / 1000.0;
+            if (dt > 0 && dt < 0.2) mpuYaw += (gz / 131.0) * dt;
+        }
+        lastMpuTime = now;
+
+        if (key == "roll") return (roll < 0 ? roll + 360 : roll);
+        if (key == "pitch") return (pitch < 0 ? pitch + 360 : pitch);
+        if (key == "yaw") {
+            float yaw = fmod(mpuYaw, 360.0);
+            return (yaw < 0 ? yaw + 360 : yaw);
+        }
+    }
+    return 0;
+}`
+                );
                 break;
 
             case 'set_variable':

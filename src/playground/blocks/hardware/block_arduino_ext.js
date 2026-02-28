@@ -33,22 +33,22 @@ Entry.ArduinoExt = {
         Entry.hw.update();
     },
     sensorTypes: {
-        ALIVE:      0,
-        DIGITAL:    1,
-        ANALOG:     2,
-        PWM:        3,
-        SERVO_PIN:  4,
-        TONE:       5,
-        PULSEIN:    6,
+        ALIVE: 0,
+        DIGITAL: 1,
+        ANALOG: 2,
+        PWM: 3,
+        SERVO_PIN: 4,
+        TONE: 5,
+        PULSEIN: 6,
         ULTRASONIC: 7,
-        TIMER:      8,
-        STEPPER:    9,
-        DHTINIT:   10,  //a
-        DHTTEMP:   11,  //b
-        DHTHUMI:   12,  //c
-        IRRINIT:   13,  //d
-        IRREMOTE:  14,  //e
-        LCD_INIT:  15,  //f
+        TIMER: 8,
+        STEPPER: 9,
+        DHTINIT: 10,  //a
+        DHTTEMP: 11,  //b
+        DHTHUMI: 12,  //c
+        IRRINIT: 13,  //d
+        IRREMOTE: 14,  //e
+        LCD_INIT: 15,  //f
         LCD_PRINT: 16,  //g
         LCD_CLEAR: 17,  //h
 
@@ -91,10 +91,10 @@ Entry.ArduinoExt = {
         TIME_20ms: 20,
         TIME_50ms: 50,
         TIME_100ms: 100,
-        TIME_200ms: 200, 
-        TIME_500ms: 500,    
-        TIME_600ms: 600,   
-        TIME_100ms: 1000,   
+        TIME_200ms: 200,
+        TIME_500ms: 500,
+        TIME_600ms: 600,
+        TIME_100ms: 1000,
     },
     BlockState: {},
     monitorTemplate: {
@@ -194,10 +194,10 @@ Entry.ArduinoExt = {
             },
         },
         mode: 'both',
-  },
+    },
 };
 
-Entry.ArduinoExt.setLanguage = function() {
+Entry.ArduinoExt.setLanguage = function () {
     return {
         ko: {
             template: {
@@ -242,7 +242,7 @@ Entry.ArduinoExt.setLanguage = function() {
             },
         },
         uz: {
-          template: {
+            template: {
                 arduino_ext_get_analog_value: "Analog %1 pin qiymati",
                 arduino_ext_get_analog_value_map: "%1ning doirasini %2 ~ %3 dan %4 ~ %5 ga o'zgartirgan qiymati",
                 arduino_ext_get_ultrasonic_value: "Ultrasonik sensor trig %1 eko %2 sensor qiymati",
@@ -260,7 +260,7 @@ Entry.ArduinoExt.setLanguage = function() {
                 arduino_ext_set_lcd_init: 'LCDni qaytadan tiklash %1',
                 arduino_ext_set_lcd_print: 'LCDning %1 -qatorida %2 -ustuniga %3 yozish %4',
                 arduino_ext_set_lcd_clear: 'LCD ekranni tozalash %1',
-          },
+            },
         },
         ru: {
             template: {
@@ -282,7 +282,7 @@ Entry.ArduinoExt.setLanguage = function() {
                 arduino_ext_set_lcd_print: 'Написать %3 в стороке %1 в столбце %2 LCD %4',
                 arduino_ext_set_lcd_clear: 'Очистить LCD экран %1',
             },
-          },
+        },
     };
 };
 
@@ -307,7 +307,7 @@ Entry.ArduinoExt.blockMenuBlocks = [
 ];
 
 //region arduinoExt 아두이노 확장모드
-Entry.ArduinoExt.getBlocks = function() {
+Entry.ArduinoExt.getBlocks = function () {
     return {
         arduino_ext_analog_list: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
@@ -424,7 +424,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [{syntax: 'analogRead(%1)'}]
+                ar: [{ syntax: 'analogRead(%1)' }]
             },
         },
         arduino_ext_get_analog_value_map: {
@@ -571,7 +571,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [{syntax: 'map(%1, %2, %3, %4, %5)'}]
+                ar: [{ syntax: 'map(%1, %2, %3, %4, %5)' }]
             },
         },
         arduino_ext_get_digital: {
@@ -632,7 +632,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [{syntax: 'digitalRead(%1)'}]
+                ar: [{ syntax: 'digitalRead(%1)' }]
             },
         },
         arduino_ext_toggle_led: {
@@ -720,7 +720,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [{syntax: 'digitalWrite(%1, %2);'}]
+                ar: [{ syntax: 'digitalWrite(%1, %2);' }]
             },
         },
         arduino_ext_digital_pwm: {
@@ -798,7 +798,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [{syntax: 'analogWrite(%1, %2);'}]
+                ar: [{ syntax: 'analogWrite(%1, %2);' }]
             },
         },
         arduino_get_digital_toggle: {
@@ -926,7 +926,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [{syntax: 'distance()'}]
+                ar: [{ syntax: 'distance()' }]
             },
         },
         arduino_ext_tone_list: {
@@ -1248,7 +1248,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [{syntax: 'tone(%1, %2, %3);'}]
+                ar: [{ syntax: 'tone(%1, %2, %3);' }]
             },
         },
         arduino_ext_set_servo: {
@@ -1325,7 +1325,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [{syntax: 'myServo.write(%1);'}]
+                ar: [{ syntax: 'myServo.write(%1);' }]
             },
         },
         arduino_ext_set_stepper: {
@@ -1477,7 +1477,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [{syntax: 'myStepper.step(%1);'}]
+                ar: [{ syntax: 'myStepper.step(%1);' }]
             },
         },
         arduino_ext_set_temp_humi_init: {
@@ -1517,32 +1517,29 @@ Entry.ArduinoExt.getBlocks = function() {
                 var sq = Entry.hw.sendQueue;
                 var port = script.getNumberValue('PORT', script);
 
-				if (!script.isStart) 
-                {
-					if (!sq.SET) {
-						sq.SET = {};
-					}
-					
-					var duration = Entry.ArduinoExt.TIME_500ms;
+                if (!script.isStart) {
+                    if (!sq.SET) {
+                        sq.SET = {};
+                    }
+
+                    var duration = Entry.ArduinoExt.TIME_500ms;
                     script.isStart = true;
                     script.timeFlag = 1;
-					
-					sq.SET[port] = {
-							type: Entry.ArduinoExt.sensorTypes.DHTINIT,
-							data: port,
-							time: new Date().getTime(),
-					};
-					setTimeout(function() {
+
+                    sq.SET[port] = {
+                        type: Entry.ArduinoExt.sensorTypes.DHTINIT,
+                        data: port,
+                        time: new Date().getTime(),
+                    };
+                    setTimeout(function () {
                         script.timeFlag = 0;
-                    }, duration );
-                    return script;
-				}
-				else if (script.timeFlag == 1)
-                {
+                    }, duration);
                     return script;
                 }
-                else 
-                {
+                else if (script.timeFlag == 1) {
+                    return script;
+                }
+                else {
                     delete script.timeFlag;
                     delete script.isStart;
 
@@ -1564,7 +1561,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [{syntax: 'dht.begin();'}]
+                ar: [{ syntax: 'dht.begin();' }]
             },
         },
         arduino_ext_get_temp_value: {
@@ -1583,7 +1580,7 @@ Entry.ArduinoExt.getBlocks = function() {
             events: {},
             def: {
                 params: [
-					'0',
+                    '0',
                 ],
                 type: 'arduino_ext_get_temp_value',
             },
@@ -1603,7 +1600,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 if (!Entry.hw.sendQueue.GET) {
                     Entry.hw.sendQueue.GET = {};
                 }
-				
+
                 Entry.hw.sendQueue.GET[Entry.ArduinoExt.sensorTypes.DHTTEMP] = {
                     port: temp,
                     time: new Date().getTime(),
@@ -1612,11 +1609,11 @@ Entry.ArduinoExt.getBlocks = function() {
             },
             syntax: {
                 js: [],
-                py: [{syntax: 'ArduinoExt.temperatureRead()'}],
-                ar: [{syntax: 'dht.readTemperature()'}]
+                py: [{ syntax: 'ArduinoExt.temperatureRead()' }],
+                ar: [{ syntax: 'dht.readTemperature()' }]
             },
         },
-		arduino_ext_get_humi_value: {
+        arduino_ext_get_humi_value: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
             outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
             fontColor: '#fff',
@@ -1632,7 +1629,7 @@ Entry.ArduinoExt.getBlocks = function() {
             events: {},
             def: {
                 params: [
-					'0',
+                    '0',
                 ],
                 type: 'arduino_ext_get_humi_value',
             },
@@ -1652,7 +1649,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 if (!Entry.hw.sendQueue.GET) {
                     Entry.hw.sendQueue.GET = {};
                 }
-				
+
                 Entry.hw.sendQueue.GET[Entry.ArduinoExt.sensorTypes.DHTHUMI] = {
                     port: humi,
                     time: new Date().getTime(),
@@ -1661,8 +1658,8 @@ Entry.ArduinoExt.getBlocks = function() {
             },
             syntax: {
                 js: [],
-                py: [{syntax: 'ArduinoExt.humidityRead()'}],
-                ar: [{syntax: 'dht.readHumidity()'}]
+                py: [{ syntax: 'ArduinoExt.humidityRead()' }],
+                ar: [{ syntax: 'dht.readHumidity()' }]
             },
         },
         arduino_ext_set_irremote_init: {
@@ -1702,32 +1699,29 @@ Entry.ArduinoExt.getBlocks = function() {
                 var sq = Entry.hw.sendQueue;
                 var port = script.getNumberValue('PORT', script);
 
-				if (!script.isStart) 
-                {
-					if (!sq.SET) {
-						sq.SET = {};
-					}
-					
-					var duration = Entry.ArduinoExt.TIME_500ms;
+                if (!script.isStart) {
+                    if (!sq.SET) {
+                        sq.SET = {};
+                    }
+
+                    var duration = Entry.ArduinoExt.TIME_500ms;
                     script.isStart = true;
                     script.timeFlag = 1;
-					
-					sq.SET[port] = {
-							type: Entry.ArduinoExt.sensorTypes.IRRINIT,
-							data: port,
-							time: new Date().getTime(),
-					};
-					setTimeout(function() {
+
+                    sq.SET[port] = {
+                        type: Entry.ArduinoExt.sensorTypes.IRRINIT,
+                        data: port,
+                        time: new Date().getTime(),
+                    };
+                    setTimeout(function () {
                         script.timeFlag = 0;
-                    }, duration );
-                    return script;
-				}
-				else if (script.timeFlag == 1)
-                {
+                    }, duration);
                     return script;
                 }
-                else 
-                {
+                else if (script.timeFlag == 1) {
+                    return script;
+                }
+                else {
                     delete script.timeFlag;
                     delete script.isStart;
 
@@ -1749,7 +1743,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [{syntax: 'irrecv.enableIRIn();'}]
+                ar: [{ syntax: 'irrecv.enableIRIn();' }]
             },
         },
         arduino_ext_get_irremote_value: {
@@ -1768,7 +1762,7 @@ Entry.ArduinoExt.getBlocks = function() {
             events: {},
             def: {
                 params: [
-					'0',
+                    '0',
                 ],
                 type: 'arduino_ext_get_irremote_value',
             },
@@ -1788,7 +1782,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 if (!Entry.hw.sendQueue.GET) {
                     Entry.hw.sendQueue.GET = {};
                 }
-				
+
                 Entry.hw.sendQueue.GET[Entry.ArduinoExt.sensorTypes.IRREMOTE] = {
                     port: recv,
                     time: new Date().getTime(),
@@ -1797,13 +1791,13 @@ Entry.ArduinoExt.getBlocks = function() {
             },
             syntax: {
                 js: [],
-                py: [{syntax: 'ArduinoExt.irRecvRead()'}],
-                ar: [{syntax: 'translateIR()'}]
+                py: [{ syntax: 'ArduinoExt.irRecvRead()' }],
+                ar: [{ syntax: 'translateIR()' }]
             },
         },
         arduino_ext_lcd_column_list: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
-			outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
             skeleton: 'basic_string_field',
             statements: [],
             template: '%1',
@@ -1841,7 +1835,7 @@ Entry.ArduinoExt.getBlocks = function() {
             paramsKeyMap: {
                 COLUMN: 0,
             },
-            func: function(sprite, script) {
+            func: function (sprite, script) {
                 return script.getStringField('COLUMN');
             },
             syntax: {
@@ -1885,7 +1879,7 @@ Entry.ArduinoExt.getBlocks = function() {
         },
         arduino_ext_lcd_row_list: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
-			outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
             skeleton: 'basic_string_field',
             statements: [],
             template: '%1',
@@ -1906,7 +1900,7 @@ Entry.ArduinoExt.getBlocks = function() {
             paramsKeyMap: {
                 ROW: 0,
             },
-            func: function(sprite, script) {
+            func: function (sprite, script) {
                 return script.getStringField('ROW');
             },
             syntax: {
@@ -1931,11 +1925,11 @@ Entry.ArduinoExt.getBlocks = function() {
                 ],
             },
         },
-		arduino_ext_set_lcd_init: 
+        arduino_ext_set_lcd_init:
         {
             color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,	
-			fontColor: '#fff',			
+            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            fontColor: '#fff',
             skeleton: 'basic',
             statements: [],
             params: [
@@ -1948,15 +1942,14 @@ Entry.ArduinoExt.getBlocks = function() {
             events: {},
             def: {
                 params: [
-                   null
+                    null
                 ],
                 type: 'arduino_ext_set_lcd_init',
             },
             paramsKeyMap: {},
             class: 'lcd',
             isNotFor: ['ArduinoExt'],
-            func: function(sprite, script) 
-			{
+            func: function (sprite, script) {
                 // 아래코드에서 보조 변수들(script.isStart, script.timeFlag등)이 들어간 이유는 fps(초당프레임)를 위해서입니다.
                 // 해당 코드가 없을 경우 최소 딜레이가 없기때문에 흐리게 나오는 문제가 발생합니다.
                 var sq = Entry.hw.sendQueue;
@@ -1976,7 +1969,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         time: new Date().getTime(),
                     };
 
-                    setTimeout(function() {
+                    setTimeout(function () {
                         script.timeFlag = 0;
                     }, timeValue);
                     return script;
@@ -1989,32 +1982,32 @@ Entry.ArduinoExt.getBlocks = function() {
                     return script.callReturn();
                 }
             },
-            syntax: { 
-                js: [], 
-                py: [{syntax: 'ArduinoExt.lcdInit()'}],
-                ar: [{syntax: 'lcdObj->init();'}]
+            syntax: {
+                js: [],
+                py: [{ syntax: 'ArduinoExt.lcdInit()' }],
+                ar: [{ syntax: 'lcdObj->init();' }]
             },
-        },	
+        },
         arduino_ext_set_lcd_print:
         {
             color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,	
-			fontColor: '#fff',			
+            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            fontColor: '#fff',
             skeleton: 'basic',
             statements: [],
             params: [
                 {
                     type: 'Block',
                     accept: 'string',
-                },	
+                },
                 {
                     type: 'Block',
                     accept: 'string',
-                },	
+                },
                 {
                     type: 'Block',
                     accept: 'string',
-                },							
+                },
                 {
                     type: 'Indicator',
                     img: 'block_icon/hardware_icon.svg',
@@ -2045,7 +2038,7 @@ Entry.ArduinoExt.getBlocks = function() {
             },
             class: 'lcd',
             isNotFor: ['ArduinoExt'],
-            func: function(sprite, script) {
+            func: function (sprite, script) {
                 var sq = Entry.hw.sendQueue;
                 var row = script.getNumberValue('ROW');
                 var column = script.getNumberValue('COLUMN');
@@ -2077,7 +2070,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         time: new Date().getTime(),
                     };
 
-                    setTimeout(function() {
+                    setTimeout(function () {
                         script.timeFlag = 0;
                     }, timeValue);
                     return script;
@@ -2090,8 +2083,8 @@ Entry.ArduinoExt.getBlocks = function() {
                     return script.callReturn();
                 }
             },
-            syntax: { 
-                js: [], 
+            syntax: {
+                js: [],
                 py: [
                     {
                         syntax: 'ArduinoExt.lcdPrint(%1, %2, %3)',
@@ -2112,14 +2105,14 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     }
                 ],
-                ar: [{syntax: 'lcdObj->setCursor(%1, %2);'}]
+                ar: [{ syntax: 'lcdObj->setCursor(%1, %2);' }]
             },
         },
-		arduino_ext_set_lcd_clear: 
+        arduino_ext_set_lcd_clear:
         {
             color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,	
-			fontColor: '#fff',			
+            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            fontColor: '#fff',
             skeleton: 'basic',
             statements: [],
             params: [
@@ -2132,15 +2125,14 @@ Entry.ArduinoExt.getBlocks = function() {
             events: {},
             def: {
                 params: [
-                   null
+                    null
                 ],
                 type: 'arduino_ext_set_lcd_clear',
             },
             paramsKeyMap: {},
             class: 'lcd',
             isNotFor: ['ArduinoExt'],
-            func: function(sprite, script) 
-			{
+            func: function (sprite, script) {
                 if (!Entry.hw.sendQueue.SET) {
                     Entry.hw.sendQueue.SET = {};
                 }
@@ -2151,10 +2143,10 @@ Entry.ArduinoExt.getBlocks = function() {
                 };
                 return script.callReturn();
             },
-            syntax: { 
-                js: [], 
-                py: [{syntax: 'ArduinoExt.lcdClear()'}],
-                ar: [{syntax: 'lcdObj->clear();'}]
+            syntax: {
+                js: [],
+                py: [{ syntax: 'ArduinoExt.lcdClear()' }],
+                ar: [{ syntax: 'lcdObj->clear();' }]
             },
         },
     };

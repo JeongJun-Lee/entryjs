@@ -354,7 +354,10 @@ export default class HardwareMonitor {
                     port.group.getElementsByTagName('rect')[1].attr({ fill: '#00CFCA' });
                 }
             } else {
-                let value = sendQueue ? sendQueue[key] : portData[key];
+                let value = (sendQueue && sendQueue[key] !== undefined) ? sendQueue[key] : portData[key];
+                if (value === undefined && sendQueue && sendQueue.SET && sendQueue.SET[key] !== undefined) {
+                    value = sendQueue.SET[key].data;
+                }
                 if (objectKeys.length > 0) {
                     $.each(objectKeys, (idx, valueKey) => {
                         if ($.isPlainObject(value)) {
@@ -541,17 +544,15 @@ export default class HardwareMonitor {
             if (x > portX && portX > prevPointer) {
                 path = `M${portX},${y}L${portX},${portY}`;
             } else {
-                path = `M${(x + prevPointer) / 2},${y}l0,${
-                    portY > y ? 28 : -3
-                }H${portX}L${portX},${portY}`;
+                path = `M${(x + prevPointer) / 2},${y}l0,${portY > y ? 28 : -3
+                    }H${portX}L${portX},${portY}`;
             }
         } else if (x < portX && portX < prevPointer) {
             // right side
             path = `m${portX},${y}L${portX},${portY}`;
         } else {
-            path = `m${(prevPointer + x) / 2},${y}l0,${
-                portY > y ? 28 : -3
-            }H${portX}L${portX},${portY}`;
+            path = `m${(prevPointer + x) / 2},${y}l0,${portY > y ? 28 : -3
+                }H${portX}L${portX},${portY}`;
         }
 
         port.group.attr({ transform: `translate(${groupX},${y})` });
