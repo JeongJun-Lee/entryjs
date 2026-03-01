@@ -963,6 +963,11 @@ Entry.ArduinoNanoExt.getBlocks = function () {
             isNotFor: ['ArduinoNanoExt'],
             func(sprite, script) {
                 const port = script.getField('PORT');
+                if (!Entry.hw.sendQueue.GET) Entry.hw.sendQueue.GET = {};
+                Entry.hw.sendQueue.GET[Entry.ArduinoNanoExt.sensorTypes.ANALOG] = {
+                    port,
+                    time: new Date().getTime(),
+                };
                 return Entry.hw.portData[`a${port}`] || 0;
             },
             syntax: { ar: [{ syntax: 'analogRead(%1)' }] },
