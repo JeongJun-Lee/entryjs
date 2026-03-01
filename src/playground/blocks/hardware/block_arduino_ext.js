@@ -218,6 +218,12 @@ Entry.ArduinoExt.setLanguage = function () {
                 arduino_ext_set_lcd_init: 'LCD 초기화 하기 %1',
                 arduino_ext_set_lcd_print: 'LCD %1 줄 %2 칸에 %3 을 쓰기 %4',
                 arduino_ext_set_lcd_clear: 'LCD 화면 지우기 %1',
+                arduino_ext_input_title: '기본 입력',
+                arduino_ext_output_title: '기본 출력',
+                arduino_ext_extra_sensor_title: '추가센서',
+                arduino_ext_irremote_title: 'IR 리모콘',
+                arduino_ext_lcd_title: 'LCD',
+                arduino_ext_motor_title: '모터',
             },
         },
         en: {
@@ -239,6 +245,12 @@ Entry.ArduinoExt.setLanguage = function () {
                 arduino_ext_set_lcd_init: 'Init LCD screen %1',
                 arduino_ext_set_lcd_print: 'Write %3 on %1 line %2 column of LCD %4',
                 arduino_ext_set_lcd_clear: 'Clear LCD screen %1',
+                arduino_ext_input_title: 'Basic Input',
+                arduino_ext_output_title: 'Basic Output',
+                arduino_ext_extra_sensor_title: 'Additional Sensors',
+                arduino_ext_irremote_title: 'IR remote',
+                arduino_ext_lcd_title: 'LCD',
+                arduino_ext_motor_title: 'Motor',
             },
         },
         uz: {
@@ -260,6 +272,12 @@ Entry.ArduinoExt.setLanguage = function () {
                 arduino_ext_set_lcd_init: 'LCDni qaytadan tiklash %1',
                 arduino_ext_set_lcd_print: 'LCDning %1 -qatorida %2 -ustuniga %3 yozish %4',
                 arduino_ext_set_lcd_clear: 'LCD ekranni tozalash %1',
+                arduino_ext_input_title: 'Asosiy Kirish',
+                arduino_ext_output_title: 'Asosiy Chiqish',
+                arduino_ext_extra_sensor_title: 'Qo\'shimcha sensorlar',
+                arduino_ext_irremote_title: 'IR masofadan boshqarish',
+                arduino_ext_lcd_title: 'LCD',
+                arduino_ext_motor_title: 'Motorlar',
             },
         },
         ru: {
@@ -281,34 +299,177 @@ Entry.ArduinoExt.setLanguage = function () {
                 arduino_ext_set_lcd_init: 'Инициализировать LCD экран %1',
                 arduino_ext_set_lcd_print: 'Написать %3 в стороке %1 в столбце %2 LCD %4',
                 arduino_ext_set_lcd_clear: 'Очистить LCD экран %1',
+                arduino_ext_input_title: 'Базовый Ввод',
+                arduino_ext_output_title: 'Базовый Выход',
+                arduino_ext_extra_sensor_title: 'Дополнительные датчики',
+                arduino_ext_irremote_title: 'ИК-пульт',
+                arduino_ext_lcd_title: 'ЖК-дисплей',
+                arduino_ext_motor_title: 'Мотор',
             },
         },
     };
 };
 
 Entry.ArduinoExt.blockMenuBlocks = [
+    // Input
+    'arduino_ext_input_title',
     'arduino_ext_get_analog_value',
     'arduino_ext_get_analog_value_map',
     'arduino_ext_get_digital',
+
+    // Output
+    'arduino_ext_output_title',
     'arduino_ext_toggle_led',
     'arduino_ext_digital_pwm',
-    'arduino_ext_get_ultrasonic_value',
     'arduino_ext_set_tone',
-    'arduino_ext_set_servo',
-    'arduino_ext_set_stepper',
+
+    // Extra Sensor
+    'arduino_ext_extra_sensor_title',
+    'arduino_ext_get_ultrasonic_value',
     'arduino_ext_set_temp_humi_init',
     'arduino_ext_get_temp_value',
     'arduino_ext_get_humi_value',
+
+    // IR Remote
+    'arduino_ext_irremote_title',
     'arduino_ext_set_irremote_init',
     'arduino_ext_get_irremote_value',
+
+    // LCD
+    'arduino_ext_lcd_title',
     'arduino_ext_set_lcd_init',
     'arduino_ext_set_lcd_print',
     'arduino_ext_set_lcd_clear',
+
+    // Motor
+    'arduino_ext_motor_title',
+    'arduino_ext_set_servo',
+    'arduino_ext_set_stepper',
 ];
 
 //region arduinoExt 아두이노 확장모드
 Entry.ArduinoExt.getBlocks = function () {
     return {
+        arduino_ext_input_title: {
+            color: EntryStatic.colorSet.common.TRANSPARENT,
+            fontColor: '#191970',
+            skeleton: 'basic_text',
+            skeletonOptions: {
+                contentPos: { x: 5 },
+            },
+            params: [
+                {
+                    type: 'Text',
+                    text: Lang.template.arduino_ext_input_title,
+                    color: '#191970',
+                    align: 'left',
+                },
+            ],
+            def: { type: 'arduino_ext_input_title' },
+            class: 'ArduinoExtSensor',
+            isNotFor: ['ArduinoExt'],
+            events: {},
+        },
+        arduino_ext_extra_sensor_title: {
+            color: EntryStatic.colorSet.common.TRANSPARENT,
+            fontColor: '#191970',
+            skeleton: 'basic_text',
+            skeletonOptions: {
+                contentPos: { x: 5 },
+            },
+            params: [
+                {
+                    type: 'Text',
+                    text: Lang.template.arduino_ext_extra_sensor_title,
+                    color: '#191970',
+                    align: 'left',
+                },
+            ],
+            def: { type: 'arduino_ext_extra_sensor_title' },
+            class: 'ArduinoExtSensor',
+            isNotFor: ['ArduinoExt'],
+            events: {},
+        },
+        arduino_ext_irremote_title: {
+            color: EntryStatic.colorSet.common.TRANSPARENT,
+            fontColor: '#191970',
+            skeleton: 'basic_text',
+            skeletonOptions: {
+                contentPos: { x: 5 },
+            },
+            params: [
+                {
+                    type: 'Text',
+                    text: Lang.template.arduino_ext_irremote_title,
+                    color: '#191970',
+                    align: 'left',
+                },
+            ],
+            def: { type: 'arduino_ext_irremote_title' },
+            class: 'ArduinoExtSensor',
+            isNotFor: ['ArduinoExt'],
+            events: {},
+        },
+        arduino_ext_output_title: {
+            color: EntryStatic.colorSet.common.TRANSPARENT,
+            fontColor: '#191970',
+            skeleton: 'basic_text',
+            skeletonOptions: {
+                contentPos: { x: 5 },
+            },
+            params: [
+                {
+                    type: 'Text',
+                    text: Lang.template.arduino_ext_output_title,
+                    color: '#191970',
+                    align: 'left',
+                },
+            ],
+            def: { type: 'arduino_ext_output_title' },
+            class: 'ArduinoExtOutput',
+            isNotFor: ['ArduinoExt'],
+            events: {},
+        },
+        arduino_ext_lcd_title: {
+            color: EntryStatic.colorSet.common.TRANSPARENT,
+            fontColor: '#191970',
+            skeleton: 'basic_text',
+            skeletonOptions: {
+                contentPos: { x: 5 },
+            },
+            params: [
+                {
+                    type: 'Text',
+                    text: Lang.template.arduino_ext_lcd_title,
+                    color: '#191970',
+                    align: 'left',
+                },
+            ],
+            def: { type: 'arduino_ext_lcd_title' },
+            class: 'ArduinoExtOutput',
+            isNotFor: ['ArduinoExt'],
+            events: {},
+        },
+        arduino_ext_motor_title: {
+            color: EntryStatic.colorSet.common.TRANSPARENT,
+            fontColor: '#191970',
+            skeleton: 'basic_text',
+            skeletonOptions: {
+                contentPos: { x: 5 },
+            },
+            params: [
+                {
+                    type: 'Text',
+                    text: Lang.template.arduino_ext_motor_title,
+                    color: '#191970',
+                    align: 'left',
+                },
+            ],
+            def: { type: 'arduino_ext_motor_title' },
+            class: 'ArduinoExtMotor',
+            isNotFor: ['ArduinoExt'],
+            events: {},
+        },
         arduino_ext_analog_list: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
             outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
