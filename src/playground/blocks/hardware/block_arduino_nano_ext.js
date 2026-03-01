@@ -656,11 +656,6 @@ Entry.ArduinoNanoExt.getBlocks = function () {
             isNotFor: ['ArduinoNanoExt'],
             func(sprite, script) {
                 const port = script.getField('PORT');
-                if (!Entry.hw.sendQueue.GET) Entry.hw.sendQueue.GET = {};
-                Entry.hw.sendQueue.GET[Entry.ArduinoNanoExt.sensorTypes.ANALOG] = {
-                    port,
-                    time: new Date().getTime(),
-                };
                 return Entry.hw.portData[`a${port}`] || 0;
             },
             syntax: { ar: [{ syntax: 'analogRead(%1)' }] },
@@ -854,11 +849,6 @@ Entry.ArduinoNanoExt.getBlocks = function () {
             isNotFor: ['ArduinoNanoExt'],
             func(sprite, script) {
                 const port = '3'; // A3
-                if (!Entry.hw.sendQueue.GET) Entry.hw.sendQueue.GET = {};
-                Entry.hw.sendQueue.GET[Entry.ArduinoNanoExt.sensorTypes.ANALOG] = {
-                    port,
-                    time: new Date().getTime(),
-                };
                 return Entry.hw.portData[`a${port}`] || 0;
             },
             syntax: { ar: [{ syntax: 'analogRead(3)' }] },
@@ -922,11 +912,6 @@ Entry.ArduinoNanoExt.getBlocks = function () {
             isNotFor: ['ArduinoNanoExt'],
             func(sprite, script) {
                 const port = script.getField('PORT');
-                if (!Entry.hw.sendQueue.GET) Entry.hw.sendQueue.GET = {};
-                Entry.hw.sendQueue.GET[Entry.ArduinoNanoExt.sensorTypes.SOUND] = {
-                    port,
-                    time: new Date().getTime(),
-                };
                 return Entry.hw.portData.SOUND || 0;
             },
             syntax: { ar: [{ syntax: 'getSoundLevel(%1)' }] },
@@ -963,11 +948,6 @@ Entry.ArduinoNanoExt.getBlocks = function () {
             isNotFor: ['ArduinoNanoExt'],
             func(sprite, script) {
                 const port = script.getField('PORT');
-                if (!Entry.hw.sendQueue.GET) Entry.hw.sendQueue.GET = {};
-                Entry.hw.sendQueue.GET[Entry.ArduinoNanoExt.sensorTypes.ANALOG] = {
-                    port,
-                    time: new Date().getTime(),
-                };
                 return Entry.hw.portData[`a${port}`] || 0;
             },
             syntax: { ar: [{ syntax: 'analogRead(%1)' }] },
@@ -996,11 +976,6 @@ Entry.ArduinoNanoExt.getBlocks = function () {
             isNotFor: ['ArduinoNanoExt'],
             func(sprite, script) {
                 const port = script.getField('AXIS');
-                if (!Entry.hw.sendQueue.GET) Entry.hw.sendQueue.GET = {};
-                Entry.hw.sendQueue.GET[Entry.ArduinoNanoExt.sensorTypes.ANALOG] = {
-                    port,
-                    time: new Date().getTime(),
-                };
                 return Entry.hw.portData[`a${port}`] || 0;
             },
             syntax: { ar: [{ syntax: 'analogRead(%1)' }] },
@@ -1016,11 +991,6 @@ Entry.ArduinoNanoExt.getBlocks = function () {
             isNotFor: ['ArduinoNanoExt'],
             func(sprite, script) {
                 const port = '8'; // D8
-                if (!Entry.hw.sendQueue.GET) Entry.hw.sendQueue.GET = {};
-                Entry.hw.sendQueue.GET[Entry.ArduinoNanoExt.sensorTypes.DIGITAL] = {
-                    port,
-                    time: new Date().getTime(),
-                };
                 const result = Entry.hw.portData[port];
                 return result === 0;
             },
