@@ -5244,6 +5244,7 @@ Lang.Msgs = {
         '생활 속 안전을 위해 국민이 지켜야 하는 행동요령에 대한 블록 모음입니다. [국민안전처 제공]',
     ai_utilize_tts_description:
         'nVoice 음성합성 기술로 다양한 목소리로 문장을 읽는 블록모음 입니다. ',
+    uzbek_tts_fallback: '서버가 동작하지 않아, 로컬 음성으로 대신합니다.',
     hardware_need_update_title: '업데이트 안내',
     hardware_need_update_content:
         '보안 업데이트로 인해 하드웨어 연결 프로그램은\n1.9.51 버전 이상만 사용할 수 있습니다.\n더 낮은 버전이라면 최신 버전을 다운로드 받아 주세요.',

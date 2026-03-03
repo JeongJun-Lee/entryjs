@@ -4926,7 +4926,8 @@ Lang.Msgs = {
     expansion_behaviorConductLifeSafety_description:
         'It is a collection of blocks about basic behavior-guidelines that the public should follow for safty in life. (Provided by MPSS)',
     ai_utilize_tts_description:
-        'It is a collection of blocks that can read text in a variety of voice using the Clova.',
+        "Collection of blocks for reading sentences in various voices by using 'Clova' voice synthesis technology. ",
+    uzbek_tts_fallback: 'The server is not responding, using local voice instead.',
     hardware_need_update_title: 'Entry HW update',
     hardware_need_update_content:
         "Please update to the latest version,\nif you are using below version.\nEntry website only supported v1.9.51 or later.\nPlease remove the web browser cache,\nif any block doesn't appear after updating.",
