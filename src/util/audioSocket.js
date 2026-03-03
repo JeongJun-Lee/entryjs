@@ -10,23 +10,29 @@ const DEFAULT_ADDR = {
 
 export function voiceApiConnect(addr = DEFAULT_ADDR, language = 'Kor', cb) {
     return new Promise((resolve, reject) => {
-        const client = io(addr.hostname, {
+        let hostname = addr.hostname;
+        const isUzbek = language === 'Uzb' || language === 'uz' || language === 'uz-UZ';
+        // Force local Vosk for Uzbek in entry-offline regardless of isOffline status
+        if (isUzbek && (typeof window !== 'undefined' && window.process && window.process.type === 'renderer' || typeof Entry !== 'undefined')) {
+            hostname = 'http://127.0.0.1:4002';
+        }
+        console.log(`[audioSocket] STT Connection attempt to: ${hostname} (Language: ${language})`);
+
+        const client = io(hostname, {
             path: addr.path,
             query: `language=${language}`,
-            secure: true,
-            reconnect: true,
+            secure: hostname.startsWith('https'),
+            reconnect: false, // Don't auto-reconnect for STT, better to start fresh
+            forceNew: true,   // Important: don't reuse connection
+            multiplex: false, // Important: don't multiplex
             rejectUnauthorized: false,
             timeout: GATEWAY_CONNECT_TIMEOUT,
             transports: ['websocket', 'polling'],
         });
 
-        client.on('open', () => {
-            console.log('NSASR Voice Server Connected');
-            resolve(client);
-        });
-
         client.on('connect', () => {
-            console.log('socket connected');
+            console.log('[Antigravity] NSASR Voice Server Connected');
+            resolve(client);
         });
 
         client.on('disconnect', () => {

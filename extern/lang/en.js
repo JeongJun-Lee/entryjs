@@ -1038,6 +1038,7 @@ Lang.Blocks = {
     korean: 'Korean',
     english: 'English',
     japan: 'Japanese',
+    uzbek_s: 'Uzbek',
     korean_s: 'korean',
     english_s: 'english',
     japan_s: 'japanese',

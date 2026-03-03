@@ -23,7 +23,7 @@ Entry.AI_UTILIZE_BLOCK.audio = {
     },
 };
 
-Entry.AI_UTILIZE_BLOCK.audio.getBlocks = function() {
+Entry.AI_UTILIZE_BLOCK.audio.getBlocks = function () {
     return {
         audio_title: {
             skeleton: 'basic_text',
@@ -129,6 +129,7 @@ Entry.AI_UTILIZE_BLOCK.audio.getBlocks = function() {
                         [Lang.Blocks.korean_s, 'Kor'],
                         [Lang.Blocks.english_s, 'Eng'],
                         [Lang.Blocks.japan_s, 'Jpn'],
+                        [Lang.Blocks.uzbek_s, 'Uzb'],
                     ],
                     value: 'Kor',
                     fontSize: 11,
@@ -143,14 +144,14 @@ Entry.AI_UTILIZE_BLOCK.audio.getBlocks = function() {
             ],
             events: {
                 viewAdd: [
-                    function() {
+                    function () {
                         if (Entry.container.sttValue) {
                             Entry.container.sttValue.setVisible(true);
                         }
                     },
                 ],
                 viewDestroy: [
-                    function(block, notIncludeSelf) {
+                    function (block, notIncludeSelf) {
                         if (Entry.container.sttValue) {
                             Entry.container.sttValue.checkVisible(block, notIncludeSelf);
                         }
@@ -187,6 +188,10 @@ Entry.AI_UTILIZE_BLOCK.audio.getBlocks = function() {
                         Entry.container.sttValue.setName(
                             `${Lang.template.voice_title_text}:${Lang.Blocks.japan_s}`
                         );
+                    } else if (language === 'Uzb') {
+                        Entry.container.sttValue.setName(
+                            `${Lang.template.voice_title_text}:${Lang.Blocks.uzbek_s}`
+                        );
                     }
                     AudioUtils.isRecording = true;
                     Entry.container.enableSttValue();
@@ -221,6 +226,7 @@ Entry.AI_UTILIZE_BLOCK.audio.getBlocks = function() {
                         [Lang.Blocks.korean_s, 'Kor'],
                         [Lang.Blocks.english_s, 'Eng'],
                         [Lang.Blocks.japan_s, 'Jpn'],
+                        [Lang.Blocks.uzbek_s, 'Uzb'],
                     ],
                     value: 'Kor',
                     fontSize: 11,
@@ -235,14 +241,14 @@ Entry.AI_UTILIZE_BLOCK.audio.getBlocks = function() {
             ],
             events: {
                 viewAdd: [
-                    function() {
+                    function () {
                         if (Entry.container.sttValue) {
                             Entry.container.sttValue.setVisible(true);
                         }
                     },
                 ],
                 viewDestroy: [
-                    function(block, notIncludeSelf) {
+                    function (block, notIncludeSelf) {
                         if (Entry.container.sttValue) {
                             Entry.container.sttValue.checkVisible(block, notIncludeSelf);
                         }
@@ -281,6 +287,10 @@ Entry.AI_UTILIZE_BLOCK.audio.getBlocks = function() {
                     } else if (language === 'Jpn') {
                         Entry.container.sttValue.setName(
                             `${Lang.template.voice_title_text}:${Lang.Blocks.japan_s}`
+                        );
+                    } else if (language === 'Uzb') {
+                        Entry.container.sttValue.setName(
+                            `${Lang.template.voice_title_text}:${Lang.Blocks.uzbek_s}`
                         );
                     }
                     AudioUtils.isRecording = true;
@@ -323,14 +333,14 @@ Entry.AI_UTILIZE_BLOCK.audio.getBlocks = function() {
             ],
             events: {
                 viewAdd: [
-                    function() {
+                    function () {
                         if (Entry.container.sttValue) {
                             Entry.container.sttValue.setVisible(true);
                         }
                     },
                 ],
                 viewDestroy: [
-                    function(block, notIncludeSelf) {
+                    function (block, notIncludeSelf) {
                         if (Entry.container.sttValue) {
                             Entry.container.sttValue.checkVisible(block, notIncludeSelf);
                         }
@@ -372,14 +382,14 @@ Entry.AI_UTILIZE_BLOCK.audio.getBlocks = function() {
             params: [],
             events: {
                 viewAdd: [
-                    function() {
+                    function () {
                         if (Entry.container.sttValue) {
                             Entry.container.sttValue.setVisible(true);
                         }
                     },
                 ],
                 viewDestroy: [
-                    function(block, notIncludeSelf) {
+                    function (block, notIncludeSelf) {
                         if (Entry.container.sttValue) {
                             Entry.container.sttValue.checkVisible(block, notIncludeSelf);
                         }

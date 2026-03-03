@@ -450,6 +450,7 @@ Lang.Blocks = {
     korean_s: '한국어',
     english_s: '영어',
     japan_s: '일본어',
+    uzbek_s: '우즈베크어',
     portuguese: '포르투갈어',
     hindi: '힌디어',
     japan: '일본어',

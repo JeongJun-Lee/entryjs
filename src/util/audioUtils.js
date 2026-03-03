@@ -4,7 +4,6 @@
  */
 
 const { voiceApiConnect } = require('./audioSocket');
-const toWav = require('audiobuffer-to-wav');
 
 const STATUS_CODE = {
     CONNECTED: 'CONNECTED',
@@ -95,39 +94,24 @@ class AudioUtils {
                     window.AudioContext = window.webkitAudioContext;
                 }
             }
-            const audioContext = new window.AudioContext();
+            // Create context with 16kHz sample rate directly to avoid resampling overhead
+            const audioContext = new window.AudioContext({ sampleRate: DESIRED_SAMPLE_RATE });
             const streamSrc = audioContext.createMediaStreamSource(mediaStream);
             const analyserNode = audioContext.createAnalyser();
-            // const reducerNode = new window.audio.NoiseReducer(0.5, 5);
             const gainNode = audioContext.createGain();
-            gainNode.gain.value = 1.8;
+            gainNode.gain.value = 1.5;
 
-            const highpassFilter = audioContext.createBiquadFilter();
-            highpassFilter.type = 'highpass';
-            highpassFilter.frequency.value = 150;
-            highpassFilter.Q.value = 1;
-            highpassFilter.detune.value = 1;
-
-            analyserNode.fftSize = 4096;
-            analyserNode.smoothingTimeConstant = 0.0;
-            analyserNode.minDecibels = -80;
-            analyserNode.maxDecibels = -40;
-
-            const scriptNode = audioContext.createScriptProcessor(512, 1, 1);
+            const scriptNode = audioContext.createScriptProcessor(2048, 1, 1);
             const streamDest = audioContext.createMediaStreamDestination();
             const mediaRecorder = new MediaRecorder(streamDest.stream);
-            // 순서대로 노드 커넥션을 맺는다.
-            this._connectNodes(streamSrc, analyserNode, scriptNode, streamDest);
+
+            this._connectNodes(streamSrc, gainNode, analyserNode, scriptNode, streamDest);
             scriptNode.onaudioprocess = this._handleScriptProcess(analyserNode);
 
             this._audioContext = audioContext;
             this._userMediaStream = mediaStream;
             this._mediaRecorder = mediaRecorder;
 
-            // 음성 인식 api 를 사용하기 위함
-            // 음성 인식은 websocket 을 통해서 WAV로 전송하게 되어있음.
-            // 첫번째 파라미터는 프로토콜을 제외한 hostname+port 조합
-            // ex)'localhost:4001'
             this.isInitialized = true;
             return;
         } catch (e) {
@@ -144,7 +128,126 @@ class AudioUtils {
         }
     }
 
+    _getLangCode(language) {
+        switch (language) {
+            case 'Kor': return 'ko-KR';
+            case 'Eng': return 'en-US';
+            case 'Jpn': return 'ja-JP';
+            case 'Uzb':
+            case 'Uzbek':
+            case 'uz':
+            case 'uz-UZ': return 'uz-UZ';
+            default: return language;
+        }
+    }
+
     startRecord(recordMilliSecond, language) {
+        this.result = null;
+        const isUzbek = language === 'Uzb' || language === 'uz' || language === 'uz-UZ';
+        if (typeof Entry !== 'undefined' && Entry.isOffline) {
+            if (isUzbek) {
+                return this._startSocketRecord(recordMilliSecond, language);
+            } else {
+                console.log(`[audioUtils] Offline mode: Skipping STT for ${language}`);
+                return Promise.resolve('-');
+            }
+        }
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            return this._startSocketRecord(recordMilliSecond, language);
+        }
+
+        return new Promise((resolve) => {
+            const recognition = new SpeechRecognition();
+            recognition.lang = this._getLangCode(language);
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            let resolved = false;
+
+            recognition.onresult = (event) => {
+                if (resolved) return;
+                const text = event.results[0][0].transcript;
+                resolved = true;
+                resolve(text);
+                this.stopRecord();
+            };
+
+            recognition.onerror = async (event) => {
+                if (resolved) return;
+                console.log('SpeechRecognition error:', event.error);
+                const isUzbek = language === 'Uzb' || language === 'uz' || language === 'uz-UZ';
+                if (isUzbek && (event.error === 'network' || event.error === 'not-allowed' || event.error === 'service-not-allowed')) {
+                    resolved = true;
+                    this.startedRecording = false;
+                    if (Entry.engine && typeof Entry.engine.toggleAudioShadePanel === 'function') {
+                        Entry.engine.toggleAudioShadePanel(); // hide panel so fallback can toggle it again
+                    }
+                    resolve(await this._startSocketRecord(recordMilliSecond, language));
+                } else if (!isUzbek && event.error === 'network') {
+                    // For non-uzbek languages, if network fails, we fall back to original socket (Naver Clova)
+                    // though it will likely fail if actually offline.
+                    resolved = true;
+                    this.startedRecording = false;
+                    if (Entry.engine && typeof Entry.engine.toggleAudioShadePanel === 'function') {
+                        Entry.engine.toggleAudioShadePanel();
+                    }
+                    resolve(await this._startSocketRecord(recordMilliSecond, language));
+                } else {
+                    resolved = true;
+                    resolve('-');
+                    this.stopRecord();
+                }
+            };
+
+            recognition.onnomatch = () => {
+                if (!resolved) {
+                    resolved = true;
+                    resolve('-');
+                    this.stopRecord();
+                }
+            };
+
+            try {
+                if (!this.isRecording) {
+                    this.isRecording = true;
+                }
+                recognition.start();
+                this.startedRecording = true;
+                if (Entry.engine && typeof Entry.engine.toggleAudioShadePanel === 'function') {
+                    Entry.engine.toggleAudioShadePanel();
+                }
+
+                this._properStopCall = setTimeout(() => {
+                    if (!resolved) {
+                        recognition.stop();
+                        resolved = true;
+                        resolve('-');
+                        this.stopRecord();
+                    }
+                }, recordMilliSecond);
+
+                this.stopCallback = () => {
+                    if (!resolved) {
+                        recognition.stop();
+                        resolved = true;
+                        resolve(0);
+                    }
+                };
+            } catch (e) {
+                console.error(e);
+                if (!resolved) {
+                    resolved = true;
+                    this.startedRecording = false;
+                    if (Entry.engine && typeof Entry.engine.toggleAudioShadePanel === 'function') {
+                        Entry.engine.toggleAudioShadePanel();
+                    }
+                    this._startSocketRecord(recordMilliSecond, language).then(resolve);
+                }
+            }
+        });
+    }
+
+    _startSocketRecord(recordMilliSecond, language) {
         return new Promise(async (resolve, reject) => {
             this.resolveFunc = resolve;
             if (!this.isInitialized) {
@@ -152,10 +255,10 @@ class AudioUtils {
                 resolve(0);
                 return;
             }
-            // this.isRecording = true;
+            this.isRecording = true;
             if (this._audioContext.state === 'suspended') {
-                this.isInitialized = false;
-                await this.initialize();
+                console.log('[audioUtils] AudioContext is suspended, resuming...');
+                await this._audioContext.resume();
             }
 
             try {
@@ -177,7 +280,7 @@ class AudioUtils {
             this.startedRecording = true;
             Entry.engine.toggleAudioShadePanel();
             this._socketClient.on('disconnect', () => {
-                resolve('-');
+                console.log('[audioUtils] Socket disconnected');
             });
             this._socketClient.on('message', (e) => {
                 switch (e) {
@@ -209,7 +312,9 @@ class AudioUtils {
                     }
                 }
             });
-            this._properStopCall = setTimeout(this.stopRecord, recordMilliSecond);
+            this._properStopCall = setTimeout(() => {
+                this.stopRecord();
+            }, recordMilliSecond);
             this.stopCallback = () => {
                 resolve(0);
             };
@@ -217,6 +322,105 @@ class AudioUtils {
     }
 
     startTimedRecord(recordMilliSecond, language) {
+        this.result = null;
+        const isUzbek = language === 'Uzb' || language === 'uz' || language === 'uz-UZ';
+        if (typeof Entry !== 'undefined' && Entry.isOffline && isUzbek) {
+            return this._startSocketTimedRecord(recordMilliSecond, language);
+        }
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            return this._startSocketTimedRecord(recordMilliSecond, language);
+        }
+
+        return new Promise((resolve) => {
+            const recognition = new SpeechRecognition();
+            recognition.lang = this._getLangCode(language);
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            let resolved = false;
+
+            recognition.onresult = (event) => {
+                if (resolved) return;
+                const text = event.results[0][0].transcript;
+                resolved = true;
+                resolve(text);
+                this.stopRecord();
+            };
+
+            recognition.onerror = async (event) => {
+                if (resolved) return;
+                console.log('SpeechRecognition error:', event.error);
+                const isUzbek = language === 'Uzb' || language === 'uz' || language === 'uz-UZ';
+                if (isUzbek && (event.error === 'network' || event.error === 'not-allowed' || event.error === 'service-not-allowed')) {
+                    resolved = true;
+                    this.startedRecording = false;
+                    if (Entry.engine && typeof Entry.engine.toggleAudioShadePanel === 'function') {
+                        Entry.engine.toggleAudioShadePanel();
+                    }
+                    resolve(await this._startSocketTimedRecord(recordMilliSecond, language));
+                } else if (!isUzbek && event.error === 'network') {
+                    resolved = true;
+                    this.startedRecording = false;
+                    if (Entry.engine && typeof Entry.engine.toggleAudioShadePanel === 'function') {
+                        Entry.engine.toggleAudioShadePanel();
+                    }
+                    resolve(await this._startSocketTimedRecord(recordMilliSecond, language));
+                } else {
+                    resolved = true;
+                    resolve('-');
+                    this.stopRecord();
+                }
+            };
+
+            recognition.onnomatch = () => {
+                if (!resolved) {
+                    resolved = true;
+                    resolve('-');
+                    this.stopRecord();
+                }
+            };
+
+            try {
+                if (!this.isRecording) {
+                    this.isRecording = true;
+                }
+                recognition.start();
+                this.startedRecording = true;
+                if (Entry.engine && typeof Entry.engine.toggleAudioShadePanel === 'function') {
+                    Entry.engine.toggleAudioShadePanel();
+                }
+
+                this._properStopCall = setTimeout(() => {
+                    if (!resolved) {
+                        recognition.stop();
+                        resolved = true;
+                        resolve('-');
+                        this.stopRecord();
+                    }
+                }, recordMilliSecond);
+
+                this.stopCallback = () => {
+                    if (!resolved) {
+                        recognition.stop();
+                        resolved = true;
+                        resolve(0);
+                    }
+                };
+            } catch (e) {
+                console.error(e);
+                if (!resolved) {
+                    resolved = true;
+                    this.startedRecording = false;
+                    if (Entry.engine && typeof Entry.engine.toggleAudioShadePanel === 'function') {
+                        Entry.engine.toggleAudioShadePanel();
+                    }
+                    this._startSocketTimedRecord(recordMilliSecond, language).then(resolve);
+                }
+            }
+        });
+    }
+
+    _startSocketTimedRecord(recordMilliSecond, language) {
         return new Promise(async (resolve, reject) => {
             this.isTimedRecord = true;
             this.timedResult = [];
@@ -226,10 +430,10 @@ class AudioUtils {
                 resolve(0);
                 return;
             }
-            // this.isRecording = true;
+            this.isRecording = true;
             if (this._audioContext.state === 'suspended') {
-                this.isInitialized = false;
-                await this.initialize();
+                console.log('[audioUtils] AudioContext is suspended, resuming...');
+                await this._audioContext.resume();
             }
 
             try {
@@ -304,10 +508,16 @@ class AudioUtils {
                 }
             });
 
-            if (this._socketClient && this._socketClient.readyState === this._socketClient.OPEN) {
+            if (this._socketClient && this._socketClient.connected) {
                 // socket.io로 서버 전송
                 buffers.forEach((buffer) => {
-                    this._socketClient.send(toWav(buffer));
+                    const channelData = buffer.getChannelData(0);
+                    const pcmData = new Int16Array(channelData.length);
+                    for (let i = 0; i < channelData.length; i++) {
+                        const s = Math.max(-1, Math.min(1, channelData[i]));
+                        pcmData[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+                    }
+                    this._socketClient.send(pcmData.buffer);
                 });
             }
         });
@@ -325,6 +535,7 @@ class AudioUtils {
     stopRecord() {
         if (this._socketClient) {
             this._socketClient.disconnect();
+            this._socketClient = null;
         }
         if (!this.isInitialized || !this.isRecording) {
             return;
@@ -339,14 +550,16 @@ class AudioUtils {
 
         this._stopMediaRecorder();
         this._audioContext.suspend();
-        this.stream.getTracks().forEach((track) => {
-            track.stop();
-        });
+        if (this.stream) {
+            this.stream.getTracks().forEach((track) => {
+                track.stop();
+            });
+        }
         clearTimeout(this._properStopCall);
         if (this.stopCallback) {
             this.stopCallback();
         }
-        // this.isRecording = false;
+        this.isRecording = false;
     }
 
     isAudioConnected() {
@@ -398,43 +611,20 @@ class AudioUtils {
             return;
         }
 
-        ///// RESAMPLE
-        // offline context 로 44100hz 에서 16000hz로 resample
-        const offlineCtx = new OfflineAudioContext(
-            outputBuffer.numberOfChannels,
-            outputBuffer.duration * DESIRED_SAMPLE_RATE,
-            DESIRED_SAMPLE_RATE
-        );
-        const cloneBuffer = offlineCtx.createBuffer(
-            outputBuffer.numberOfChannels,
-            outputBuffer.length,
-            outputBuffer.sampleRate
-        );
-        // Copy the source data into the offline AudioBuffer
-        for (let channel = 0; channel < outputBuffer.numberOfChannels; channel++) {
-            cloneBuffer.copyToChannel(outputBuffer.getChannelData(channel), channel);
+        if (this.isTimedRecord) {
+            this.timedResult.push(inputBuffer);
+        } else if (this._socketClient && this._socketClient.connected) {
+            const channelData = inputBuffer.getChannelData(0);
+            const pcmData = new Int16Array(channelData.length);
+            for (let i = 0; i < channelData.length; i++) {
+                if (i === 0 && Math.random() < 0.01) {
+                    console.log(`[audioUtils] Sending PCM chunk to socket: ${pcmData.length} samples`);
+                }
+                const s = Math.max(-1, Math.min(1, channelData[i]));
+                pcmData[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+            }
+            this._socketClient.send(pcmData.buffer);
         }
-        // Play it from the beginning.
-        const source = offlineCtx.createBufferSource();
-        source.buffer = cloneBuffer;
-        source.connect(offlineCtx.destination);
-        offlineCtx.oncomplete = (e) => {
-            if (!this.isRecording) {
-                return;
-            }
-
-            if (this.isTimedRecord) {
-                this.timedResult.push(e.renderedBuffer);
-            } else if (
-                this._socketClient &&
-                this._socketClient.readyState === this._socketClient.OPEN
-            ) {
-                // socket.io로 서버 전송
-                this._socketClient.send(toWav(e.renderedBuffer));
-            }
-        };
-        offlineCtx.startRendering();
-        source.start(0);
     };
 }
 
