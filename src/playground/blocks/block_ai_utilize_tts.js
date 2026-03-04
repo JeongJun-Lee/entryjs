@@ -2,6 +2,7 @@
 
 const { toQueryString } = require('../../util/common');
 const _trim = require('lodash/trim');
+const audioUtils = require('../../util/audioUtils').default;
 
 Entry.AI_UTILIZE_BLOCK.tts = {
     name: 'tts',
@@ -227,12 +228,15 @@ Entry.AI_UTILIZE_BLOCK.tts.getBlocks = function () {
                     // Attempt to use IPC to call 'say' module in the Main process (entry-offline)
                     if (typeof window !== 'undefined' && window.ipcInvoke) {
                         console.log(`TTS: Attempting Uzbek voice ${targetVoiceName} via IPC run-tts`);
+                        audioUtils.setMute(true);
                         window.ipcInvoke('run-tts', message, targetVoiceName)
                             .then(() => {
+                                audioUtils.setMute(false);
                                 resolve();
                             })
                             .catch((err) => {
                                 console.error(`TTS: IPC run-tts failed:`, err);
+                                audioUtils.setMute(false);
                                 resolve();
                             });
                     } else {
@@ -274,15 +278,15 @@ Entry.AI_UTILIZE_BLOCK.tts.getBlocks = function () {
                         clearTimeout(timeoutId);
 
                         tts.loadQueue = tts.loadQueue.filter((queueId) => {
-                            const filtered = items.find((item) => item.id === queueId);
+                            const filtered = items.find((item) => item.item.id === queueId);
                             if (filtered) {
-                                const instance = Entry.Utils.playSound(queueId, filtered.prop);
+                                const instance = Entry.Utils.playSound(queueId, filtered.item.prop);
                                 instance.soundType = 'tts';
                                 Entry.Utils.addSoundInstances(instance);
                                 const duration =
                                     instance.duration > 0
                                         ? instance.duration
-                                        : filtered.duration * 300;
+                                        : filtered.item.duration * 300;
                                 setTimeout(() => {
                                     resolve();
                                 }, duration);
@@ -349,6 +353,7 @@ Entry.AI_UTILIZE_BLOCK.tts.getBlocks = function () {
                         tts.loadQueue.push(id);
                     };
                     audioProbe.src = uzSrc;
+                    return; // Crucial: avoid playClova() below
                 }
             }
 

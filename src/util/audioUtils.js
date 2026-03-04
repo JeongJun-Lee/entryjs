@@ -10,6 +10,8 @@ const STATUS_CODE = {
     NOT_RECOGNIZED: 'NOT_RECOGNIZED',
     START_RECOGNIZE: 'START_RECOGNIZE',
     END_POINT_DETECTED: 'END_POINT_DETECTED',
+    MODEL_LOADING: 'MODEL_LOADING',
+    MODEL_LOADED: 'MODEL_LOADED',
 };
 
 const getVoiceServerAddress = () => ({
@@ -21,6 +23,7 @@ const DESIRED_SAMPLE_RATE = 16000;
 
 class AudioUtils {
     isTimedRecord = false;
+    isMuted = false;
     timedResult = [];
     stopCallback = null;
 
@@ -143,15 +146,19 @@ class AudioUtils {
 
     startRecord(recordMilliSecond, language) {
         this.result = null;
-        const isUzbek = language === 'Uzb' || language === 'uz' || language === 'uz-UZ';
-        if (typeof Entry !== 'undefined' && Entry.isOffline) {
-            if (isUzbek) {
-                return this._startSocketRecord(recordMilliSecond, language);
-            } else {
-                console.log(`[audioUtils] Offline mode: Skipping STT for ${language}`);
-                return Promise.resolve('-');
-            }
+        const isLocalVosk =
+            language === 'Uzb' ||
+            language === 'uz' ||
+            language === 'uz-UZ';
+        if (isLocalVosk) {
+            return this._startSocketRecord(recordMilliSecond, language);
         }
+
+        if (typeof Entry !== 'undefined' && Entry.isOffline) {
+            console.log(`[audioUtils] Offline mode: Skipping STT for ${language}`);
+            return Promise.resolve('-');
+        }
+
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SpeechRecognition) {
             return this._startSocketRecord(recordMilliSecond, language);
@@ -270,7 +277,17 @@ class AudioUtils {
                     }
                 );
             } catch (err) {
-                console.log(err);
+                console.error('[audioUtils] Connection to STT server failed:', err);
+                this.isRecording = false;
+                resolve('-');
+                return;
+            }
+
+            if (!this._socketClient) {
+                console.error('[audioUtils] Socket client not created');
+                this.isRecording = false;
+                resolve('-');
+                return;
             }
 
             this._audioChunks = [];
@@ -279,53 +296,80 @@ class AudioUtils {
             this._mediaRecorder.start();
             this.startedRecording = true;
             Entry.engine.toggleAudioShadePanel();
-            this._socketClient.on('disconnect', () => {
-                console.log('[audioUtils] Socket disconnected');
-            });
-            this._socketClient.on('message', (e) => {
-                switch (e) {
-                    case STATUS_CODE.CONNECTED:
-                        break;
-                    case STATUS_CODE.END_POINT_DETECTED:
-                        Entry.dispatchEvent('audioRecordProcessing');
-                        if (this.startedRecording) {
-                            Entry.engine.toggleAudioProgressPanel();
-                        }
-                        this.startedRecording = false;
-                        break;
-                    case STATUS_CODE.NOT_RECOGNIZED:
-                        this.stopCallback = null;
-                        resolve('-');
-                        this.stopRecord();
-                        break;
-                    default: {
-                        const parsed = JSON.parse(e);
-                        const isArray = Array.isArray(parsed);
-                        if (isArray) {
-                            this.stopCallback = null;
-                            resolve(parsed[0]);
-                            this.stopRecord();
-                        } else {
-                            resolve('-');
-                        }
-                        break;
+
+            if (this._socketClient) {
+                this._socketClient.on('disconnect', () => {
+                    console.log('[audioUtils] Socket disconnected');
+                    if (this.stopCallback) {
+                        this.stopCallback();
+                    } else if (this.resolveFunc) {
+                        this.resolveFunc('-');
                     }
-                }
-            });
-            this._properStopCall = setTimeout(() => {
-                this.stopRecord();
-            }, recordMilliSecond);
-            this.stopCallback = () => {
-                resolve(0);
-            };
+                });
+                this._socketClient.on('message', (e) => {
+                    switch (e) {
+                        case STATUS_CODE.CONNECTED:
+                            break;
+                        case STATUS_CODE.MODEL_LOADING:
+                            console.log('[audioUtils] STATUS: MODEL_LOADING');
+                            break;
+                        case STATUS_CODE.MODEL_LOADED:
+                            console.log('[audioUtils] STATUS: MODEL_LOADED');
+                            if (Entry.toast) {
+                                Entry.toast.success(
+                                    Lang.Msgs.video_model_load_success,
+                                    Lang.Msgs.audio_model_load_completed
+                                );
+                            }
+                            break;
+                        case STATUS_CODE.END_POINT_DETECTED:
+                            Entry.dispatchEvent('audioRecordProcessing');
+                            if (this.startedRecording) {
+                                Entry.engine.toggleAudioProgressPanel();
+                            }
+                            this.startedRecording = false;
+                            break;
+                        case STATUS_CODE.NOT_RECOGNIZED:
+                            this.stopCallback = null;
+                            resolve('-');
+                            this.stopRecord();
+                            break;
+                        default: {
+                            const parsed = JSON.parse(e);
+                            const isArray = Array.isArray(parsed);
+                            if (isArray) {
+                                this.stopCallback = null;
+                                resolve(parsed[0]);
+                                this.stopRecord();
+                            } else {
+                                resolve('-');
+                            }
+                            break;
+                        }
+                    }
+                });
+                this._properStopCall = setTimeout(() => {
+                    this.stopRecord();
+                }, recordMilliSecond);
+                this.stopCallback = () => {
+                    resolve(0);
+                };
+            }
         });
     }
 
     startTimedRecord(recordMilliSecond, language) {
         this.result = null;
-        const isUzbek = language === 'Uzb' || language === 'uz' || language === 'uz-UZ';
-        if (typeof Entry !== 'undefined' && Entry.isOffline && isUzbek) {
+        const isLocalVosk =
+            language === 'Uzb' ||
+            language === 'uz' ||
+            language === 'uz-UZ';
+        if (isLocalVosk) {
             return this._startSocketTimedRecord(recordMilliSecond, language);
+        }
+        if (typeof Entry !== 'undefined' && Entry.isOffline) {
+            console.log(`[audioUtils] Offline mode: Skipping STT for ${language}`);
+            return Promise.resolve('-');
         }
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SpeechRecognition) {
@@ -445,7 +489,19 @@ class AudioUtils {
                     }
                 );
             } catch (err) {
-                console.log(err);
+                console.error('[audioUtils] Connection to STT server failed (timed):', err);
+                this.isRecording = false;
+                this.isTimedRecord = false;
+                resolve('-');
+                return;
+            }
+
+            if (!this._socketClient) {
+                console.error('[audioUtils] Socket client not created (timed)');
+                this.isRecording = false;
+                this.isTimedRecord = false;
+                resolve('-');
+                return;
             }
 
             this._audioChunks = [];
@@ -454,6 +510,16 @@ class AudioUtils {
             this._mediaRecorder.start();
             this.startedRecording = true;
             Entry.engine.toggleAudioShadePanel();
+            if (this._socketClient) {
+                this._socketClient.on('disconnect', () => {
+                    console.log('[audioUtils] Socket disconnected');
+                    if (this.isRecording && this.stopCallback) {
+                        this.stopCallback();
+                    } else if (this.resolveFunc) {
+                        this.resolveFunc('-');
+                    }
+                });
+            }
 
             this._properStopCall = setTimeout(async () => {
                 try {
@@ -479,6 +545,10 @@ class AudioUtils {
 
     async sendBuffer(buffers, language) {
         return new Promise(async (resolve, reject) => {
+            if (!this._socketClient) {
+                resolve('-');
+                return;
+            }
             this._socketClient.on('disconnect', () => {
                 resolve('-');
             });
@@ -538,6 +608,11 @@ class AudioUtils {
             this._socketClient = null;
         }
         if (!this.isInitialized || !this.isRecording) {
+            // Even if not recording, ensure stopCallback is handled if it exists
+            if (this.stopCallback) {
+                this.stopCallback();
+                this.stopCallback = null;
+            }
             return;
         }
         Entry.dispatchEvent('audioRecordProcessing');
@@ -580,6 +655,20 @@ class AudioUtils {
         }
     }
 
+    /**
+     * STT 데이터 전송을 일시 중지(Mute)하거나 재개한다.
+     * TTS 재생 중에 마이크 소리가 섞이는 것을 방지하기 위해 사용.
+     * @param {boolean} isMuted
+     */
+    setMute(isMuted) {
+        this.isMuted = !!isMuted;
+        if (this.isMuted) {
+            console.log('[audioUtils] STT Muted (TTS Playing...)');
+        } else {
+            console.log('[audioUtils] STT Unmuted');
+        }
+    }
+
     _isBrowserSupportAudio() {
         if (
             !navigator.mediaDevices ||
@@ -608,6 +697,19 @@ class AudioUtils {
             }
         }
         if (!this.isRecording) {
+            return;
+        }
+
+        if (this.isMuted) {
+            // Mute 상태일 때는 0으로 채워진 오디오 데이터로 처리 (인식 방지)
+            if (this.isTimedRecord) {
+                const silentBuffer = this._audioContext.createBuffer(
+                    inputBuffer.numberOfChannels,
+                    inputBuffer.length,
+                    inputBuffer.sampleRate
+                );
+                this.timedResult.push(silentBuffer);
+            }
             return;
         }
 
