@@ -43,11 +43,15 @@ Entry.ArduinoExt = {
         ULTRASONIC: 7,
         TIMER: 8,
         STEPPER: 9,
-        DHTINIT: 10,
-        DHTTEMP: 11,
-        DHTHUMI: 12,
-        IRRINIT: 13,
-        IRREMOTE: 14,
+        DHTINIT: 10,  //a
+        DHTTEMP: 11,  //b
+        DHTHUMI: 12,  //c
+        IRRINIT: 13,  //d
+        IRREMOTE: 14,  //e
+        LCD_INIT: 15,  //f
+        LCD_PRINT: 16,  //g
+        LCD_CLEAR: 17,  //h
+
     },
     toneTable: {
         '0': 0,
@@ -87,9 +91,10 @@ Entry.ArduinoExt = {
         TIME_20ms: 20,
         TIME_50ms: 50,
         TIME_100ms: 100,
-        TIME_200ms: 200, 
-        TIME_500ms: 500,    
-        TIME_600ms: 600,   
+        TIME_200ms: 200,
+        TIME_500ms: 500,
+        TIME_600ms: 600,
+        TIME_100ms: 1000,
     },
     BlockState: {},
     monitorTemplate: {
@@ -189,10 +194,10 @@ Entry.ArduinoExt = {
             },
         },
         mode: 'both',
-  },
+    },
 };
 
-Entry.ArduinoExt.setLanguage = function() {
+Entry.ArduinoExt.setLanguage = function () {
     return {
         ko: {
             template: {
@@ -210,6 +215,15 @@ Entry.ArduinoExt.setLanguage = function() {
                 arduino_ext_set_stepper: '디지털 %1 %2 %3 %4 번 핀의 스텝모터를 %5 RPM으로 %6 스텝 이동하기 %7',
                 arduino_ext_set_irremote_init: "디지털 %1 번 핀에 연결된 적외선 수신기 사용하기 %2",
                 arduino_ext_get_irremote_value: '수신된 적외선 신호값',
+                arduino_ext_set_lcd_init: 'LCD 초기화 하기 %1',
+                arduino_ext_set_lcd_print: 'LCD %1 줄 %2 칸에 %3 을 쓰기 %4',
+                arduino_ext_set_lcd_clear: 'LCD 화면 지우기 %1',
+                arduino_ext_input_title: '기본 입력',
+                arduino_ext_output_title: '기본 출력',
+                arduino_ext_extra_sensor_title: '추가센서',
+                arduino_ext_irremote_title: 'IR 리모콘',
+                arduino_ext_lcd_title: 'LCD',
+                arduino_ext_motor_title: '모터',
             },
         },
         en: {
@@ -228,11 +242,20 @@ Entry.ArduinoExt.setLanguage = function() {
                 arduino_ext_set_stepper: 'Set stepper pin %1 %2 %3 %4 RPM as %5 and steps as %6 %7',
                 arduino_ext_set_irremote_init: "Init IR receiver pin %1  %2",
                 arduino_ext_get_irremote_value: 'Received IR signal value',
+                arduino_ext_set_lcd_init: 'Init LCD screen %1',
+                arduino_ext_set_lcd_print: 'Write %3 on %1 line %2 column of LCD %4',
+                arduino_ext_set_lcd_clear: 'Clear LCD screen %1',
+                arduino_ext_input_title: 'Basic Input',
+                arduino_ext_output_title: 'Basic Output',
+                arduino_ext_extra_sensor_title: 'Additional Sensors',
+                arduino_ext_irremote_title: 'IR remote',
+                arduino_ext_lcd_title: 'LCD',
+                arduino_ext_motor_title: 'Motor',
             },
         },
         uz: {
-          template: {
-                arduino_ext_get_analog_value: "Analog %1 pin sensor qiymati",
+            template: {
+                arduino_ext_get_analog_value: "Analog %1 pin qiymati",
                 arduino_ext_get_analog_value_map: "%1ning doirasini %2 ~ %3 dan %4 ~ %5 ga o'zgartirgan qiymati",
                 arduino_ext_get_ultrasonic_value: "Ultrasonik sensor trig %1 eko %2 sensor qiymati",
                 arduino_ext_toggle_led: "Raqamli %1 pinini %2 %3",
@@ -244,51 +267,209 @@ Entry.ArduinoExt.setLanguage = function() {
                 arduino_ext_get_temp_value: 'Harorat sensor qiymati',
                 arduino_ext_get_humi_value: 'Namlik sensor qiymati',
                 arduino_ext_set_stepper: "Raqamli %1 %2 %3 %4 pinning stepper motorini %5 RPMdan %6 qadam ko'chirish %7",
-                arduino_ext_set_irremote_init: "Pult signali qabulqiluvchini %1 pindan foydalanish %2",
-                arduino_ext_get_irremote_value: 'Pultdan bosilgan raqami',
-          },
+                arduino_ext_set_irremote_init: "Pult signali qabul qiluvchini %1 pindan foydalanish %2",
+                arduino_ext_get_irremote_value: 'Pultdan bosilgan raqam',
+                arduino_ext_set_lcd_init: 'LCDni qaytadan tiklash %1',
+                arduino_ext_set_lcd_print: 'LCDning %1 -qatorida %2 -ustuniga %3 yozish %4',
+                arduino_ext_set_lcd_clear: 'LCD ekranni tozalash %1',
+                arduino_ext_input_title: 'Asosiy Kirish',
+                arduino_ext_output_title: 'Asosiy Chiqish',
+                arduino_ext_extra_sensor_title: 'Qo\'shimcha sensorlar',
+                arduino_ext_irremote_title: 'IR masofadan boshqarish',
+                arduino_ext_lcd_title: 'LCD',
+                arduino_ext_motor_title: 'Motorlar',
+            },
         },
         ru: {
             template: {
-                  arduino_ext_get_analog_value: "Аналоговое значение датчика %1",
-                  arduino_ext_get_analog_value_map: "Изменить диапазон %1 с %2 на %3, на %4 и на %5.",
-                  arduino_ext_get_ultrasonic_value: "Чтение триггерного пина ультразвукового датчика %1, эхо-пина %2",
-                  arduino_ext_toggle_led: "Цифровой пин %1 %2 %3",
-                  arduino_ext_digital_pwm: "Установить цифровой вывод %1 на %2 %3",
-                  arduino_ext_set_tone: "Включите пищалку на цифровом выводе %1 звуковым сигналом %2 %3 в течение %4 секунд %5",
-                  arduino_ext_set_servo: "Установить сервомотор %1 на угол %2 %3.",
-                  arduino_ext_get_digital: "Цифровое значение датчика %1",
-                  arduino_ext_set_temp_humi_init: "Инициализация датчика температуры и влажности, подключенного к цифровому выводу %1 %2",
-                  arduino_ext_get_temp_value: 'Значение температуры датчика температуры',
-                  arduino_ext_get_humi_value: 'Значение влажности датчика влажности',
-                  arduino_ext_set_stepper: "Установить шаговый пин %1 %2 %3 %4 об/мин как %5 и шаги как %6 %7",
-                  arduino_ext_set_irremote_init: "Инициализировать пин ИК-приемника %1 %2",
-                  arduino_ext_get_irremote_value: 'Полученное значение ИК-сигнала',
+                arduino_ext_get_analog_value: "Аналоговое значение датчика %1",
+                arduino_ext_get_analog_value_map: "Изменить диапазон %1 с %2 на %3, на %4 и на %5.",
+                arduino_ext_get_ultrasonic_value: "Чтение триггерного пина ультразвукового датчика %1, эхо-пина %2",
+                arduino_ext_toggle_led: "Цифровой пин %1 %2 %3",
+                arduino_ext_digital_pwm: "Установить цифровой вывод %1 на %2 %3",
+                arduino_ext_set_tone: "Включите пищалку на цифровом выводе %1 звуковым сигналом %2 %3 в течение %4 секунд %5",
+                arduino_ext_set_servo: "Установить сервомотор %1 на угол %2 %3.",
+                arduino_ext_get_digital: "Цифровое значение датчика %1",
+                arduino_ext_set_temp_humi_init: "Инициализация датчика температуры и влажности, подключенного к цифровому выводу %1 %2",
+                arduino_ext_get_temp_value: 'Значение температуры датчика температуры',
+                arduino_ext_get_humi_value: 'Значение влажности датчика влажности',
+                arduino_ext_set_stepper: "Установить шаговый пин %1 %2 %3 %4 об/мин как %5 и шаги как %6 %7",
+                arduino_ext_set_irremote_init: "Инициализировать пин ИК-приемника %1 %2",
+                arduino_ext_get_irremote_value: 'Полученное значение ИК-сигнала',
+                arduino_ext_set_lcd_init: 'Инициализировать LCD экран %1',
+                arduino_ext_set_lcd_print: 'Написать %3 в стороке %1 в столбце %2 LCD %4',
+                arduino_ext_set_lcd_clear: 'Очистить LCD экран %1',
+                arduino_ext_input_title: 'Базовый Ввод',
+                arduino_ext_output_title: 'Базовый Выход',
+                arduino_ext_extra_sensor_title: 'Дополнительные датчики',
+                arduino_ext_irremote_title: 'ИК-пульт',
+                arduino_ext_lcd_title: 'ЖК-дисплей',
+                arduino_ext_motor_title: 'Мотор',
             },
-          },
+        },
     };
 };
 
 Entry.ArduinoExt.blockMenuBlocks = [
+    // Input
+    'arduino_ext_input_title',
     'arduino_ext_get_analog_value',
     'arduino_ext_get_analog_value_map',
-    'arduino_ext_get_ultrasonic_value',
     'arduino_ext_get_digital',
+
+    // Output
+    'arduino_ext_output_title',
+    'arduino_ext_toggle_led',
+    'arduino_ext_digital_pwm',
+    'arduino_ext_set_tone',
+
+    // Extra Sensor
+    'arduino_ext_extra_sensor_title',
+    'arduino_ext_get_ultrasonic_value',
     'arduino_ext_set_temp_humi_init',
     'arduino_ext_get_temp_value',
     'arduino_ext_get_humi_value',
-    'arduino_ext_toggle_led',
-    'arduino_ext_digital_pwm',
-    'arduino_ext_set_servo',
-    'arduino_ext_set_tone',
-    'arduino_ext_set_stepper',
+
+    // IR Remote
+    'arduino_ext_irremote_title',
     'arduino_ext_set_irremote_init',
     'arduino_ext_get_irremote_value',
+
+    // LCD
+    'arduino_ext_lcd_title',
+    'arduino_ext_set_lcd_init',
+    'arduino_ext_set_lcd_print',
+    'arduino_ext_set_lcd_clear',
+
+    // Motor
+    'arduino_ext_motor_title',
+    'arduino_ext_set_servo',
+    'arduino_ext_set_stepper',
 ];
 
 //region arduinoExt 아두이노 확장모드
-Entry.ArduinoExt.getBlocks = function() {
+Entry.ArduinoExt.getBlocks = function () {
     return {
+        arduino_ext_input_title: {
+            color: EntryStatic.colorSet.common.TRANSPARENT,
+            fontColor: '#191970',
+            skeleton: 'basic_text',
+            skeletonOptions: {
+                contentPos: { x: 5 },
+            },
+            params: [
+                {
+                    type: 'Text',
+                    text: Lang.template.arduino_ext_input_title,
+                    color: '#191970',
+                    align: 'left',
+                },
+            ],
+            def: { type: 'arduino_ext_input_title' },
+            class: 'ArduinoExtSensor',
+            isNotFor: ['ArduinoExt'],
+            events: {},
+        },
+        arduino_ext_extra_sensor_title: {
+            color: EntryStatic.colorSet.common.TRANSPARENT,
+            fontColor: '#191970',
+            skeleton: 'basic_text',
+            skeletonOptions: {
+                contentPos: { x: 5 },
+            },
+            params: [
+                {
+                    type: 'Text',
+                    text: Lang.template.arduino_ext_extra_sensor_title,
+                    color: '#191970',
+                    align: 'left',
+                },
+            ],
+            def: { type: 'arduino_ext_extra_sensor_title' },
+            class: 'ArduinoExtSensor',
+            isNotFor: ['ArduinoExt'],
+            events: {},
+        },
+        arduino_ext_irremote_title: {
+            color: EntryStatic.colorSet.common.TRANSPARENT,
+            fontColor: '#191970',
+            skeleton: 'basic_text',
+            skeletonOptions: {
+                contentPos: { x: 5 },
+            },
+            params: [
+                {
+                    type: 'Text',
+                    text: Lang.template.arduino_ext_irremote_title,
+                    color: '#191970',
+                    align: 'left',
+                },
+            ],
+            def: { type: 'arduino_ext_irremote_title' },
+            class: 'ArduinoExtSensor',
+            isNotFor: ['ArduinoExt'],
+            events: {},
+        },
+        arduino_ext_output_title: {
+            color: EntryStatic.colorSet.common.TRANSPARENT,
+            fontColor: '#191970',
+            skeleton: 'basic_text',
+            skeletonOptions: {
+                contentPos: { x: 5 },
+            },
+            params: [
+                {
+                    type: 'Text',
+                    text: Lang.template.arduino_ext_output_title,
+                    color: '#191970',
+                    align: 'left',
+                },
+            ],
+            def: { type: 'arduino_ext_output_title' },
+            class: 'ArduinoExtOutput',
+            isNotFor: ['ArduinoExt'],
+            events: {},
+        },
+        arduino_ext_lcd_title: {
+            color: EntryStatic.colorSet.common.TRANSPARENT,
+            fontColor: '#191970',
+            skeleton: 'basic_text',
+            skeletonOptions: {
+                contentPos: { x: 5 },
+            },
+            params: [
+                {
+                    type: 'Text',
+                    text: Lang.template.arduino_ext_lcd_title,
+                    color: '#191970',
+                    align: 'left',
+                },
+            ],
+            def: { type: 'arduino_ext_lcd_title' },
+            class: 'ArduinoExtOutput',
+            isNotFor: ['ArduinoExt'],
+            events: {},
+        },
+        arduino_ext_motor_title: {
+            color: EntryStatic.colorSet.common.TRANSPARENT,
+            fontColor: '#191970',
+            skeleton: 'basic_text',
+            skeletonOptions: {
+                contentPos: { x: 5 },
+            },
+            params: [
+                {
+                    type: 'Text',
+                    text: Lang.template.arduino_ext_motor_title,
+                    color: '#191970',
+                    align: 'left',
+                },
+            ],
+            def: { type: 'arduino_ext_motor_title' },
+            class: 'ArduinoExtMotor',
+            isNotFor: ['ArduinoExt'],
+            events: {},
+        },
         arduino_ext_analog_list: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
             outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
@@ -404,7 +585,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [{syntax: 'analogRead(%1)'}]
+                ar: [{ syntax: 'analogRead(%1)' }]
             },
         },
         arduino_ext_get_analog_value_map: {
@@ -551,85 +732,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [{syntax: 'map(%1, %2, %3, %4, %5)'}]
-            },
-        },
-        arduino_ext_get_ultrasonic_value: {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            fontColor: '#fff',
-            skeleton: 'basic_string_field',
-            statements: [],
-            params: [
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-            ],
-            events: {},
-            def: {
-                params: [
-                    {
-                        type: 'arduino_get_port_number',
-                        params: ['2'],
-                    },
-                    {
-                        type: 'arduino_get_port_number',
-                        params: ['4'],
-                    },
-                ],
-                type: 'arduino_ext_get_ultrasonic_value',
-            },
-            paramsKeyMap: {
-                PORT1: 0,
-                PORT2: 1,
-            },
-            class: 'ArduinoExtGet',
-            isNotFor: ['ArduinoExt'],
-            func(sprite, script) {
-                const port1 = script.getNumberValue('PORT1', script);
-                const port2 = script.getNumberValue('PORT2', script);
-
-                if (!Entry.hw.sendQueue.SET) {
-                    Entry.hw.sendQueue.SET = {};
-                }
-                delete Entry.hw.sendQueue.SET[port1];
-                delete Entry.hw.sendQueue.SET[port2];
-
-                if (!Entry.hw.sendQueue.GET) {
-                    Entry.hw.sendQueue.GET = {};
-                }
-                Entry.hw.sendQueue.GET[Entry.ArduinoExt.sensorTypes.ULTRASONIC] = {
-                    port: [port1, port2],
-                    time: new Date().getTime(),
-                };
-                return Entry.hw.portData.ULTRASONIC || 0;
-            },
-            syntax: {
-                js: [],
-                py: [
-                    {
-                        syntax: 'ArduinoExt.ultrasonicRead(%1, %2)',
-                        blockType: 'param',
-                        textParams: [
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                        ],
-                    },
-                ],
-                ar: [{syntax: 'distance()'}]
+                ar: [{ syntax: 'map(%1, %2, %3, %4, %5)' }]
             },
         },
         arduino_ext_get_digital: {
@@ -690,16 +793,108 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [{syntax: 'digitalRead(%1)'}]
+                ar: [{ syntax: 'digitalRead(%1)' }]
             },
         },
-		arduino_ext_set_temp_humi_init: {
+        arduino_ext_toggle_led: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
             outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            fontColor: '#fff',
             skeleton: 'basic',
             statements: [],
             params: [
+                {
+                    type: 'Block',
+                    accept: 'string',
+                    defaultType: 'number',
+                },
+                {
+                    type: 'Block',
+                    accept: 'string',
+                },
+                {
+                    type: 'Indicator',
+                    img: 'block_icon/hardware_icon.svg',
+                    size: 12,
+                },
+            ],
+            events: {},
+            def: {
+                params: [
+                    {
+                        type: 'arduino_get_port_number',
+                        params: [3],
+                    },
+                    {
+                        type: 'arduino_get_digital_toggle',
+                        params: ['on'],
+                    },
+                    null,
+                ],
+                type: 'arduino_ext_toggle_led',
+            },
+            paramsKeyMap: {
+                PORT: 0,
+                VALUE: 1,
+            },
+            class: 'ArduinoExtGet',
+            isNotFor: ['ArduinoExt'],
+            func(sprite, script) {
+                const port = script.getNumberValue('PORT');
+                let value = script.getValue('VALUE');
+
+                if (typeof value === 'string') {
+                    value = value.toLowerCase();
+                }
+                if (Entry.ArduinoExt.highList.indexOf(value) > -1) {
+                    value = 255;
+                } else if (Entry.ArduinoExt.lowList.indexOf(value) > -1) {
+                    value = 0;
+                } else {
+                    throw new Error();
+                }
+                if (!Entry.hw.sendQueue.SET) {
+                    Entry.hw.sendQueue.SET = {};
+                }
+                Entry.hw.sendQueue.SET[port] = {
+                    type: Entry.ArduinoExt.sensorTypes.DIGITAL,
+                    data: value,
+                    time: new Date().getTime(),
+                };
+                // For legacy port writing
+                Entry.hw.sendQueue[port] = value;
+                return script.callReturn();
+            },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'ArduinoExt.digitalWrite(%1, %2)',
+                        textParams: [
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                        ],
+                    },
+                ],
+                ar: [{ syntax: 'digitalWrite(%1, %2);' }]
+            },
+        },
+        arduino_ext_digital_pwm: {
+            color: EntryStatic.colorSet.block.default.HARDWARE,
+            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            skeleton: 'basic',
+            statements: [],
+            params: [
+                {
+                    type: 'Block',
+                    accept: 'string',
+                    defaultType: 'number',
+                },
                 {
                     type: 'Block',
                     accept: 'string',
@@ -715,61 +910,48 @@ Entry.ArduinoExt.getBlocks = function() {
             def: {
                 params: [
                     {
-                        type: 'arduino_get_port_number',
-                        params: [3],
+                        type: 'arduino_get_pwm_port_number',
                     },
+                    {
+                        type: 'text',
+                        params: ['255'],
+                    },
+                    null,
                 ],
-                type: 'arduino_ext_set_temp_humi_init',
+                type: 'arduino_ext_digital_pwm',
             },
             paramsKeyMap: {
                 PORT: 0,
+                VALUE: 1,
             },
-            class: 'dht',
+            class: 'ArduinoExtGet',
             isNotFor: ['ArduinoExt'],
             func(sprite, script) {
-                var sq = Entry.hw.sendQueue;
-                var port = script.getNumberValue('PORT', script);
-
-				if (!script.isStart) 
-                {
-					if (!sq.SET) {
-						sq.SET = {};
-					}
-					
-					var duration = Entry.ArduinoExt.TIME_500ms;
-                    script.isStart = true;
-                    script.timeFlag = 1;
-					
-					sq.SET[port] = {
-							type: Entry.ArduinoExt.sensorTypes.DHTINIT,
-							data: port,
-							time: new Date().getTime(),
-					};
-					setTimeout(function() {
-                        script.timeFlag = 0;
-                    }, duration );
-                    return script;
-				}
-				else if (script.timeFlag == 1)
-                {
-                    return script;
+                const port = script.getNumberValue('PORT');
+                let value = script.getNumberValue('VALUE');
+                value = Math.round(value);
+                value = Math.max(value, 0);
+                value = Math.min(value, 255);
+                if (!Entry.hw.sendQueue.SET) {
+                    Entry.hw.sendQueue.SET = {};
                 }
-                else 
-                {
-                    delete script.timeFlag;
-                    delete script.isStart;
-
-                    Entry.engine.isContinue = false;
-                    return script.callReturn();
-                }
+                Entry.hw.sendQueue.SET[port] = {
+                    type: Entry.ArduinoExt.sensorTypes.PWM,
+                    data: value,
+                    time: new Date().getTime(),
+                };
+                return script.callReturn();
             },
             syntax: {
                 js: [],
                 py: [
                     {
-                        syntax: 'ArduinoExt.dhtTempHumiInit(%1)',
-                        blockType: 'param',
+                        syntax: 'ArduinoExt.analogWrite(%1, %2)',
                         textParams: [
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
                             {
                                 type: 'Block',
                                 accept: 'string',
@@ -777,241 +959,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [{syntax: 'dht.begin();'}]
-            },
-        },
-        arduino_ext_get_temp_value: {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            fontColor: '#fff',
-            skeleton: 'basic_string_field',
-            statements: [],
-            params: [
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-            ],
-            events: {},
-            def: {
-                params: [
-					'0',
-                ],
-                type: 'arduino_ext_get_temp_value',
-            },
-            paramsKeyMap: {
-                TEMP: 0,
-            },
-            class: 'dht',
-            isNotFor: ['ArduinoExt'],
-            func(sprite, script) {
-                const temp = script.getNumberValue('TEMP', script);
-
-                if (!Entry.hw.sendQueue.SET) {
-                    Entry.hw.sendQueue.SET = {};
-                }
-                delete Entry.hw.sendQueue.SET[temp];
-
-                if (!Entry.hw.sendQueue.GET) {
-                    Entry.hw.sendQueue.GET = {};
-                }
-				
-                Entry.hw.sendQueue.GET[Entry.ArduinoExt.sensorTypes.DHTTEMP] = {
-                    port: temp,
-                    time: new Date().getTime(),
-                };
-                return Entry.hw.portData.DHTTEMP || 0;
-            },
-            syntax: {
-                js: [],
-                py: [{syntax: 'ArduinoExt.temperatureRead()'}],
-                ar: [{syntax: 'dht.readTemperature()'}]
-            },
-        },
-		arduino_ext_get_humi_value: {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            fontColor: '#fff',
-            skeleton: 'basic_string_field',
-            statements: [],
-            params: [
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-            ],
-            events: {},
-            def: {
-                params: [
-					'0',
-                ],
-                type: 'arduino_ext_get_humi_value',
-            },
-            paramsKeyMap: {
-                HUMI: 0,
-            },
-            class: 'dht',
-            isNotFor: ['ArduinoExt'],
-            func(sprite, script) {
-                const humi = script.getNumberValue('HUMI', script);
-
-                if (!Entry.hw.sendQueue.SET) {
-                    Entry.hw.sendQueue.SET = {};
-                }
-                delete Entry.hw.sendQueue.SET[humi];
-
-                if (!Entry.hw.sendQueue.GET) {
-                    Entry.hw.sendQueue.GET = {};
-                }
-				
-                Entry.hw.sendQueue.GET[Entry.ArduinoExt.sensorTypes.DHTHUMI] = {
-                    port: humi,
-                    time: new Date().getTime(),
-                };
-                return Entry.hw.portData.DHTHUMI || 0;
-            },
-            syntax: {
-                js: [],
-                py: [{syntax: 'ArduinoExt.humidityRead()'}],
-                ar: [{syntax: 'dht.readHumidity()'}]
-            },
-        },
-        arduino_ext_set_irremote_init: {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            fontColor: '#fff',
-            skeleton: 'basic',
-            statements: [],
-            params: [
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-                {
-                    type: 'Indicator',
-                    img: 'block_icon/hardware_icon.svg',
-                    size: 12,
-                },
-            ],
-            events: {},
-            def: {
-                params: [
-                    {
-                        type: 'arduino_get_port_number',
-                        params: [3],
-                    },
-                ],
-                type: 'arduino_ext_set_irremote_init',
-            },
-            paramsKeyMap: {
-                PORT: 0,
-            },
-            class: 'irremote',
-            isNotFor: ['ArduinoExt'],
-            func(sprite, script) {
-                var sq = Entry.hw.sendQueue;
-                var port = script.getNumberValue('PORT', script);
-
-				if (!script.isStart) 
-                {
-					if (!sq.SET) {
-						sq.SET = {};
-					}
-					
-					var duration = Entry.ArduinoExt.TIME_500ms;
-                    script.isStart = true;
-                    script.timeFlag = 1;
-					
-					sq.SET[port] = {
-							type: Entry.ArduinoExt.sensorTypes.IRRINIT,
-							data: port,
-							time: new Date().getTime(),
-					};
-					setTimeout(function() {
-                        script.timeFlag = 0;
-                    }, duration );
-                    return script;
-				}
-				else if (script.timeFlag == 1)
-                {
-                    return script;
-                }
-                else 
-                {
-                    delete script.timeFlag;
-                    delete script.isStart;
-
-                    Entry.engine.isContinue = false;
-                    return script.callReturn();
-                }
-            },
-            syntax: {
-                js: [],
-                py: [
-                    {
-                        syntax: 'ArduinoExt.irRemoteInit(%1)',
-                        blockType: 'param',
-                        textParams: [
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                        ],
-                    },
-                ],
-                ar: [{syntax: 'irrecv.enableIRIn();'}]
-            },
-        },
-        arduino_ext_get_irremote_value: {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            fontColor: '#fff',
-            skeleton: 'basic_string_field',
-            statements: [],
-            params: [
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-            ],
-            events: {},
-            def: {
-                params: [
-					'0',
-                ],
-                type: 'arduino_ext_get_irremote_value',
-            },
-            paramsKeyMap: {
-                RECV: 0,
-            },
-            class: 'irremote',
-            isNotFor: ['ArduinoExt'],
-            func(sprite, script) {
-                const recv = script.getNumberValue('RECV', script);
-
-                if (!Entry.hw.sendQueue.SET) {
-                    Entry.hw.sendQueue.SET = {};
-                }
-                delete Entry.hw.sendQueue.SET[recv];
-
-                if (!Entry.hw.sendQueue.GET) {
-                    Entry.hw.sendQueue.GET = {};
-                }
-				
-                Entry.hw.sendQueue.GET[Entry.ArduinoExt.sensorTypes.IRREMOTE] = {
-                    port: recv,
-                    time: new Date().getTime(),
-                };
-                return Entry.hw.portData.IRREMOTE || 0;
-            },
-            syntax: {
-                js: [],
-                py: [{syntax: 'ArduinoExt.irRecvRead()'}],
-                ar: [{syntax: 'translateIR()'}]
+                ar: [{ syntax: 'analogWrite(%1, %2);' }]
             },
         },
         arduino_get_digital_toggle: {
@@ -1064,10 +1012,11 @@ Entry.ArduinoExt.getBlocks = function() {
                 ],
             },
         },
-        arduino_ext_toggle_led: {
+        arduino_ext_get_ultrasonic_value: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
             outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            skeleton: 'basic',
+            fontColor: '#fff',
+            skeleton: 'basic_string_field',
             statements: [],
             params: [
                 {
@@ -1078,11 +1027,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 {
                     type: 'Block',
                     accept: 'string',
-                },
-                {
-                    type: 'Indicator',
-                    img: 'block_icon/hardware_icon.svg',
-                    size: 12,
+                    defaultType: 'number',
                 },
             ],
             events: {},
@@ -1090,53 +1035,46 @@ Entry.ArduinoExt.getBlocks = function() {
                 params: [
                     {
                         type: 'arduino_get_port_number',
-                        params: [3],
+                        params: ['2'],
                     },
                     {
-                        type: 'arduino_get_digital_toggle',
-                        params: ['on'],
+                        type: 'arduino_get_port_number',
+                        params: ['4'],
                     },
-                    null,
                 ],
-                type: 'arduino_ext_toggle_led',
+                type: 'arduino_ext_get_ultrasonic_value',
             },
             paramsKeyMap: {
-                PORT: 0,
-                VALUE: 1,
+                PORT1: 0,
+                PORT2: 1,
             },
-            class: 'ArduinoExt',
+            class: 'ultra_tone',
             isNotFor: ['ArduinoExt'],
             func(sprite, script) {
-                const port = script.getNumberValue('PORT');
-                let value = script.getValue('VALUE');
+                const port1 = script.getNumberValue('PORT1', script);
+                const port2 = script.getNumberValue('PORT2', script);
 
-                if (typeof value === 'string') {
-                    value = value.toLowerCase();
-                }
-                if (Entry.ArduinoExt.highList.indexOf(value) > -1) {
-                    value = 255;
-                } else if (Entry.ArduinoExt.lowList.indexOf(value) > -1) {
-                    value = 0;
-                } else {
-                    throw new Error();
-                }
                 if (!Entry.hw.sendQueue.SET) {
                     Entry.hw.sendQueue.SET = {};
                 }
-                Entry.hw.sendQueue.SET[port] = {
-                    type: Entry.ArduinoExt.sensorTypes.DIGITAL,
-                    data: value,
+                delete Entry.hw.sendQueue.SET[port1];
+                delete Entry.hw.sendQueue.SET[port2];
+
+                if (!Entry.hw.sendQueue.GET) {
+                    Entry.hw.sendQueue.GET = {};
+                }
+                Entry.hw.sendQueue.GET[Entry.ArduinoExt.sensorTypes.ULTRASONIC] = {
+                    port: [port1, port2],
                     time: new Date().getTime(),
                 };
-                // For legacy port writing
-                Entry.hw.sendQueue[port] = value;
-                return script.callReturn();
+                return Entry.hw.portData.ULTRASONIC || 0;
             },
             syntax: {
                 js: [],
                 py: [
                     {
-                        syntax: 'ArduinoExt.digitalWrite(%1, %2)',
+                        syntax: 'ArduinoExt.ultrasonicRead(%1, %2)',
+                        blockType: 'param',
                         textParams: [
                             {
                                 type: 'Block',
@@ -1149,85 +1087,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [{syntax: 'digitalWrite(%1, %2);'}]
-            },
-        },
-        arduino_ext_digital_pwm: {
-            color: EntryStatic.colorSet.block.default.HARDWARE,
-            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
-            skeleton: 'basic',
-            statements: [],
-            params: [
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-                {
-                    type: 'Block',
-                    accept: 'string',
-                    defaultType: 'number',
-                },
-                {
-                    type: 'Indicator',
-                    img: 'block_icon/hardware_icon.svg',
-                    size: 12,
-                },
-            ],
-            events: {},
-            def: {
-                params: [
-                    {
-                        type: 'arduino_get_pwm_port_number',
-                    },
-                    {
-                        type: 'text',
-                        params: ['255'],
-                    },
-                    null,
-                ],
-                type: 'arduino_ext_digital_pwm',
-            },
-            paramsKeyMap: {
-                PORT: 0,
-                VALUE: 1,
-            },
-            class: 'ArduinoExt',
-            isNotFor: ['ArduinoExt'],
-            func(sprite, script) {
-                const port = script.getNumberValue('PORT');
-                let value = script.getNumberValue('VALUE');
-                value = Math.round(value);
-                value = Math.max(value, 0);
-                value = Math.min(value, 255);
-                if (!Entry.hw.sendQueue.SET) {
-                    Entry.hw.sendQueue.SET = {};
-                }
-                Entry.hw.sendQueue.SET[port] = {
-                    type: Entry.ArduinoExt.sensorTypes.PWM,
-                    data: value,
-                    time: new Date().getTime(),
-                };
-                return script.callReturn();
-            },
-            syntax: {
-                js: [],
-                py: [
-                    {
-                        syntax: 'ArduinoExt.analogWrite(%1, %2)',
-                        textParams: [
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                            {
-                                type: 'Block',
-                                accept: 'string',
-                            },
-                        ],
-                    },
-                ],
-                ar: [{syntax: 'analogWrite(%1, %2);'}]
+                ar: [{ syntax: 'distance()' }]
             },
         },
         arduino_ext_tone_list: {
@@ -1443,7 +1303,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 OCTAVE: 2,
                 DURATION: 3,
             },
-            class: 'ArduinoExt',
+            class: 'ultra_tone',
             isNotFor: ['ArduinoExt'],
             func(sprite, script) {
                 const sq = Entry.hw.sendQueue;
@@ -1549,7 +1409,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [{syntax: 'tone(%1, %2, %3);'}]
+                ar: [{ syntax: 'tone(%1, %2, %3);' }]
             },
         },
         arduino_ext_set_servo: {
@@ -1589,7 +1449,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 PORT: 0,
                 VALUE: 1,
             },
-            class: 'ArduinoExt',
+            class: 'motor',
             isNotFor: ['ArduinoExt'],
             func(sprite, script) {
                 const sq = Entry.hw.sendQueue;
@@ -1626,7 +1486,7 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [{syntax: 'myServo.write(%1);'}]
+                ar: [{ syntax: 'myServo.write(%1);' }]
             },
         },
         arduino_ext_set_stepper: {
@@ -1710,7 +1570,7 @@ Entry.ArduinoExt.getBlocks = function() {
                 SPEED: 4,
                 STEPS: 5,
             },
-            class: 'ArduinoExt',
+            class: 'motor',
             isNotFor: ['ArduinoExt'],
             func(sprite, script) {
                 const sq = Entry.hw.sendQueue;
@@ -1778,9 +1638,678 @@ Entry.ArduinoExt.getBlocks = function() {
                         ],
                     },
                 ],
-                ar: [{syntax: 'myStepper.step(%1);'}]
+                ar: [{ syntax: 'myStepper.step(%1);' }]
             },
-        }
+        },
+        arduino_ext_set_temp_humi_init: {
+            color: EntryStatic.colorSet.block.default.HARDWARE,
+            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            fontColor: '#fff',
+            skeleton: 'basic',
+            statements: [],
+            params: [
+                {
+                    type: 'Block',
+                    accept: 'string',
+                    defaultType: 'number',
+                },
+                {
+                    type: 'Indicator',
+                    img: 'block_icon/hardware_icon.svg',
+                    size: 12,
+                },
+            ],
+            events: {},
+            def: {
+                params: [
+                    {
+                        type: 'arduino_get_port_number',
+                        params: [3],
+                    },
+                ],
+                type: 'arduino_ext_set_temp_humi_init',
+            },
+            paramsKeyMap: {
+                PORT: 0,
+            },
+            class: 'dht',
+            isNotFor: ['ArduinoExt'],
+            func(sprite, script) {
+                var sq = Entry.hw.sendQueue;
+                var port = script.getNumberValue('PORT', script);
+
+                if (!script.isStart) {
+                    if (!sq.SET) {
+                        sq.SET = {};
+                    }
+
+                    var duration = Entry.ArduinoExt.TIME_500ms;
+                    script.isStart = true;
+                    script.timeFlag = 1;
+
+                    sq.SET[port] = {
+                        type: Entry.ArduinoExt.sensorTypes.DHTINIT,
+                        data: port,
+                        time: new Date().getTime(),
+                    };
+                    setTimeout(function () {
+                        script.timeFlag = 0;
+                    }, duration);
+                    return script;
+                }
+                else if (script.timeFlag == 1) {
+                    return script;
+                }
+                else {
+                    delete script.timeFlag;
+                    delete script.isStart;
+
+                    Entry.engine.isContinue = false;
+                    return script.callReturn();
+                }
+            },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'ArduinoExt.dhtTempHumiInit(%1)',
+                        blockType: 'param',
+                        textParams: [
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                        ],
+                    },
+                ],
+                ar: [{ syntax: 'dht.begin();' }]
+            },
+        },
+        arduino_ext_get_temp_value: {
+            color: EntryStatic.colorSet.block.default.HARDWARE,
+            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            fontColor: '#fff',
+            skeleton: 'basic_string_field',
+            statements: [],
+            params: [
+                {
+                    type: 'Block',
+                    accept: 'string',
+                    defaultType: 'number',
+                },
+            ],
+            events: {},
+            def: {
+                params: [
+                    '0',
+                ],
+                type: 'arduino_ext_get_temp_value',
+            },
+            paramsKeyMap: {
+                TEMP: 0,
+            },
+            class: 'dht',
+            isNotFor: ['ArduinoExt'],
+            func(sprite, script) {
+                const temp = script.getNumberValue('TEMP', script);
+
+                if (!Entry.hw.sendQueue.SET) {
+                    Entry.hw.sendQueue.SET = {};
+                }
+                delete Entry.hw.sendQueue.SET[temp];
+
+                if (!Entry.hw.sendQueue.GET) {
+                    Entry.hw.sendQueue.GET = {};
+                }
+
+                Entry.hw.sendQueue.GET[Entry.ArduinoExt.sensorTypes.DHTTEMP] = {
+                    port: temp,
+                    time: new Date().getTime(),
+                };
+                return Entry.hw.portData.DHTTEMP || 0;
+            },
+            syntax: {
+                js: [],
+                py: [{ syntax: 'ArduinoExt.temperatureRead()' }],
+                ar: [{ syntax: 'dht.readTemperature()' }]
+            },
+        },
+        arduino_ext_get_humi_value: {
+            color: EntryStatic.colorSet.block.default.HARDWARE,
+            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            fontColor: '#fff',
+            skeleton: 'basic_string_field',
+            statements: [],
+            params: [
+                {
+                    type: 'Block',
+                    accept: 'string',
+                    defaultType: 'number',
+                },
+            ],
+            events: {},
+            def: {
+                params: [
+                    '0',
+                ],
+                type: 'arduino_ext_get_humi_value',
+            },
+            paramsKeyMap: {
+                HUMI: 0,
+            },
+            class: 'dht',
+            isNotFor: ['ArduinoExt'],
+            func(sprite, script) {
+                const humi = script.getNumberValue('HUMI', script);
+
+                if (!Entry.hw.sendQueue.SET) {
+                    Entry.hw.sendQueue.SET = {};
+                }
+                delete Entry.hw.sendQueue.SET[humi];
+
+                if (!Entry.hw.sendQueue.GET) {
+                    Entry.hw.sendQueue.GET = {};
+                }
+
+                Entry.hw.sendQueue.GET[Entry.ArduinoExt.sensorTypes.DHTHUMI] = {
+                    port: humi,
+                    time: new Date().getTime(),
+                };
+                return Entry.hw.portData.DHTHUMI || 0;
+            },
+            syntax: {
+                js: [],
+                py: [{ syntax: 'ArduinoExt.humidityRead()' }],
+                ar: [{ syntax: 'dht.readHumidity()' }]
+            },
+        },
+        arduino_ext_set_irremote_init: {
+            color: EntryStatic.colorSet.block.default.HARDWARE,
+            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            fontColor: '#fff',
+            skeleton: 'basic',
+            statements: [],
+            params: [
+                {
+                    type: 'Block',
+                    accept: 'string',
+                    defaultType: 'number',
+                },
+                {
+                    type: 'Indicator',
+                    img: 'block_icon/hardware_icon.svg',
+                    size: 12,
+                },
+            ],
+            events: {},
+            def: {
+                params: [
+                    {
+                        type: 'arduino_get_port_number',
+                        params: [3],
+                    },
+                ],
+                type: 'arduino_ext_set_irremote_init',
+            },
+            paramsKeyMap: {
+                PORT: 0,
+            },
+            class: 'irremote',
+            isNotFor: ['ArduinoExt'],
+            func(sprite, script) {
+                var sq = Entry.hw.sendQueue;
+                var port = script.getNumberValue('PORT', script);
+
+                if (!script.isStart) {
+                    if (!sq.SET) {
+                        sq.SET = {};
+                    }
+
+                    var duration = Entry.ArduinoExt.TIME_500ms;
+                    script.isStart = true;
+                    script.timeFlag = 1;
+
+                    sq.SET[port] = {
+                        type: Entry.ArduinoExt.sensorTypes.IRRINIT,
+                        data: port,
+                        time: new Date().getTime(),
+                    };
+                    setTimeout(function () {
+                        script.timeFlag = 0;
+                    }, duration);
+                    return script;
+                }
+                else if (script.timeFlag == 1) {
+                    return script;
+                }
+                else {
+                    delete script.timeFlag;
+                    delete script.isStart;
+
+                    Entry.engine.isContinue = false;
+                    return script.callReturn();
+                }
+            },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'ArduinoExt.irRemoteInit(%1)',
+                        blockType: 'param',
+                        textParams: [
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                        ],
+                    },
+                ],
+                ar: [{ syntax: 'irrecv.enableIRIn();' }]
+            },
+        },
+        arduino_ext_get_irremote_value: {
+            color: EntryStatic.colorSet.block.default.HARDWARE,
+            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            fontColor: '#fff',
+            skeleton: 'basic_string_field',
+            statements: [],
+            params: [
+                {
+                    type: 'Block',
+                    accept: 'string',
+                    defaultType: 'number',
+                },
+            ],
+            events: {},
+            def: {
+                params: [
+                    '0',
+                ],
+                type: 'arduino_ext_get_irremote_value',
+            },
+            paramsKeyMap: {
+                RECV: 0,
+            },
+            class: 'irremote',
+            isNotFor: ['ArduinoExt'],
+            func(sprite, script) {
+                const recv = script.getNumberValue('RECV', script);
+
+                if (!Entry.hw.sendQueue.SET) {
+                    Entry.hw.sendQueue.SET = {};
+                }
+                delete Entry.hw.sendQueue.SET[recv];
+
+                if (!Entry.hw.sendQueue.GET) {
+                    Entry.hw.sendQueue.GET = {};
+                }
+
+                Entry.hw.sendQueue.GET[Entry.ArduinoExt.sensorTypes.IRREMOTE] = {
+                    port: recv,
+                    time: new Date().getTime(),
+                };
+                return Entry.hw.portData.IRREMOTE || 0;
+            },
+            syntax: {
+                js: [],
+                py: [{ syntax: 'ArduinoExt.irRecvRead()' }],
+                ar: [{ syntax: 'translateIR()' }]
+            },
+        },
+        arduino_ext_lcd_column_list: {
+            color: EntryStatic.colorSet.block.default.HARDWARE,
+            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            skeleton: 'basic_string_field',
+            statements: [],
+            template: '%1',
+            params: [
+                {
+                    type: 'Dropdown',
+                    options: [
+                        ['1', '0'],
+                        ['2', '1'],
+                        ['3', '2'],
+                        ['4', '3'],
+                        ['5', '4'],
+                        ['6', '5'],
+                        ['7', '6'],
+                        ['8', '7'],
+                        ['9', '8'],
+                        ['10', '9'],
+                        ['11', '10'],
+                        ['12', '11'],
+                        ['13', '12'],
+                        ['14', '13'],
+                        ['15', '14'],
+                        ['16', '15'],
+                    ],
+                    value: '0',
+                    fontSize: 11,
+                    bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                    arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                },
+            ],
+            events: {},
+            def: {
+                params: [null],
+            },
+            paramsKeyMap: {
+                COLUMN: 0,
+            },
+            func: function (sprite, script) {
+                return script.getStringField('COLUMN');
+            },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: '%1',
+                        textParams: [
+                            {
+                                type: 'Dropdown',
+                                options: [
+                                    ['1', '0'],
+                                    ['2', '1'],
+                                    ['3', '2'],
+                                    ['4', '3'],
+                                    ['5', '4'],
+                                    ['6', '5'],
+                                    ['7', '6'],
+                                    ['8', '7'],
+                                    ['9', '8'],
+                                    ['10', '9'],
+                                    ['11', '10'],
+                                    ['12', '11'],
+                                    ['13', '12'],
+                                    ['14', '13'],
+                                    ['15', '14'],
+                                    ['16', '15'],
+                                ],
+                                value: '3',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter:
+                                    Entry.block.converters
+                                        .returnStringOrNumberByValue,
+                            },
+                        ],
+                    },
+                ],
+            },
+        },
+        arduino_ext_lcd_row_list: {
+            color: EntryStatic.colorSet.block.default.HARDWARE,
+            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            skeleton: 'basic_string_field',
+            statements: [],
+            template: '%1',
+            params: [
+                {
+                    type: 'Dropdown',
+                    options: [['1', '0'], ['2', '1']],
+                    value: '0',
+                    fontSize: 11,
+                    bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                    arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                },
+            ],
+            events: {},
+            def: {
+                params: [null],
+            },
+            paramsKeyMap: {
+                ROW: 0,
+            },
+            func: function (sprite, script) {
+                return script.getStringField('ROW');
+            },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: '%1',
+                        textParams: [
+                            {
+                                type: 'Dropdown',
+                                options: [['1', '0'], ['2', '1']],
+                                value: '3',
+                                fontSize: 11,
+                                bgColor: EntryStatic.colorSet.block.darken.HARDWARE,
+                                arrowColor: EntryStatic.colorSet.arrow.default.HARDWARE,
+                                converter:
+                                    Entry.block.converters
+                                        .returnStringOrNumberByValue,
+                            },
+                        ],
+                    },
+                ],
+            },
+        },
+        arduino_ext_set_lcd_init:
+        {
+            color: EntryStatic.colorSet.block.default.HARDWARE,
+            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            fontColor: '#fff',
+            skeleton: 'basic',
+            statements: [],
+            params: [
+                {
+                    type: 'Indicator',
+                    img: 'block_icon/hardware_icon.svg',
+                    size: 12,
+                },
+            ],
+            events: {},
+            def: {
+                params: [
+                    null
+                ],
+                type: 'arduino_ext_set_lcd_init',
+            },
+            paramsKeyMap: {},
+            class: 'lcd',
+            isNotFor: ['ArduinoExt'],
+            func: function (sprite, script) {
+                // 아래코드에서 보조 변수들(script.isStart, script.timeFlag등)이 들어간 이유는 fps(초당프레임)를 위해서입니다.
+                // 해당 코드가 없을 경우 최소 딜레이가 없기때문에 흐리게 나오는 문제가 발생합니다.
+                var sq = Entry.hw.sendQueue;
+                if (!script.isStart) {
+                    if (!sq['SET']) {
+                        sq['SET'] = {};
+                    }
+
+                    script.isStart = true;
+                    script.timeFlag = 1;
+                    var fps = Entry.FPS || 60;
+                    var timeValue = 60 / fps * Entry.ArduinoExt.TIME_1000ms;
+
+                    sq['SET'][15] = {
+                        type: Entry.ArduinoExt.sensorTypes.LCD_INIT,
+                        data: 255,
+                        time: new Date().getTime(),
+                    };
+
+                    setTimeout(function () {
+                        script.timeFlag = 0;
+                    }, timeValue);
+                    return script;
+                } else if (script.timeFlag == 1) {
+                    return script;
+                } else {
+                    delete script.timeFlag;
+                    delete script.isStart;
+                    Entry.engine.isContinue = false;
+                    return script.callReturn();
+                }
+            },
+            syntax: {
+                js: [],
+                py: [{ syntax: 'ArduinoExt.lcdInit()' }],
+                ar: [{ syntax: 'lcdObj->init();' }]
+            },
+        },
+        arduino_ext_set_lcd_print:
+        {
+            color: EntryStatic.colorSet.block.default.HARDWARE,
+            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            fontColor: '#fff',
+            skeleton: 'basic',
+            statements: [],
+            params: [
+                {
+                    type: 'Block',
+                    accept: 'string',
+                },
+                {
+                    type: 'Block',
+                    accept: 'string',
+                },
+                {
+                    type: 'Block',
+                    accept: 'string',
+                },
+                {
+                    type: 'Indicator',
+                    img: 'block_icon/hardware_icon.svg',
+                    size: 12,
+                },
+            ],
+            events: {},
+            def: {
+                params: [
+                    {
+                        type: 'arduino_ext_lcd_row_list',
+                    },
+                    {
+                        type: 'arduino_ext_lcd_column_list',
+                    },
+                    {
+                        type: 'text',
+                        params: ['Hello, Entry'],
+                    },
+                    null,
+                ],
+                type: 'arduino_ext_set_lcd_print',
+            },
+            paramsKeyMap: {
+                ROW: 0,
+                COLUMN: 1,
+                TEXT: 2,
+            },
+            class: 'lcd',
+            isNotFor: ['ArduinoExt'],
+            func: function (sprite, script) {
+                var sq = Entry.hw.sendQueue;
+                var row = script.getNumberValue('ROW');
+                var column = script.getNumberValue('COLUMN');
+                if (column < 0) column = 0;
+                if (column > 15) column = 15;
+                if (row < 0) row = 0;
+                if (row > 1) row = 1;
+                var text = script.getValue('TEXT');
+
+                // 아래코드에서 보조 변수들(script.isStart, script.timeFlag등)이 들어간 이유는 fps(초당프레임)를 위해서입니다.
+                // 해당 코드가 없을 경우 최소 딜레이가 없기때문에 흐리게 나오는 문제가 발생합니다.
+                if (!script.isStart) {
+                    if (!sq['SET']) {
+                        sq['SET'] = {};
+                    }
+
+                    script.isStart = true;
+                    script.timeFlag = 1;
+                    var fps = Entry.FPS || 60;
+                    var timeValue = 60 / fps * Entry.ArduinoExt.TIME_50ms;
+
+                    sq['SET'][15] = {
+                        type: Entry.ArduinoExt.sensorTypes.LCD_PRINT,
+                        data: {
+                            row,
+                            column,
+                            text,
+                        },
+                        time: new Date().getTime(),
+                    };
+
+                    setTimeout(function () {
+                        script.timeFlag = 0;
+                    }, timeValue);
+                    return script;
+                } else if (script.timeFlag == 1) {
+                    return script;
+                } else {
+                    delete script.timeFlag;
+                    delete script.isStart;
+                    Entry.engine.isContinue = false;
+                    return script.callReturn();
+                }
+            },
+            syntax: {
+                js: [],
+                py: [
+                    {
+                        syntax: 'ArduinoExt.lcdPrint(%1, %2, %3)',
+                        blockType: 'param',
+                        textParams: [
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                        ],
+                    }
+                ],
+                ar: [{ syntax: 'lcdObj->setCursor(%1, %2);' }]
+            },
+        },
+        arduino_ext_set_lcd_clear:
+        {
+            color: EntryStatic.colorSet.block.default.HARDWARE,
+            outerLine: EntryStatic.colorSet.block.darken.HARDWARE,
+            fontColor: '#fff',
+            skeleton: 'basic',
+            statements: [],
+            params: [
+                {
+                    type: 'Indicator',
+                    img: 'block_icon/hardware_icon.svg',
+                    size: 12,
+                },
+            ],
+            events: {},
+            def: {
+                params: [
+                    null
+                ],
+                type: 'arduino_ext_set_lcd_clear',
+            },
+            paramsKeyMap: {},
+            class: 'lcd',
+            isNotFor: ['ArduinoExt'],
+            func: function (sprite, script) {
+                if (!Entry.hw.sendQueue.SET) {
+                    Entry.hw.sendQueue.SET = {};
+                }
+                Entry.hw.sendQueue.SET[15] = {
+                    type: Entry.ArduinoExt.sensorTypes.LCD_CLEAR,
+                    data: 255,
+                    time: new Date().getTime(),
+                };
+                return script.callReturn();
+            },
+            syntax: {
+                js: [],
+                py: [{ syntax: 'ArduinoExt.lcdClear()' }],
+                ar: [{ syntax: 'lcdObj->clear();' }]
+            },
+        },
     };
 };
 //endregion arduinoExt 아두이노 확장모드

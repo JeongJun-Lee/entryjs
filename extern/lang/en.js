@@ -1038,6 +1038,7 @@ Lang.Blocks = {
     korean: 'Korean',
     english: 'English',
     japan: 'Japanese',
+    uzbek_s: 'Uzbek',
     korean_s: 'korean',
     english_s: 'english',
     japan_s: 'japanese',
@@ -4926,7 +4927,8 @@ Lang.Msgs = {
     expansion_behaviorConductLifeSafety_description:
         'It is a collection of blocks about basic behavior-guidelines that the public should follow for safty in life. (Provided by MPSS)',
     ai_utilize_tts_description:
-        'It is a collection of blocks that can read text in a variety of voice using the Clova.',
+        "Collection of blocks for reading sentences in various voices by using 'Clova' voice synthesis technology. ",
+    uzbek_tts_fallback: 'The server is not responding, using local voice instead.',
     hardware_need_update_title: 'Entry HW update',
     hardware_need_update_content:
         "Please update to the latest version,\nif you are using below version.\nEntry website only supported v1.9.51 or later.\nPlease remove the web browser cache,\nif any block doesn't appear after updating.",
@@ -5684,7 +5686,7 @@ Lang.Helper = {
     calc_operation:
         'Reports calculated values of a variety of equations relating to input numbers.',
     get_date:
-        'Reports the values regarding the current year, month, day, day of the week and time.',
+        'Reports the values regarding the current year, month, day, day of the week and time.\n- Year: Returns the current year.\n- Month: Returns the current month.\n- Day: Returns the current day.\n- Day of the week: Returns the current day of the week as a number.\nReturns Sunday, Monday, Tuesdays, Wednesdays, Thursdays, Fridays, Saturdays as 0, 1, 2, 3, 4, 5, 6 in turn.\n- Time: Returns the current time in hours, minutes, and seconds, respectively.',
     distance_something: 'Reports the distance between the object and the selected object.',
     get_sound_duration: 'Reports the time length of the selected sound.',
     get_user_name: 'Reports the username who runs the project.',
