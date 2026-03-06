@@ -141,6 +141,7 @@ Entry.AI_UTILIZE_BLOCK.tts.getBlocks = function () {
 
             const isKorean = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(message);
             const isUzbekEnv = typeof Lang !== 'undefined' && Lang.type === 'uz';
+            const isMac = typeof window !== 'undefined' && window.navigator && /Mac/.test(window.navigator.platform);
             let isOffline = Entry.isOffline || (typeof navigator !== 'undefined' && !navigator.onLine);
 
             // Electron specific offline check refinement
@@ -164,6 +165,7 @@ Entry.AI_UTILIZE_BLOCK.tts.getBlocks = function () {
                 isKorean,
                 isUzbekEnv,
                 isOffline,
+                isMac,
                 langType: typeof Lang !== 'undefined' ? Lang.type : 'undefined',
             });
 
@@ -208,8 +210,9 @@ Entry.AI_UTILIZE_BLOCK.tts.getBlocks = function () {
 
             // Trigger Uzbek routing if it's NOT Korean and either:
             // 1. Language setting is Uzbek
-            // 2. The text contains Latin/Cyrillic characters that aren't Korean (and we're testing Uzbek)
-            if (!isKorean && (isUzbekEnv || /[a-zA-Zа-яА-Я]/.test(message))) {
+            // 2. The text contains Latin/Cyrillic characters that aren't Korean
+            // BUT SKIP THIS IF WE ARE ON MAC (Mac uses Clova for all languages)
+            if (!isKorean && (isUzbekEnv || /[a-zA-Zа-яА-Я]/.test(message)) && !isMac) {
                 console.log(`TTS Debug: ${JSON.stringify({ message, isKorean, isUzbekEnv, isOffline })}`);
                 console.log('TTS: Routing to Uzbek logic');
 
