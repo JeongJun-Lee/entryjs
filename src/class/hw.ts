@@ -401,7 +401,8 @@ export default class Hardware {
             this.hwModule.name == 'ITPLE'
         ) {
             // Check variation from data for ArduinoExt BT (ID: 010904 -> variation: 4)
-            if (data.variation === 4) {
+            // Check variation for ArduinoNanoExt BT (ID: 011302 -> variation: 2)
+            if (data.variation === 4 || (this.hwModule.name === 'ArduinoNanoExt' && data.variation === 2)) {
                 Entry.options.uploadEnable = false;
             } else {
                 Entry.options.uploadEnable = true;
