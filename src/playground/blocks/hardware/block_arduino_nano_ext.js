@@ -915,7 +915,11 @@ Entry.ArduinoNanoExt.getBlocks = function () {
                     port: [port, port],
                     time: new Date().getTime(),
                 };
-                return Entry.hw.portData.ULTRASONIC || 0;
+                let mappedPort = port;
+                if (port === '14') mappedPort = '0';
+                else if (port === '15') mappedPort = '1';
+                else if (port === '16') mappedPort = '2';
+                return Entry.hw.portData['a' + mappedPort] || 0;
             },
             syntax: { ar: [{ syntax: 'getDistance(%1)' }] },
         },
