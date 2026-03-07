@@ -100,6 +100,10 @@ class ImageLearning {
     }
 
     async predict(canvas) {
+        if (!this.model) {
+            console.warn("ImageLearning: Cannot predict without a loaded model.");
+            return [];
+        }
         tf.engine().startScope();
         const tensor = await this.preprocess(canvas);
         const logits = this.model.predict(tensor);
@@ -138,8 +142,18 @@ class ImageLearning {
     }
 
     async load(url) {
-        this.model = await tf.loadLayersModel(url);
-        this.isLoaded = true;
+        if (!url) {
+            console.warn("ImageLearning: No model URL provided. Using mock/offline mode.");
+            this.isLoaded = true;
+            return;
+        }
+        try {
+            this.model = await tf.loadLayersModel(url);
+            this.isLoaded = true;
+        } catch (e) {
+            console.error("ImageLearning: Failed to load model", e);
+            this.isLoaded = true; // prevent infinite loading sequences
+        }
     }
 
     isTrained() {

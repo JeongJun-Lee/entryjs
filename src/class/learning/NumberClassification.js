@@ -7,6 +7,7 @@ import _mean from 'lodash/mean';
 import _toNumber from 'lodash/toNumber';
 import _isNaN from 'lodash/isNaN';
 import DataTable from '../DataTable';
+import Utils from './Utils';
 
 export const classes = [
     'ai_learning_train',
@@ -17,6 +18,12 @@ export const classes = [
     'number_learning_attr_4',
     'number_learning_attr_5',
     'number_learning_attr_6',
+    'number_learning_attr_7',
+    'number_learning_attr_8',
+    'number_learning_attr_9',
+    'number_learning_attr_10',
+    'number_learning_attr_11',
+    'number_learning_attr_12',
 ];
 
 class NumberClassification {
@@ -46,7 +53,12 @@ class NumberClassification {
         this.#name = name;
         this.#trainParam = trainParam || {};
         this.#table = table;
-        this.result = result;
+        // Preserve trained result across stop-event re-init.
+        // The 'stop' event calls init() with stale constructor params;
+        // if we already have a result, keep it intact.
+        if (this.result === undefined || this.result === null) {
+            this.result = result;
+        }
         this.#trainCallback = (value) => {
             this.#view.setValue(value);
         };
@@ -80,6 +92,28 @@ class NumberClassification {
             this.url = url;
             this.modelId = modelId;
         }
+    }
+
+    updateFields() {
+        const table = this.#table;
+        let dataFields = table?.fields;
+        if ((!dataFields || dataFields.length === 0) && table?.id === 'test_table_1') {
+            const def = typeof Lang !== 'undefined' && Lang.AiLearningTree ? Lang.AiLearningTree : null;
+            dataFields = [
+                (def && def.sample_field_1) || '꽃받침 길이',
+                (def && def.sample_field_2) || '꽃받침 너비',
+                (def && def.sample_field_3) || '꽃잎 길이',
+                (def && def.sample_field_4) || '꽃잎 너비',
+                (def && def.sample_field_5) || '품종',
+            ];
+        }
+
+        this.#fields = this.#table?.select?.[0]?.map((index) =>
+            dataFields && dataFields[index] ? dataFields[index] : `Col ${index}`
+        );
+        this.#predictField = this.#table?.select?.[1]?.map((index) =>
+            dataFields && dataFields[index] ? dataFields[index] : `Col ${index}`
+        );
     }
 
     setTable() {
@@ -194,7 +228,7 @@ class NumberClassification {
     }
 
     getLabels() {
-        const { data: trainData, labels } = convertTableToKnnData(this.#table);
+        const { labels } = convertTableToKnnData(this.#table);
         return _uniq(labels[0]).sort((a, b) => String(a).localeCompare(String(b)));
     }
 
@@ -206,7 +240,7 @@ class NumberClassification {
         }
         this.#trainCallback(1);
         this.#isTrained = false;
-        const { data: trainData, labels } = convertTableToKnnData(this.#table);
+        const { data: trainData, labels, attrValueMaps } = convertTableToKnnData(this.#table);
         const trainLabels = labels[0];
         const uniqLabels = _uniq(labels[0]).sort((a, b) => String(a).localeCompare(String(b)));
         const numLabels = uniqLabels.length;
@@ -231,7 +265,10 @@ class NumberClassification {
             numLabels,
             maxVector,
             minVector,
+            attrValueMaps,
         };
+        this.#attrLength = trainData[0] ? trainData[0].length : 0;
+        this.updateFields();
         this.#isTrained = true;
         this.#trainParam.isLoaded = true;
         this.colors = this.createColor();
@@ -257,6 +294,7 @@ class NumberClassification {
             minVector: savedData.minVector,
             numLabels: savedData.numLabels,
             neighbors: savedData.neighbors,
+            attrValueMaps: savedData.attrValueMaps || {},
             isLoaded: true,
         };
         this.colors = this.createColor();
@@ -273,10 +311,24 @@ class NumberClassification {
 
     predict(data) {
         const distData = [];
-        const { trainData, trainLabels, neighbors } = this.#trainParam;
+        const attrFiltered = this.#table?.select?.[0] || [];
+        const { attrValueMaps } = this.#trainParam;
+        const encodedData = data.map((val, index) => {
+            const originalIndex = attrFiltered[index];
+            const num = parseFloat(val);
+            if (!_isNaN(num)) {
+                return num;
+            }
+            const map = attrValueMaps?.[originalIndex];
+            if (map) {
+                const trimmedValue = typeof val === 'string' ? val.trim() : val;
+                return map[trimmedValue] || 0;
+            }
+            return 0;
+        });
 
         for (let i = 0; i < trainData.length; i++) {
-            const dist = eudist(this.normalize(data), this.normalize(trainData[i]));
+            const dist = eudist(this.normalize(encodedData), this.normalize(trainData[i]));
             distData.push({
                 index: i,
                 dist,
@@ -397,21 +449,43 @@ function eudist(a, b) {
 function convertTableToKnnData(tableData = {}) {
     const { select = [[0], [1]], data: table = [] } = tableData;
     const [attr, predict] = select;
+    const tempMap = {};
+    const tempMapCount = {};
+    const ATTR_STR2NUM_MAP = {};
+    const ATTR_STR2NUM_MAP_COUNT = {};
+
     const filtered = table.filter((row) => {
         const label = row[predict[0]];
-        return label !== undefined && label !== null && String(label).trim() !== '';
+        const hasLabel = label !== undefined && label !== null && String(label).trim() !== '';
+        const hasAttrs = attr.every((i) => {
+            const val = row[i];
+            return val !== undefined && val !== null && String(val).trim() !== '';
+        });
+        return hasLabel && hasAttrs;
     });
+
     return filtered.reduce(
         (accumulator, row) => {
-            const { data = [], labels = [] } = accumulator;
+            const { data = [], labels = [], attrValueMaps = ATTR_STR2NUM_MAP } = accumulator;
             return {
-                data: [...data, row.filter((data, index) => attr.includes(index))],
+                data: [
+                    ...data,
+                    attr.map((i) => {
+                        const val = row[i];
+                        const num = parseFloat(val);
+                        if (!_isNaN(num)) {
+                            return num;
+                        }
+                        return Utils.stringToNumber(i, val, ATTR_STR2NUM_MAP, ATTR_STR2NUM_MAP_COUNT);
+                    }),
+                ],
                 labels: predict.map((i, idx) => {
                     const arr = labels[idx] || [];
                     return [...arr, row[i]];
                 }),
+                attrValueMaps,
             };
         },
-        { data: [], labels: [] }
+        { data: [], labels: [], attrValueMaps: ATTR_STR2NUM_MAP }
     );
 }

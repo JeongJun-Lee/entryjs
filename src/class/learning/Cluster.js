@@ -6,6 +6,7 @@ import _isNaN from 'lodash/isNaN';
 import LearningView from './LearningView';
 import Chart from './Chart';
 import DataTable from '../DataTable';
+import Utils from './Utils';
 
 const GRAPH_COLOR = [
     '#4f80ff',
@@ -31,6 +32,12 @@ export const classes = [
     'cluster_attr_4',
     'cluster_attr_5',
     'cluster_attr_6',
+    'cluster_attr_7',
+    'cluster_attr_8',
+    'cluster_attr_9',
+    'cluster_attr_10',
+    'cluster_attr_11',
+    'cluster_attr_12',
     'ai_learning_train_chart',
 ];
 
@@ -60,7 +67,13 @@ class Cluster {
     init({ name, result, table, trainParam }) {
         this.#name = name;
         this.#trainParam = trainParam || {};
-        this.#result = result || {};
+        // Preserve trained result (centroids + graphData) across stop-event re-init.
+        // The 'stop' event calls init() with stale constructor params;
+        // if we already have trained centroids, keep them intact.
+        if (!this.#result?.centroids) {
+            this.#result = result || {};
+            this.attrValueMaps = result?.attrValueMaps || {};
+        }
         this.#table = table;
         this.#trainCallback = (value) => {
             this.#view.setValue(value);
@@ -71,7 +84,11 @@ class Cluster {
         if (this.#attrLength === 2) {
             this.#chartEnable = true;
         }
-        this.#fields = table?.select?.[0]?.map((index) => table?.fields[index]);
+        this.updateFields();
+    }
+
+    updateFields() {
+        this.#fields = this.#table?.select?.[0]?.map((index) => this.#table?.fields[index]);
     }
 
     setTable() {
@@ -182,21 +199,36 @@ class Cluster {
         this.#isTrained = false;
         const { data, select } = this.#table;
         const filtered = data.filter((row) =>
-            select.flat().some((selected) => {
+            select.flat().every((selected) => {
                 const val = row[selected];
                 return val !== undefined && val !== null && String(val).trim() !== '';
             })
         );
         const [attr] = select;
+        const ATTR_STR2NUM_MAP = {};
+        const ATTR_STR2NUM_MAP_COUNT = {};
 
         const { centroids, indexes } = kmeans(
-            filtered.map((row) => attr.map((i) => parseFloat(row[i]) || 0)),
+            filtered.map((row) =>
+                attr.map((i) => {
+                    const val = row[i];
+                    const num = parseFloat(val);
+                    if (!_isNaN(num)) {
+                        return num;
+                    }
+                    return Utils.stringToNumber(i, val, ATTR_STR2NUM_MAP, ATTR_STR2NUM_MAP_COUNT);
+                })
+            ),
             this.#trainParam
         );
         this.#result = {
             graphData: convertGraphData(filtered, centroids, indexes, attr),
             centroids,
+            attrValueMaps: ATTR_STR2NUM_MAP,
         };
+        this.attrValueMaps = ATTR_STR2NUM_MAP;
+        this.#attrLength = attr.length;
+        this.updateFields();
         this.#isTrained = true;
         const { k } = this.#trainParam;
         this.#chart?.load({
@@ -218,8 +250,22 @@ class Cluster {
         }
         const { k } = this.#trainParam;
         const { centroids } = this.#result;
+        const attrFiltered = this.#table?.select?.[0] || [];
+        const encodedArray = arr.map((val, index) => {
+            const originalIndex = attrFiltered[index];
+            const num = parseFloat(val);
+            if (!_isNaN(num)) {
+                return num;
+            }
+            const map = this.attrValueMaps?.[originalIndex];
+            if (map) {
+                const trimmedValue = typeof val === 'string' ? val.trim() : val;
+                return map[trimmedValue] || 0;
+            }
+            return 0;
+        });
 
-        this.#predictResult = predictCluster(arr, k, centroids) + 1;
+        this.#predictResult = predictCluster(encodedArray, k, centroids) + 1;
         return this.#predictResult;
     }
 

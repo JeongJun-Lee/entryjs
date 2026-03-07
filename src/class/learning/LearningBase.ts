@@ -37,7 +37,12 @@ class LearningBase {
     init({ name, result, table, trainParam }: any) {
         this.name = name;
         this.trainParam = trainParam || {};
-        this.result = result || {};
+        // Preserve trained result across stop-event re-init.
+        // The 'stop' event calls init() with stale constructor params;
+        // if we already have a trained result, keep it intact.
+        if (!this.result || Object.keys(this.result).length === 0) {
+            this.result = result || {};
+        }
         this.table = table;
         this.trainCallback = (value: any) => {
             this.view.setValue(value);
@@ -83,8 +88,8 @@ class LearningBase {
             Entry.toast.alert(Lang.Msgs.warn, Lang.AiLearning.train_param_error);
             throw Error(Lang.AiLearning.train_param_error);
         }
-        this.table.data = data;
-        this.table.fields = fields;
+        this.table.data = tableSource.rows;
+        this.table.fields = tableSource.fields;
     }
 
     destroy() {

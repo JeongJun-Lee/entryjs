@@ -53,6 +53,12 @@ const banClasses = [
     'core_attr_4',
     'core_attr_5',
     'core_attr_6',
+    'core_attr_7',
+    'core_attr_8',
+    'core_attr_9',
+    'core_attr_10',
+    'core_attr_11',
+    'core_attr_12',
 ];
 
 export default class AILearning {
@@ -134,7 +140,7 @@ export default class AILearning {
         this.destroy();
     }
 
-    async loadModel({ url, trainParam, tableData, isActive, classes }) {
+    async loadModel({ url, trainParam, tableData, isActive, classes, model }) {
         let modelPath = '';
         try {
             modelPath = await this.#dataApi?.getModelDownloadUrl(url) || url;
@@ -176,14 +182,15 @@ export default class AILearning {
                 trainParam,
                 table: this.#tableData,
                 model,
+                loadModel: this.#dataApi?.loadModel,
             });
             this.#labels = this.#module.getLabels();
         } else if (type === 'cluster') {
             this.#tableData = tableData || createDataTable(classes, name);
             this.#module = new Cluster({
                 name,
-                result,
-                url,
+                result: this.result,
+                url: modelPath,
                 trainParam,
                 table: this.#tableData,
                 model,
@@ -230,6 +237,7 @@ export default class AILearning {
                 trainParam,
                 table: this.#tableData,
                 model,
+                loadModel: this.#dataApi?.loadModel,
             });
         } else if (type === 'svm') {
             this.#tableData = tableData || createDataTable(classes, name);
@@ -240,6 +248,7 @@ export default class AILearning {
                 trainParam,
                 table: this.#tableData,
                 model,
+                loadModel: this.#dataApi?.loadModel,
             });
         }
 
@@ -292,10 +301,16 @@ export default class AILearning {
             tableData: this.#tableData,
             isActive,
             classes,
+            model: this.#modelId,
         });
 
         if (this.#module && result) {
-            this.#module.result = result;
+            // Only set module.result if the module's own load() didn't already
+            // process and set it (with _addFeatureNames / traverse annotations).
+            // Otherwise we'd overwrite the processed graphData with raw saved data.
+            if (!this.#module.result?.graphData) {
+                this.#module.result = result;
+            }
             if (this.#module.load && typeof model === 'object') {
                 await this.#module.load(model);
             }
@@ -317,6 +332,10 @@ export default class AILearning {
     async train() {
         if (this.#module && typeof this.#module.train === 'function') {
             await this.#module.train();
+            this.unbanBlocks();
+            if (this.#playground) {
+                this.#playground.reloadPlayground();
+            }
         }
     }
 

@@ -19,15 +19,37 @@ export const classes = [
     'decisiontree_attr_4',
     'decisiontree_attr_5',
     'decisiontree_attr_6',
+    'decisiontree_attr_7',
+    'decisiontree_attr_8',
+    'decisiontree_attr_9',
+    'decisiontree_attr_10',
+    'decisiontree_attr_11',
+    'decisiontree_attr_12',
 ];
 
 class DecisionTree extends LearningBase {
     type = 'decisiontree';
 
-    init({ name, url, result, table, trainParam, model }) {
+    init({ name, url, result, table, trainParam, model, loadModel }) {
         this.name = name;
         this.trainParam = trainParam || {};
-        this.result = result || {};
+
+        // ── Preserve trained state across stop-event re-init ──
+        // The 'stop' event in LearningBase calls init() with the STALE original
+        // params captured in the constructor closure.  If we already have a trained
+        // model and result with graphData, we must keep them — NOT overwrite them.
+        // NOTE: We cannot reconstruct this.model from graphData because graphData
+        // has been post-processed by traverse() / _addFeatureNames() and no longer
+        // has the 'kind' property that DTClassifier.load() / TreeNode requires.
+        const hasCurrentModel = !!this.model;
+        const hasCurrentTrainedResult = this.result && this.result.graphData && this.result.fields;
+
+        if (hasCurrentTrainedResult) {
+            // Keep this.result as-is (already trained / loaded).
+        } else {
+            this.result = result || {};
+        }
+
         this.table = table;
         this.loadModel = loadModel;
         this.trainCallback = (value) => {
@@ -35,21 +57,33 @@ class DecisionTree extends LearningBase {
         };
         this.trained = true;
         this.attrLength = table?.select?.[0]?.length || 0;
+        this.updateFields();
 
         this.fields = table?.select?.[0]?.map((index) => table?.fields[index]);
         this.predictFields = table?.select?.[1]?.map((index) => table?.fields[index]);
-        if (model) {
+
+        if (hasCurrentModel) {
+            // Model already exists from train() or a previous load().
+            // Keep this.model, this.valueMap, this.attrValueMaps exactly as they are.
+            // Do NOT call this.load(url) — that would fetch the old server model
+            // and overwrite everything.
+        } else if (model && typeof model === 'object') {
+            this._sanitizeModelForLoad(model);
             this.model = DTClassifier.load(model);
             this.valueMap = result?.valueMap;
         } else if (url) {
             this.load(`/uploads/${url}/model.json`);
         }
+
         if (!Utils.isWebGlSupport()) {
             tf.setBackend('cpu');
         }
     }
 
     generateTree() {
+        if (!this.result) {
+            return;
+        }
         const { graphData, fields = [], valueMap = {} } = this.result;
         try {
             let titleText = '결정 트리';
@@ -78,30 +112,14 @@ class DecisionTree extends LearningBase {
     }
 
     openChart() {
-        if (!this.tree) {
-            this.generateTree();
-        } else {
-            const { graphData, fields = [], valueMap = {} } = this.result || {};
-            let titleText = '결정 트리';
-            if (typeof Lang !== 'undefined') {
-                const aiLang = Lang.AiLearning || {};
-                const template = Lang.template || {};
-                titleText = template.learning_title_decisiontree_str || aiLang.tree_title || aiLang.tree || titleText;
-            }
-            if (this.tree.load && graphData) {
-                this.tree.load({
-                    source: {
-                        graphData,
-                        fields: fields,
-                        valueMap,
-                        yes: typeof Lang !== 'undefined' ? (Lang.AiLearning?.yes || '예') : '예',
-                        no: typeof Lang !== 'undefined' ? (Lang.AiLearning?.no || '아니오') : '아니오',
-                    },
-                    title: titleText
-                });
-            }
-            this.tree.show();
+        // Always destroy and recreate the chart so the visualization
+        // always reflects the current this.result.graphData.
+        // (Tree.setData() from @entrylabs/tool may not reliably re-render.)
+        if (this.tree) {
+            this.tree.destroy();
+            this.tree = null;
         }
+        this.generateTree();
         // 트리가 가로로 많이 길어질 수 있으므로 모달 최소 너비 확장
         requestAnimationFrame(() => {
             const modalEl = document.querySelector('.entry-learning-chart .entry-modal, .entry-learning-chart [class*="modal"], .entry-learning-chart > div');
@@ -132,6 +150,7 @@ class DecisionTree extends LearningBase {
             return;
         }
         this.trained = false;
+        this.model = null;
         this.result = null;
         if (this.tree) {
             this.tree.destroy();
@@ -157,22 +176,35 @@ class DecisionTree extends LearningBase {
             return;
         }
 
-        const { trainX, trainY, testArr, select, fields, valueMap, numClass, hasMissing } = getData(
-            testRate,
-            this.table
-        );
+        const dataRes = getData(testRate, this.table);
+        console.log('DecisionTree getData Result:', dataRes);
+        const {
+            trainX,
+            trainY,
+            testArr,
+            select,
+            fields,
+            valueMap,
+            numClass,
+            hasMissing,
+            attrValueMaps,
+        } = dataRes;
 
         if (hasMissing) {
             this.trainCallback(0);
+            const msg = typeof Lang !== 'undefined' && Lang.AiLearning?.missing_value_error
+                ? Lang.AiLearning.missing_value_error
+                : '결측치가 존재하여 학습을 중단합니다. 결측치를 처리한 후에 재학습을 진행하세요.';
             Entry.toast.alert(
                 typeof Lang !== 'undefined' ? (Lang.Msgs?.warn || '경고') : '경고',
-                '결측치가 존재하여 학습을 중단합니다. 결측치를 처리한 후에 재학습을 진행하세요.'
+                msg
             );
-            return;
+            throw new Error(msg);
         }
-        this.valueMap = Object.fromEntries(
-            Object.entries(valueMap).map(([key, value]) => [value, key])
-        );
+        this.valueMap = {};
+        Object.entries(valueMap).forEach(([key, value]) => {
+            this.valueMap[value - 1] = key; // DTClassifier uses 0-indexed classes
+        });
         this.model = createModel(maxDepth, minNumSamples, gainThreshold);
         this.model?.train(trainX, trainY);
 
@@ -182,20 +214,25 @@ class DecisionTree extends LearningBase {
         const { accuracy, f1, precision, recall } = score;
 
         const rootNode = this.model.toJSON().root;
-        this._addFeatureNames(rootNode, fields, select[0]);
+        this._addFeatureNames(rootNode, fields);
+        traverse(rootNode, numClass, fields, this.valueMap);
 
         this.result = {
             graphData: rootNode,
             select,
-            fields: parsedFields,
+            fields,
             confusionMatrix,
             accuracy,
             f1,
             valueMap: this.valueMap,
+            attrValueMaps,
             numClass,
             precision,
             recall,
         };
+
+        this.attrLength = select[0].length;
+        this.updateFields();
     }
 
     async load(url, modelId) {
@@ -209,81 +246,193 @@ class DecisionTree extends LearningBase {
         }
         if (!data) return;
         const { model, result } = data;
-        let graphData = null;
         if (model && model.root) {
             try {
-                graphData = JSON.parse(JSON.stringify(model.root));
-                const numClass = result?.numClass || (result?.valueMap ? Object.keys(result.valueMap).length : 1);
-                const fields = result?.fields || (this.table ? this.table.select[0].map(i => this.table.fields[i]) : []);
-                const valueMap = result?.valueMap || {};
-                traverse(graphData, numClass, fields, valueMap);
+                let fields = result?.fields;
+                if (!fields && this.table) {
+                    const [attr, predict] = this.table.select || [[], []];
+                    let attrFiltered;
+                    if (attr && attr.length > 0) {
+                        attrFiltered = [...attr];
+                    } else {
+                        const predictSet = new Set(predict);
+                        attrFiltered = (this.table.fields || []).map((_, i) => i).filter((i) => !predictSet.has(i));
+                    }
+                    fields = attrFiltered.map((i) => this.table.fields[i]);
+                }
+                this._graphDataFields = fields;
             } catch (e) {
-                console.error('DecisionTree load traverse failed:', e);
+                console.error('DecisionTree load fields fallback failed:', e);
             }
         }
         try {
             if (model && model.root) {
-                // Ensure ml-cart correctly reconstitutes distributions into Matrix objects
-                const fixModelForLoad = (node) => {
-                    if (!node) return;
-                    if (node.distribution !== undefined) {
-                        if (node.distribution && node.distribution.data) {
-                            node.distribution = node.distribution.data;
-                        } else if (typeof node.distribution === 'object' && !Array.isArray(node.distribution)) {
-                            node.distribution = [Object.values(node.distribution)];
-                        }
-                    }
-                    if (node.left) fixModelForLoad(node.left);
-                    if (node.right) fixModelForLoad(node.right);
-                };
-                fixModelForLoad(model.root);
-
+                this._sanitizeModelForLoad(model);
                 this.model = DTClassifier.load(model);
             }
         } catch (e) {
             console.error('DecisionTree model load failed:', e);
+            Entry.toast.alert(
+                typeof Lang !== 'undefined' ? (Lang.Msgs?.warn || '경고') : '경고',
+                typeof Lang !== 'undefined' && Lang.AiLearning?.load_error
+                    ? Lang.AiLearning.load_error
+                    : '모델을 불러오는 중 오류가 발생했습니다. 다시 학습시켜 주세요.'
+            );
         }
-        this.valueMap = result?.valueMap;
+        this.valueMap = result?.valueMap || {};
+        this.attrValueMaps = result?.attrValueMaps || {};
 
         const rootNode = this.model?.toJSON().root;
         if (rootNode) {
-            this._addFeatureNames(rootNode, result?.fields, result?.select?.[0] || []);
+            const finalFields = result?.fields || this._graphDataFields || [];
+            this._addFeatureNames(rootNode, finalFields);
+            traverse(rootNode, result?.numClass, finalFields, this.valueMap || {});
         }
 
         this.result = {
             ...result,
-            graphData: rootNode,
+            select: result?.select || this.table?.select,
+            attrValueMaps: this.attrValueMaps,
+            // Always use the newly-processed rootNode (with _addFeatureNames /
+            // traverse annotations) so the tree visualization renders correctly.
+            graphData: rootNode || result?.graphData,
         };
+        if (this.result?.select?.[0]) {
+            this.attrLength = this.result.select[0].length;
+            this.updateFields();
+        }
     }
 
-    _addFeatureNames(node, fields, attrFiltered) {
+    _addFeatureNames(node, fields) {
         if (!node) return;
         if (node.splitColumn !== undefined && node.splitColumn !== null) {
-            const originalIndex = attrFiltered[node.splitColumn] !== undefined ? attrFiltered[node.splitColumn] : node.splitColumn;
-            node.featureName = fields && fields[originalIndex] ? fields[originalIndex] : `Feature ${node.splitColumn}`;
+            node.featureName = fields && fields[node.splitColumn] ? fields[node.splitColumn] : `Feature ${node.splitColumn}`;
         }
-        if (node.left) this._addFeatureNames(node.left, fields, attrFiltered);
-        if (node.right) this._addFeatureNames(node.right, fields, attrFiltered);
+        if (node.left) this._addFeatureNames(node.left, fields);
+        if (node.right) this._addFeatureNames(node.right, fields);
+    }
+
+    _sanitizeModelForLoad(model) {
+        if (!model || !model.root) return;
+
+        // Ensure ml-cart correctly reconstitutes distributions into Matrix objects
+        const fixModelForLoad = (node) => {
+            if (!node) return;
+            if (node.distribution !== undefined && node.distribution !== null) {
+                let dist = node.distribution;
+
+                if (typeof dist === 'number') {
+                    // Regression leaf, do nothing
+                } else {
+                    // Classification leaf
+                    if (typeof dist === 'object' && dist !== null && 'data' in dist) {
+                        dist = dist.data;
+                    }
+
+                    if (Array.isArray(dist) || ArrayBuffer.isView(dist)) {
+                        // Check if 1D array of numbers
+                        if (dist.length > 0 && typeof dist[0] !== 'object') {
+                            dist = [dist];
+                        }
+                    } else if (typeof dist === 'object' && dist !== null) {
+                        // Sparse object
+                        dist = [Object.values(dist)];
+                    } else {
+                        dist = [];
+                    }
+
+                    const normalizedDist = [];
+                    for (let i = 0; i < dist.length; i++) {
+                        let row = dist[i];
+                        if (typeof row === 'object' && row !== null && 'length' in row) {
+                            const newRow = [];
+                            for (let j = 0; j < row.length; j++) {
+                                const n = parseFloat(row[j]);
+                                newRow.push(isNaN(n) ? 0 : n);
+                            }
+                            normalizedDist.push(newRow);
+                        } else {
+                            const n = parseFloat(row);
+                            normalizedDist.push([isNaN(n) ? 0 : n]);
+                        }
+                    }
+
+                    if (normalizedDist.length === 0) {
+                        normalizedDist.push([0]);
+                    }
+
+                    node.distribution = normalizedDist;
+                }
+            }
+            if (node.left) fixModelForLoad(node.left);
+            if (node.right) fixModelForLoad(node.right);
+        };
+        fixModelForLoad(model.root);
     }
 
     async predict(array) {
+        console.log('DecisionTree Predict State:', {
+            result: this.result,
+            table: this.table,
+            attrValueMaps: this.attrValueMaps,
+        });
         if (!this.model) {
             const msg = (typeof Lang !== 'undefined' && Lang.AiLearning?.model_status_3) || '아직 로딩된 모델이 없습니다.';
             throw new Error(msg);
         }
-        const xs = [array];
-        // ml-cart 내부 버그 방어: classify()가 Matrix가 아닌 배열을 반환할 수 있음
+        let attrFiltered = this.result?.select?.[0];
+        if (!attrFiltered || attrFiltered.length === 0) {
+            console.warn('DecisionTree predict: attrFiltered is empty, reconstructing from table...');
+            const [attr, predict] = this.table?.select || [[], []];
+            if (attr && attr.length > 0) {
+                attrFiltered = [...attr];
+            } else {
+                const predictSet = new Set(predict);
+                attrFiltered = (this.table?.fields || []).map((_, i) => i).filter((i) => !predictSet.has(i));
+            }
+        }
+        if (!attrFiltered || attrFiltered.length === 0) {
+            attrFiltered = [];
+        }
+        const encodedArray = array.map((val, index) => {
+            const originalIndex = attrFiltered[index];
+            const num = parseFloat(val);
+            if (!_isNaN(num)) {
+                return num;
+            }
+            const map = this.attrValueMaps?.[originalIndex];
+            if (map) {
+                const trimmedValue = typeof val === 'string' ? val.trim() : val;
+                return map[trimmedValue] || 0;
+            }
+            return 0;
+        });
+
+        const xs = [encodedArray];
+        console.log('DecisionTree Predict Input:', {
+            array,
+            attrFiltered,
+            attrValueMaps: this.attrValueMaps,
+            encodedArray,
+        });
+
         let preds;
         try {
             preds = this.model.predict(xs);
+            console.log('DecisionTree Predict Output (model.predict):', preds);
         } catch (e) {
-            // maxRowIndex 등 Matrix 메서드 미지원 시 직접 argmax 계산
             preds = this._predictFallback(xs);
+            console.log('DecisionTree Predict Output (fallback):', preds);
         }
-        this.predictResult = preds.map((target) => ({
-            className: this.valueMap[target + 1] || target,
-            probability: 1,
-        }));
+        this.predictResult = preds.map((target) => {
+            let className = getLabelFromValueMap(target, this.valueMap);
+            if (className === `Class ${target}`) className = target;
+
+            return {
+                className,
+                probability: 1,
+            };
+        });
     }
 
     _predictFallback(xs) {
@@ -299,18 +448,25 @@ class DecisionTree extends LearningBase {
             if (dist.data && Array.isArray(dist.data)) {
                 arr = dist.data[0];
             } else if (dist.data && !Array.isArray(dist.data)) {
+                // handle matrix typed array
                 arr = Array.from(dist.data);
             }
             if (!Array.isArray(arr)) return 0;
             let maxIdx = 0;
             let maxVal = -Infinity;
             for (let i = 0; i < arr.length; i++) {
-                const v = typeof arr[i] === 'object' ? arr[i][0] : arr[i];
+                // If it is an array of arrays like [[0, 1]], we need to extract the value
+                const v = Array.isArray(arr[i]) ? arr[i][0] : arr[i];
                 if (v > maxVal) { maxVal = v; maxIdx = i; }
             }
             return maxIdx;
         });
     }
+    updateFields() {
+        this.fields = this.table?.select?.[0]?.map((index) => this.table?.fields[index]);
+        this.predictFields = this.table?.select?.[1]?.map((index) => this.table?.fields[index]);
+    }
+
     isTrained() {
         return this.trained && !!this.model;
     }
@@ -349,19 +505,47 @@ function getData(testRate, data) {
     // predict 컬럼이 attr에 포함되면 label leakage 발생 → 강제 제외
     const predictSet = new Set(predict);
     const attrFiltered = attr.filter((i) => !predictSet.has(i));
+    console.log('DecisionTree getData details:', {
+        select,
+        attr,
+        predict,
+        attrFiltered,
+    });
+
+    const ATTR_STR2NUM_MAP = {};
+    const ATTR_STR2NUM_MAP_COUNT = {};
 
     const hasMissing = table.some(
-        (row) => attrFiltered.some((selected) => _isNaN(_toNumber(row[selected]))) ||
-            row[predict[0]] === undefined || row[predict[0]] === null || row[predict[0]] === ''
+        (row) =>
+            attrFiltered.some((selected) => {
+                const val = row[selected];
+                return val === undefined || val === null || String(val).trim() === '';
+            }) ||
+            row[predict[0]] === undefined ||
+            row[predict[0]] === null ||
+            row[predict[0]] === ''
     );
 
     const filtered = table.filter(
-        (row) => !attrFiltered.some((selected) => _isNaN(_toNumber(row[selected]))) &&
-            row[predict[0]] !== undefined && row[predict[0]] !== null && row[predict[0]] !== ''
+        (row) =>
+            !attrFiltered.some((selected) => {
+                const val = row[selected];
+                return val === undefined || val === null || String(val).trim() === '';
+            }) &&
+            row[predict[0]] !== undefined &&
+            row[predict[0]] !== null &&
+            row[predict[0]] !== ''
     );
     const dataArray = filtered
         .map((row) => ({
-            x: attrFiltered.map((i) => parseFloat(row[i]) || 0),
+            x: attrFiltered.map((i) => {
+                const val = row[i];
+                const num = parseFloat(val);
+                if (!_isNaN(num)) {
+                    return num;
+                }
+                return Utils.stringToNumber(i, val, ATTR_STR2NUM_MAP, ATTR_STR2NUM_MAP_COUNT);
+            }),
             y: Utils.stringToNumber(predict[0], row[predict[0]], tempMap, tempMapCount),
         }))
         .map((row) => ({
@@ -369,15 +553,16 @@ function getData(testRate, data) {
             y: row.y - 1,
         }));
     const [train, test] = sliceArray(dataArray, testRate);
-    const mappedFields = attr.map(i => dataFields && dataFields[i] ? dataFields[i] : undefined);
+    const mappedFields = attrFiltered.map((i) => (dataFields && dataFields[i] ? dataFields[i] : undefined));
 
     return {
-        trainX: train.map(v => v.x),
-        trainY: train.map(v => v.y),
+        trainX: train.map((v) => v.x),
+        trainY: train.map((v) => v.y),
         testArr: test,
         select: [attrFiltered, predict],
-        fields,
+        fields: mappedFields,
         valueMap: { ...tempMap[predict[0]] },
+        attrValueMaps: ATTR_STR2NUM_MAP,
         numClass: tempMapCount[predict[0]] || 1,
         hasMissing,
     };
@@ -396,6 +581,27 @@ function evaluate(model, test, numClass) {
     const matrix = Array(numClass).fill(0).map(() => Array(numClass).fill(0));
     preds.forEach((p, i) => matrix[ys[i]][p]++);
     return { confusionMatrix: matrix, score: Utils.getScores(matrix, numClass) };
+}
+
+function getLabelFromValueMap(p, valueMap) {
+    if (!valueMap || Object.keys(valueMap).length === 0) return `Class ${p}`;
+    const entries = Object.entries(valueMap);
+    const isLabelToIndex = entries.length > 0 && entries.every(([k, v]) => typeof v === 'number' && Number.isInteger(v) && v >= 1);
+    if (isLabelToIndex) {
+        const targetIndex = p + 1;
+        for (const [key, value] of entries) {
+            if (value === targetIndex) return key;
+        }
+    }
+    const isZeroBased = valueMap[0] !== undefined || valueMap['0'] !== undefined;
+    if (isZeroBased) {
+        let label = valueMap[p] !== undefined ? valueMap[p] : valueMap[String(p)];
+        if (label !== undefined && label !== null && String(label).trim() !== '') return String(label).trim();
+    } else {
+        let label = valueMap[p + 1] !== undefined ? valueMap[p + 1] : valueMap[String(p + 1)];
+        if (label !== undefined && label !== null && String(label).trim() !== '') return String(label).trim();
+    }
+    return `Class ${p}`;
 }
 
 function traverse(node, numClass, fields, valueMap) {
@@ -442,8 +648,16 @@ function traverse(node, numClass, fields, valueMap) {
                 if (typeof d === 'object') {
                     let best = -1;
                     let max = -Infinity;
-                    // Handle sparse object { "0": 0.1, "1": 0.9 } or Array [0.1, 0.9]
-                    const items = Array.isArray(d) ? d.map((v, i) => [i, v]) : Object.entries(d);
+
+                    // ml-cart 2.0.0+ distributions are often arrays where index = class and value = count.
+                    // e.g., distribution: [[0, 1]] means 0 of class 0, and 1 of class 1
+                    let items;
+                    if (Array.isArray(d)) {
+                        items = d.map((v, i) => [i, v]);
+                    } else {
+                        items = Object.entries(d);
+                    }
+
                     for (const [k, v] of items) {
                         const prob = Number(v);
                         if (!isNaN(prob) && prob > max) {
@@ -472,17 +686,7 @@ function traverse(node, numClass, fields, valueMap) {
         p = findP(node);
 
         if (p !== -1) {
-            // Robust lookup for valueMap (1-indexed vs 0-indexed)
-            let label = valueMap[p + 1] || valueMap[String(p + 1)];
-            if (label === undefined) {
-                label = valueMap[p] || valueMap[String(p)];
-            }
-
-            if (label !== undefined && label !== null && String(label).trim() !== '') {
-                node.predictionLabel = String(label).trim();
-            } else {
-                node.predictionLabel = `Class ${p}`;
-            }
+            node.predictionLabel = getLabelFromValueMap(p, valueMap);
         } else {
             // If all else fails, use a generic classification label instead of "Unknown"
             // This case should be extremely rare with the new findP logic.

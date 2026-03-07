@@ -18,6 +18,12 @@ export const classes = [
     'regression_attr_4',
     'regression_attr_5',
     'regression_attr_6',
+    'regression_attr_7',
+    'regression_attr_8',
+    'regression_attr_9',
+    'regression_attr_10',
+    'regression_attr_11',
+    'regression_attr_12',
     'ai_learning_train_chart',
 ];
 
@@ -27,7 +33,13 @@ class Regression extends LearningBase {
     init({ name, url, result, table, trainParam }) {
         this.name = name;
         this.trainParam = trainParam || {};
-        this.result = result || {};
+        // Preserve trained result across stop-event re-init.
+        // The 'stop' event calls init() with stale constructor params;
+        // if we already have a trained result (with graphData), keep it intact.
+        if (!this.result?.graphData) {
+            this.result = result || {};
+            this.attrValueMaps = result?.attrValueMaps || {};
+        }
         this.table = table;
         this.trainCallback = (value) => {
             this.view.setValue(value);
@@ -73,7 +85,7 @@ class Regression extends LearningBase {
             let currentEpoch = 0;
             let percent = 0;
             this.trainCallback(1);
-            const { inputs, outputs } = convertToTfData(this.table, this.trainParam);
+            const { inputs, outputs, attrValueMaps } = convertToTfData(this.table, this.trainParam);
             const { model, trainHistory, a, b, graphData = [], rsquared, normResult } = await train(
                 inputs,
                 outputs,
@@ -108,7 +120,11 @@ class Regression extends LearningBase {
                 equation: `Y = ${a
                     .map((a, i) => `${addSign(a)}X<sub>${i + 1}</sub>`)
                     .join('')} ${addSign(b)}`,
+                attrValueMaps,
             };
+            this.attrValueMaps = attrValueMaps;
+            this.attrLength = inputs.length;
+            this.updateFields();
             this.trained = true;
             this.chart?.load({
                 source: this.chartData,
@@ -127,31 +143,41 @@ class Regression extends LearningBase {
     }
 
     async load(url) {
-        const model = await tf.loadLayersModel(url);
-        const modelData = new Promise((resolve) =>
-            model.save({
-                save: (data) => {
-                    const layers = data?.modelTopology?.config?.layers;
-                    if (Array.isArray(layers)) {
-                        data.modelTopology.config.layers.forEach((layer) => {
-                            if (layer?.config?.name) {
-                                layer.config.name = `${layer.config.name}_ws`;
-                            }
-                        });
-                    }
-                    if (Array.isArray(data.weightSpecs)) {
-                        data.weightSpecs.forEach((spec) => {
-                            const splits = spec.name.split('/');
-                            splits[0] = `${splits[0]}_ws`;
-                            spec.name = splits.join('/');
-                        });
-                    }
-                    resolve(data);
-                },
-            })
-        );
-        this.model = await tf.loadLayersModel({ load: () => modelData });
-        model.dispose();
+        try {
+            const model = await tf.loadLayersModel(url);
+            const modelData = new Promise((resolve) =>
+                model.save({
+                    save: (data) => {
+                        const layers = data?.modelTopology?.config?.layers;
+                        if (Array.isArray(layers)) {
+                            data.modelTopology.config.layers.forEach((layer) => {
+                                if (layer?.config?.name) {
+                                    layer.config.name = `${layer.config.name}_ws`;
+                                }
+                            });
+                        }
+                        if (Array.isArray(data.weightSpecs)) {
+                            data.weightSpecs.forEach((spec) => {
+                                const splits = spec.name.split('/');
+                                splits[0] = `${splits[0]}_ws`;
+                                spec.name = splits.join('/');
+                            });
+                        }
+                        resolve(data);
+                    },
+                })
+            );
+            this.model = await tf.loadLayersModel({ load: () => modelData });
+            model.dispose();
+        } catch (e) {
+            console.error('Regression model load failed:', e);
+            Entry.toast.alert(
+                typeof Lang !== 'undefined' ? (Lang.Msgs?.warn || '경고') : '경고',
+                typeof Lang !== 'undefined' && Lang.AiLearning?.load_error
+                    ? Lang.AiLearning.load_error
+                    : '모델을 불러오는 중 오류가 발생했습니다. 다시 학습시켜 주세요.'
+            );
+        }
     }
 
     convertNomalResult() {
@@ -166,15 +192,35 @@ class Regression extends LearningBase {
             outputMin: tf.tensor1d(outputMin),
         };
     }
+
+    updateFields() {
+        this.fields = this.table?.select?.[0]?.map((index) => this.table?.fields[index]);
+        this.predictFields = this.table?.select?.[1]?.map((index) => this.table?.fields[index]);
+    }
     async predict(data) {
         tf.engine().startScope();
         const { inputMin, inputMax, outputMax, outputMin } = this.convertNomalResult();
         const result = tf.tidy(() => {
             let convertedData;
+            const attrFiltered = this.table?.select?.[0] || [];
+            const encodedArray = (Array.isArray(data) ? data : [data]).map((val, index) => {
+                const originalIndex = attrFiltered[index];
+                const num = parseFloat(val);
+                if (!_isNaN(num)) {
+                    return num;
+                }
+                const map = this.attrValueMaps?.[originalIndex];
+                if (map) {
+                    const trimmedValue = typeof val === 'string' ? val.trim() : val;
+                    return map[trimmedValue] || 0;
+                }
+                return 0;
+            });
+
             if (Array.isArray(data)) {
-                convertedData = tf.tensor2d([data]);
+                convertedData = tf.tensor2d([encodedArray]);
             } else {
-                convertedData = tf.tensor1d([data]);
+                convertedData = tf.tensor1d(encodedArray);
             }
             convertedData = convertedData.sub(inputMin).div(inputMax.sub(inputMin));
             const preds = this.model
@@ -253,19 +299,31 @@ function convertToTfData(data, trainParam) {
     const [attr, predict] = select;
     const { epochs = 1, batchSize = 1 } = trainParam;
     const filtered = table.filter((row) => {
-        return predict.every((i) => {
+        const hasLabel = predict.every((i) => {
             const val = row[i];
             return val !== undefined && val !== null && String(val).trim() !== '';
         });
+        const hasAttrs = attr.every((i) => {
+            const val = row[i];
+            return val !== undefined && val !== null && String(val).trim() !== '';
+        });
+        return hasLabel && hasAttrs;
     });
     const totalDataSize = Math.ceil(filtered.length / batchSize) * epochs;
-    return filtered.reduce(
+    const ATTR_STR2NUM_MAP = {};
+    const ATTR_STR2NUM_MAP_COUNT = {};
+    const result = filtered.reduce(
         (accumulator, row) => {
             const { inputs = [], outputs = [] } = accumulator;
             return {
                 inputs: attr.map((i, idx) => {
                     const arr = inputs[idx] || [];
-                    return [...arr, parseFloat(row[i]) || 0];
+                    const val = row[i];
+                    const num = parseFloat(val);
+                    const encodedVal = !_isNaN(num)
+                        ? num
+                        : Utils.stringToNumber(i, val, ATTR_STR2NUM_MAP, ATTR_STR2NUM_MAP_COUNT);
+                    return [...arr, encodedVal];
                 }),
                 outputs: predict.map((i, idx) => {
                     const arr = outputs[idx] || [];
@@ -276,6 +334,10 @@ function convertToTfData(data, trainParam) {
         },
         { inputs: [], outputs: [] }
     );
+    return {
+        ...result,
+        attrValueMaps: ATTR_STR2NUM_MAP,
+    };
 }
 
 function convertToTensor(inputs, outputs) {

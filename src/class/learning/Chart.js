@@ -1,5 +1,4 @@
-import { BillBoard } from '@entrylabs/tool';
-import Tree from './LocalTree';
+import { BillBoard, Tree } from '@entrylabs/tool';
 
 export default class LearningChart {
     constructor(modalData, type = 'chart') {
@@ -8,8 +7,7 @@ export default class LearningChart {
         } else {
             this.modal = this.createChart(modalData);
         }
-        // LocalTree doesn't need explicit show() if it renders immediately,
-        // but we'll call it for consistency if needed.
+
         if (this.modal.show) {
             this.modal.show();
         }

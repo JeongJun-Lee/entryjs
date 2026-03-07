@@ -17,6 +17,12 @@ export const classes = [
     'logistic_regression_attr_4',
     'logistic_regression_attr_5',
     'logistic_regression_attr_6',
+    'logistic_regression_attr_7',
+    'logistic_regression_attr_8',
+    'logistic_regression_attr_9',
+    'logistic_regression_attr_10',
+    'logistic_regression_attr_11',
+    'logistic_regression_attr_12',
 ];
 
 class LogisticRegression extends LearningBase {
@@ -25,7 +31,12 @@ class LogisticRegression extends LearningBase {
     init({ name, url, result, table, trainParam }) {
         this.name = name;
         this.trainParam = trainParam || {};
-        this.result = result || {};
+        // Preserve trained result across stop-event re-init.
+        // The 'stop' event calls init() with stale constructor params;
+        // if we already have a trained result, keep it intact.
+        if (!this.result?.fields) {
+            this.result = result || {};
+        }
         this.table = table;
         this.trainCallback = (value) => {
             this.view.setValue(value);
@@ -50,36 +61,57 @@ class LogisticRegression extends LearningBase {
     }
 
     async load(url) {
-        const model = await tf.loadLayersModel(url);
-        const modelData = new Promise((resolve) =>
-            model.save({
-                save: (data) => {
-                    const layers = data?.modelTopology?.config?.layers;
-                    if (Array.isArray(layers)) {
-                        data.modelTopology.config.layers.forEach((layer) => {
-                            if (layer?.config?.name) {
-                                layer.config.name = `${layer.config.name}_ws`;
-                            }
-                        });
-                    }
-                    if (Array.isArray(data.weightSpecs)) {
-                        data.weightSpecs.forEach((spec) => {
-                            const splits = spec.name.split('/');
-                            splits[0] = `${splits[0]}_ws`;
-                            spec.name = splits.join('/');
-                        });
-                    }
-                    resolve(data);
-                },
-            })
-        );
-        this.model = await tf.loadLayersModel({ load: () => modelData });
-        model.dispose();
+        try {
+            const model = await tf.loadLayersModel(url);
+            const modelData = new Promise((resolve) =>
+                model.save({
+                    save: (data) => {
+                        const layers = data?.modelTopology?.config?.layers;
+                        if (Array.isArray(layers)) {
+                            data.modelTopology.config.layers.forEach((layer) => {
+                                if (layer?.config?.name) {
+                                    layer.config.name = `${layer.config.name}_ws`;
+                                }
+                            });
+                        }
+                        if (Array.isArray(data.weightSpecs)) {
+                            data.weightSpecs.forEach((spec) => {
+                                const splits = spec.name.split('/');
+                                splits[0] = `${splits[0]}_ws`;
+                                spec.name = splits.join('/');
+                            });
+                        }
+                        resolve(data);
+                    },
+                })
+            );
+            this.model = await tf.loadLayersModel({ load: () => modelData });
+            this.attrValueMaps = this.result?.attrValueMaps || {};
+            model.dispose();
+        } catch (e) {
+            console.error('LogisticRegression model load failed:', e);
+            Entry.toast.alert(
+                typeof Lang !== 'undefined' ? (Lang.Msgs?.warn || '경고') : '경고',
+                typeof Lang !== 'undefined' && Lang.AiLearning?.load_error
+                    ? Lang.AiLearning.load_error
+                    : '모델을 불러오는 중 오류가 발생했습니다. 다시 학습시켜 주세요.'
+            );
+        }
     }
 
     async reload(url) {
-        this.model = await tf.loadLayersModel(url || this.url);
-        this.isLoaded = true;
+        try {
+            this.model = await tf.loadLayersModel(url || this.url);
+            this.isLoaded = true;
+        } catch (e) {
+            console.error('LogisticRegression model reload failed:', e);
+            Entry.toast.alert(
+                typeof Lang !== 'undefined' ? (Lang.Msgs?.warn || '경고') : '경고',
+                typeof Lang !== 'undefined' && Lang.AiLearning?.load_error
+                    ? Lang.AiLearning.load_error
+                    : '모델을 불러오는 중 오류가 발생했습니다. 다시 학습시켜 주세요.'
+            );
+        }
     }
 
     async train() {
@@ -89,6 +121,7 @@ class LogisticRegression extends LearningBase {
             return;
         }
         this.trained = false;
+        this.model = null;
         let currentEpoch = 0;
         let percent = 0;
         this.trainCallback(1);
@@ -103,7 +136,21 @@ class LogisticRegression extends LearningBase {
             valueMap,
             dataLength,
             numClass,
+            hasMissing,
+            attrValueMaps,
         } = getData(validationRate, testRate, this.table, this.trainParam);
+
+        if (hasMissing) {
+            this.trainCallback(0);
+            const msg = typeof Lang !== 'undefined' && Lang.AiLearning?.missing_value_error
+                ? Lang.AiLearning.missing_value_error
+                : '결측치가 존재하여 학습을 중단합니다. 결측치를 처리한 후에 재학습을 진행하세요.';
+            Entry.toast.alert(
+                typeof Lang !== 'undefined' ? (Lang.Msgs?.warn || '경고') : '경고',
+                msg
+            );
+            throw new Error(msg);
+        }
 
         this.valueMap = Object.fromEntries(
             Object.entries(valueMap).map(([key, value]) => [value, key])
@@ -135,17 +182,40 @@ class LogisticRegression extends LearningBase {
             accuracy,
             f1,
             valueMap: this.valueMap,
+            attrValueMaps,
             precision,
             recall,
         };
+        this.attrLength = select[0].length;
+        this.updateFields();
         this.trainCallback(100);
+    }
+
+    updateFields() {
+        this.fields = this.table?.select?.[0]?.map((index) => this.table?.fields[index]);
+        this.predictFields = this.table?.select?.[1]?.map((index) => this.table?.fields[index]);
     }
 
     async predict(array) {
         if (!this.model) {
             throw new Error("can't predict: no model");
         }
-        const xs = tf.tensor([array]);
+        const attrFiltered = this.result?.select?.[0] || [];
+        const encodedArray = array.map((val, index) => {
+            const originalIndex = attrFiltered[index];
+            const num = parseFloat(val);
+            if (!_isNaN(num)) {
+                return num;
+            }
+            const map = this.attrValueMaps?.[originalIndex];
+            if (map) {
+                const trimmedValue = typeof val === 'string' ? val.trim() : val;
+                return map[trimmedValue] || 0;
+            }
+            return 0;
+        });
+
+        const xs = tf.tensor([encodedArray]);
         const preds = this.model.predict(xs);
         const resultArray = preds.arraySync();
         const valueMap = this.result?.valueMap || {};
@@ -223,6 +293,9 @@ async function trainModel(model, inputs, outputs, trainParam, onEpochEnd) {
 function getData(validationRate, testRate, data, trainParam) {
     const tempMap = {};
     const tempMapCount = {};
+    const ATTR_STR2NUM_MAP = {};
+    const ATTR_STR2NUM_MAP_COUNT = {};
+
     let { select = [[0], [1]], data: table, fields, id: tableId } = data;
 
     // V23: Restore fallback for default sample data (test_table_1) if fields are lost
@@ -240,11 +313,34 @@ function getData(validationRate, testRate, data, trainParam) {
     const [attr, predict] = select;
     const filtered = table.filter((row) => {
         const label = row[predict[0]];
-        return label !== undefined && label !== null && String(label).trim() !== '';
+        const hasLabel = label !== undefined && label !== null && String(label).trim() !== '';
+        const hasAttrs = attr.every((i) => {
+            const val = row[i];
+            return val !== undefined && val !== null && String(val).trim() !== '';
+        });
+        return hasLabel && hasAttrs;
     });
+
+    const hasMissing = table.some((row) => {
+        const label = row[predict[0]];
+        const hasLabel = label !== undefined && label !== null && String(label).trim() !== '';
+        const hasAttrs = attr.every((i) => {
+            const val = row[i];
+            return val !== undefined && val !== null && String(val).trim() !== '';
+        });
+        return !hasLabel || !hasAttrs;
+    });
+
     const dataArray = filtered
         .map((row) => ({
-            x: attr.map((i) => parseFloat(row[i]) || 0),
+            x: attr.map((i) => {
+                const val = row[i];
+                const num = parseFloat(val);
+                if (!_isNaN(num)) {
+                    return num;
+                }
+                return Utils.stringToNumber(i, val, ATTR_STR2NUM_MAP, ATTR_STR2NUM_MAP_COUNT);
+            }),
             y: Utils.stringToNumber(predict[0], row[predict[0]], tempMap, tempMapCount),
         }))
         .map((row) => {
@@ -264,8 +360,10 @@ function getData(validationRate, testRate, data, trainParam) {
         select,
         fields: attr.map((i) => fields && fields[i] ? fields[i] : `Col ${i}`),
         valueMap: { ...tempMap[predict[0]] },
+        attrValueMaps: ATTR_STR2NUM_MAP,
         dataLength: attr.length,
-        numClass: tempMapCount[predict[0]],
+        numClass: tempMapCount[predict[0]] || 1,
+        hasMissing,
     };
 }
 

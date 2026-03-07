@@ -506,6 +506,9 @@ module.exports = {
                         }).catch((e) => {
                             console.error('AI Training Error:', e);
                             script.isDone = true;
+                            Entry.Utils.stopProjectWithToast(script, 'IncompatibleError', {
+                                toast: e.message || 'Training failed',
+                            });
                         });
                         return script;
                     }
@@ -692,7 +695,7 @@ module.exports = {
 const predictBlocks = createParamBlock({
     type: ['svm', 'logistic_regression', 'decisiontree'],
     name: 'get_predict',
-    length: 6,
+    length: 12,
     createFunc: (paramsKeyMap) => async (sprite, script) => {
         if (!Entry.aiLearning.isTrained()) {
             Entry.Utils.stopProjectWithToast(script, 'IncompatibleError', {
@@ -713,7 +716,7 @@ const booleanPredictBlocks = createParamBlock({
     type: ['svm', 'logistic_regression', 'decisiontree'],
     name: 'is_result',
     skeleton: 'basic_boolean_field',
-    length: 6,
+    length: 12,
     createFunc: (paramsKeyMap) => async (sprite, script) => {
         if (!Entry.aiLearning.isTrained()) {
             Entry.Utils.stopProjectWithToast(script, 'IncompatibleError', {

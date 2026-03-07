@@ -17,6 +17,12 @@ export const classes = [
     'svm_attr_4',
     'svm_attr_5',
     'svm_attr_6',
+    'svm_attr_7',
+    'svm_attr_8',
+    'svm_attr_9',
+    'svm_attr_10',
+    'svm_attr_11',
+    'svm_attr_12',
 ];
 
 export const KERNEL_STRING_TYPE = {
@@ -43,7 +49,12 @@ class Svm extends LearningBase {
     init({ name, url, result, table, trainParam, modelId, loadModel }) {
         this.name = name;
         this.trainParam = trainParam || {};
-        this.result = result || {};
+        // Preserve trained result across stop-event re-init.
+        // The 'stop' event calls init() with stale constructor params;
+        // if we already have a trained result, keep it intact.
+        if (!this.result?.fields) {
+            this.result = result || {};
+        }
         this.table = table;
         this.loadModel = loadModel;
         this.trainCallback = (value) => {
@@ -104,6 +115,8 @@ class Svm extends LearningBase {
         } catch (e) {
             return;
         }
+        this.trained = false;
+        this.model = null;
         this.trainCallback(1);
         this.checkTrainOptionValidation();
         const { testRate = 0.2, C, kernel, degree, gamma } = this.trainParam;
@@ -115,7 +128,21 @@ class Svm extends LearningBase {
             fields,
             PREDICT_STR2NUM_MAP,
             numClass,
+            hasMissing,
+            attrValueMaps,
         } = this.getData(testRate, this.table);
+
+        if (hasMissing) {
+            this.trainCallback(0);
+            const msg = typeof Lang !== 'undefined' && Lang.AiLearning?.missing_value_error
+                ? Lang.AiLearning.missing_value_error
+                : '결측치가 존재하여 학습을 중단합니다. 결측치를 처리한 후에 재학습을 진행하세요.';
+            Entry.toast.alert(
+                typeof Lang !== 'undefined' ? (Lang.Msgs?.warn || '경고') : '경고',
+                msg
+            );
+            throw new Error(msg);
+        }
         const svmTrainOption = {
             kernel,
             C,
@@ -145,9 +172,12 @@ class Svm extends LearningBase {
             accuracy,
             f1,
             valueMap: this.predictValueMap,
+            attrValueMaps,
             precision,
             recall,
         };
+        this.attrLength = select[0].length;
+        this.updateFields();
         this.trained = true;
     }
 
@@ -164,10 +194,30 @@ class Svm extends LearningBase {
             return;
         }
         const { serializeModel, result } = data;
-        this.model = SVM.load(serializeModel);
+        try {
+            this.model = SVM.load(serializeModel);
+        } catch (e) {
+            console.error('Svm model load failed:', e);
+            Entry.toast.alert(
+                typeof Lang !== 'undefined' ? (Lang.Msgs?.warn || '경고') : '경고',
+                typeof Lang !== 'undefined' && Lang.AiLearning?.load_error
+                    ? Lang.AiLearning.load_error
+                    : '모델을 불러오는 중 오류가 발생했습니다. 다시 학습시켜 주세요.'
+            );
+        }
         this.valueMap = result?.valueMap;
         this.result = result;
+        if (result?.select?.[0]) {
+            this.attrLength = result.select[0].length;
+            this.attrValueMaps = result.attrValueMaps || {};
+            this.updateFields();
+        }
         this.trained = true;
+    }
+
+    updateFields() {
+        this.fields = this.table?.select?.[0]?.map((index) => this.table?.fields[index]);
+        this.predictFields = this.table?.select?.[1]?.map((index) => this.table?.fields[index]);
     }
 
     // INFO: 예상치 전체를 가져옴. Deeplearning 레포의 predictArrays와 동일
@@ -175,7 +225,22 @@ class Svm extends LearningBase {
         if (!this.model) {
             throw new Error("can't predict: no model");
         }
-        const xs = [array];
+        const attrFiltered = this.result?.select?.[0] || [];
+        const encodedArray = array.map((val, index) => {
+            const originalIndex = attrFiltered[index];
+            const num = parseFloat(val);
+            if (!_isNaN(num)) {
+                return num;
+            }
+            const map = this.attrValueMaps?.[originalIndex];
+            if (map) {
+                const trimmedValue = typeof val === 'string' ? val.trim() : val;
+                return map[trimmedValue] || 0;
+            }
+            return 0;
+        });
+
+        const xs = [encodedArray];
         const preds = this.model.predict(xs);
         this.predictResult = preds.map((target) => ({
             className: this.valueMap[target + 1],
@@ -186,15 +251,41 @@ class Svm extends LearningBase {
     getData(testRate, data) {
         const STR2NUM_MAP = {};
         const STR2NUM_MAP_COUNT = {};
+        const ATTR_STR2NUM_MAP = {};
+        const ATTR_STR2NUM_MAP_COUNT = {};
+
         const { select = [[0], [1]], data: table, fields } = data;
         const [attr, predict] = select;
         const filtered = table.filter((row) => {
             const label = row[predict[0]];
-            return label !== undefined && label !== null && String(label).trim() !== '';
+            const hasLabel = label !== undefined && label !== null && String(label).trim() !== '';
+            const hasAttrs = attr.every((i) => {
+                const val = row[i];
+                return val !== undefined && val !== null && String(val).trim() !== '';
+            });
+            return hasLabel && hasAttrs;
         });
+
+        const hasMissing = table.some((row) => {
+            const label = row[predict[0]];
+            const hasLabel = label !== undefined && label !== null && String(label).trim() !== '';
+            const hasAttrs = attr.every((i) => {
+                const val = row[i];
+                return val !== undefined && val !== null && String(val).trim() !== '';
+            });
+            return !hasLabel || !hasAttrs;
+        });
+
         const dataArray = filtered
             .map((row) => ({
-                x: attr.map((i) => parseFloat(row[i]) || 0),
+                x: attr.map((i) => {
+                    const val = row[i];
+                    const num = parseFloat(val);
+                    if (!_isNaN(num)) {
+                        return num;
+                    }
+                    return Utils.stringToNumber(i, val, ATTR_STR2NUM_MAP, ATTR_STR2NUM_MAP_COUNT);
+                }),
                 y: Utils.stringToNumber(
                     predict[0],
                     row[predict[0]],
@@ -214,7 +305,9 @@ class Svm extends LearningBase {
             select,
             fields: attr.map((i) => fields[i]),
             PREDICT_STR2NUM_MAP: { ...STR2NUM_MAP[predict[0]] },
+            attrValueMaps: ATTR_STR2NUM_MAP,
             numClass: STR2NUM_MAP_COUNT[predict[0]],
+            hasMissing,
         };
     }
 
