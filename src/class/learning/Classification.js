@@ -14,6 +14,11 @@ class Classification {
         this.#url = url;
         this.#labels = labels;
         this.#recordTime = recordTime;
+        this.isLoaded = true;
+    }
+
+    isTrained() {
+        return !!this.isLoaded;
     }
 
     getResult(indexOrName) {
@@ -45,9 +50,7 @@ class Classification {
         this.#popup.open();
     }
 
-    isTrained() {
-        return true;
-    }
+
 }
 
 export default Classification;
