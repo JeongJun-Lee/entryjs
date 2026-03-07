@@ -44,6 +44,7 @@ class NumberClassification {
 
     init({ name, url, table, trainParam, modelId, loadModel, result }) {
         this.#name = name;
+        this.#trainParam = trainParam || {};
         this.#table = table;
         this.result = result;
         this.#trainCallback = (value) => {
@@ -82,15 +83,26 @@ class NumberClassification {
     }
 
     setTable() {
-        const tableSource = DataTable.getSource(this.#table.id);
-        if (!tableSource) {
+        if (!this.#table) {
+            Entry.toast.alert(Lang.Msgs.warn, Lang.AiLearning.train_param_error);
+            throw Error(Lang.AiLearning.train_param_error);
+        }
+        if (!this.#table.id) {
+            if (!this.#table.data) {
+                Entry.toast.alert(Lang.Msgs.warn, Lang.AiLearning.train_param_error);
+                throw Error(Lang.AiLearning.train_param_error);
+            }
             return;
         }
-        const sourceLength = tableSource.fields.length;
-        const [attr, predict] = this.#table.select || [[], []];
-        const maxIndex = Math.max(...attr, ...predict);
-
-        if (maxIndex >= sourceLength) {
+        const tableSource = DataTable.getSource(this.#table.id);
+        if (!tableSource) {
+            if (!this.#table.data) {
+                Entry.toast.alert(Lang.Msgs.warn, Lang.AiLearning.train_param_error);
+                throw Error(Lang.AiLearning.train_param_error);
+            }
+            return;
+        }
+        if (this.#table.fieldsInfo && this.#table.fieldsInfo.length !== tableSource.fields.length) {
             Entry.toast.alert(Lang.Msgs.warn, Lang.AiLearning.train_param_error);
             throw Error(Lang.AiLearning.train_param_error);
         }
@@ -130,7 +142,7 @@ class NumberClassification {
     }
 
     isTrained() {
-        return this.#isTrained;
+        return this.#isTrained && !!this.#trainParam.isLoaded;
     }
 
     openChart() {
@@ -165,8 +177,16 @@ class NumberClassification {
         return this.#trainParam;
     }
 
-    getResult() {
-        return this.#predictResult;
+    getResult(indexOrName) {
+        const result = this.#predictResult || [];
+        const defaultResult = { probability: 0, className: '' };
+        if (indexOrName !== undefined && indexOrName !== null) {
+            const label = this.#trainParam.labels[indexOrName] || indexOrName;
+            return (
+                result.find(({ className }) => String(className) === String(label)) || defaultResult
+            );
+        }
+        return result[0] || defaultResult;
     }
 
     getTrainResult() {
@@ -179,7 +199,11 @@ class NumberClassification {
     }
 
     train() {
-        this.setTable();
+        try {
+            this.setTable();
+        } catch (e) {
+            return;
+        }
         this.#trainCallback(1);
         this.#isTrained = false;
         const { data: trainData, labels } = convertTableToKnnData(this.#table);
@@ -209,6 +233,7 @@ class NumberClassification {
             minVector,
         };
         this.#isTrained = true;
+        this.#trainParam.isLoaded = true;
         this.colors = this.createColor();
         this.#chart?.load({
             source: this.chartData,

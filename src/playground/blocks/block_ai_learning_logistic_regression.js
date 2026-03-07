@@ -7,6 +7,16 @@ module.exports = {
             name: 'get_logistic_regression_probability',
             length: 6,
             createFunc: (paramsKeyMap) => async (sprite, script) => {
+                if (!Entry.aiLearning.isTrained()) {
+                    Entry.toast.alert(
+                        typeof Lang !== 'undefined' ? (Lang.Msgs?.warn || '경고') : '경고',
+                        typeof Lang !== 'undefined' && Lang.AiLearning?.no_model_error
+                            ? Lang.AiLearning.no_model_error
+                            : '학습된 모델이 없습니다. 학습 창에서 다시 학습시켜 주세요.'
+                    );
+                    Entry.engine.toggleStop();
+                    return script.callReturn();
+                }
                 const keys = Object.keys(paramsKeyMap);
                 const predictKey = keys.pop();
                 const params = keys.map((key) => script.getNumberValue(key, script));
@@ -97,8 +107,49 @@ module.exports = {
                 class: 'ai_learning',
                 isNotFor: ['ai_learning_logistic_regression'],
                 func(sprite, script) {
+                    if (!Entry.aiLearning.isTrained()) {
+                        Entry.Utils.stopProjectWithToast(script, 'IncompatibleError', {
+                            toast:
+                                typeof Lang !== 'undefined' && Lang.AiLearning?.no_model_error
+                                    ? Lang.AiLearning.no_model_error
+                                    : '학습된 모델이 없습니다. 학습 창에서 다시 학습시켜 주세요.',
+                        });
+                        return script.callReturn();
+                    }
                     const option = script.getField('OPTION', script);
                     const value = script.getNumberValue('VALUE', script);
+
+                    if (option === 'learningRate' && value <= 0) {
+                        Entry.toast.alert(
+                            typeof Lang !== 'undefined' ? (Lang.Msgs?.warn || '경고') : '경고',
+                            typeof Lang !== 'undefined' && Lang.AiLearning?.learning_rate_error
+                                ? Lang.AiLearning.learning_rate_error
+                                : '학습률은 0보다 큰 값으로 입력해 주세요.'
+                        );
+                        Entry.engine.toggleStop();
+                        return script.callReturn();
+                    }
+                    if (option === 'epochs' && value < 1) {
+                        Entry.toast.alert(
+                            typeof Lang !== 'undefined' ? (Lang.Msgs?.warn || '경고') : '경고',
+                            typeof Lang !== 'undefined' && Lang.AiLearning?.epochs_error
+                                ? Lang.AiLearning.epochs_error
+                                : '학습 횟수는 1 이상의 정수로 입력해 주세요.'
+                        );
+                        Entry.engine.toggleStop();
+                        return script.callReturn();
+                    }
+                    if (option === 'validationRate' && (value < 0.1 || value > 0.9)) {
+                        Entry.toast.alert(
+                            typeof Lang !== 'undefined' ? (Lang.Msgs?.warn || '경고') : '경고',
+                            typeof Lang !== 'undefined' && Lang.AiLearning?.validation_rate_error
+                                ? Lang.AiLearning.validation_rate_error
+                                : '검증 데이터 비율은 0.1 ~ 0.9 사이의 값으로 입력해 주세요.'
+                        );
+                        Entry.engine.toggleStop();
+                        return script.callReturn();
+                    }
+
                     Entry.aiLearning.setTrainOption(option, parseFloat(value));
                     return script.callReturn();
                 },
@@ -143,6 +194,15 @@ module.exports = {
                 class: 'ai_learning',
                 isNotFor: ['ai_learning_logistic_regression'],
                 func(sprite, script) {
+                    if (!Entry.aiLearning.isTrained()) {
+                        Entry.Utils.stopProjectWithToast(script, 'IncompatibleError', {
+                            toast:
+                                typeof Lang !== 'undefined' && Lang.AiLearning?.no_model_error
+                                    ? Lang.AiLearning.no_model_error
+                                    : '학습된 모델이 없습니다. 학습 창에서 다시 학습시켜 주세요.',
+                        });
+                        return script.callReturn();
+                    }
                     const optimizer = script.getField('OPTIMIZER', script);
                     Entry.aiLearning.setTrainOption('optimizer', optimizer);
                     return script.callReturn();

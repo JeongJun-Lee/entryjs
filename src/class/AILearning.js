@@ -175,17 +175,18 @@ export default class AILearning {
                 url: modelPath,
                 trainParam,
                 table: this.#tableData,
-                modelId: this.#modelId,
-                loadModel: this.#dataApi?.loadModel,
+                model,
             });
             this.#labels = this.#module.getLabels();
         } else if (type === 'cluster') {
             this.#tableData = tableData || createDataTable(classes, name);
             this.#module = new Cluster({
                 name,
-                result: this.result,
+                result,
+                url,
                 trainParam,
                 table: this.#tableData,
+                model,
             });
         } else if (type === 'regression') {
             this.#tableData = tableData || createDataTable(classes, name);
@@ -195,6 +196,7 @@ export default class AILearning {
                 url: modelPath,
                 trainParam,
                 table: this.#tableData,
+                model,
             });
         } else if (type === 'image') {
             this.#module = new ImageLearning({
@@ -217,6 +219,7 @@ export default class AILearning {
                 url: modelPath,
                 trainParam,
                 table: this.#tableData,
+                model,
             });
         } else if (type === 'decisionTree') {
             this.#tableData = tableData || createDataTable(classes, name);
@@ -226,8 +229,7 @@ export default class AILearning {
                 url: modelPath,
                 trainParam,
                 table: this.#tableData,
-                modelId: this.#modelId,
-                loadModel: this.#dataApi?.loadModel,
+                model,
             });
         } else if (type === 'svm') {
             this.#tableData = tableData || createDataTable(classes, name);
@@ -237,8 +239,7 @@ export default class AILearning {
                 url: modelPath,
                 trainParam,
                 table: this.#tableData,
-                modelId: this.#modelId,
-                loadModel: this.#dataApi?.loadModel,
+                model,
             });
         }
 
@@ -320,7 +321,7 @@ export default class AILearning {
     }
 
     isTrained() {
-        return this.#module?.isTrained?.();
+        return !!this.#module?.isTrained?.();
     }
 
     setTrainOption(type, value) {

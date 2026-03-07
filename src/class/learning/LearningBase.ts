@@ -18,7 +18,6 @@ class LearningBase {
     fields: Array<String> = [];
     predictFields: Array<String> = [];
     result = {};
-    loadModel: () => {};
     table: Table;
     trainParam: any = null;
     trainCallback: (value: any) => void;
@@ -37,8 +36,8 @@ class LearningBase {
 
     init({ name, result, table, trainParam }: any) {
         this.name = name;
-        this.trainParam = trainParam;
-        this.result = result;
+        this.trainParam = trainParam || {};
+        this.result = result || {};
         this.table = table;
         this.trainCallback = (value: any) => {
             this.view.setValue(value);
@@ -56,36 +55,31 @@ class LearningBase {
     }
 
     setTable() {
+        // table 자체가 없으면 오류
+        if (!this.table) {
+            Entry.toast.alert(Lang.Msgs.warn, Lang.AiLearning.train_param_error);
+            throw Error(Lang.AiLearning.train_param_error);
+        }
+        // table.id가 없는 경우 = iris 샘플 데이터처럼 DataTable을 거치지 않는 내장 데이터
+        // table.data가 이미 있으면 그대로 사용
+        if (!this.table.id) {
+            if (!this.table.data) {
+                Entry.toast.alert(Lang.Msgs.warn, Lang.AiLearning.train_param_error);
+                throw Error(Lang.AiLearning.train_param_error);
+            }
+            return; // 기존 데이터를 그대로 사용
+        }
+        // DataTable에서 최신 데이터 refresh
         const tableSource = DataTable.getSource(this.table.id);
         if (!tableSource) {
+            // DataTable에서 찾지 못한 경우, 기존 table.data 사용
+            if (!this.table.data) {
+                Entry.toast.alert(Lang.Msgs.warn, Lang.AiLearning.train_param_error);
+                throw Error(Lang.AiLearning.train_param_error);
+            }
             return;
         }
-        let data = [];
-        if (tableSource.rows && Array.isArray(tableSource.rows)) data = tableSource.rows;
-        else if (tableSource.origin && Array.isArray(tableSource.origin)) data = tableSource.origin;
-        else if (tableSource.data && Array.isArray(tableSource.data)) {
-            if (tableSource.data.length > 0 && tableSource.data[0].value) data = tableSource.data.map(r => r.value);
-            else data = tableSource.data;
-        }
-
-        let fields = tableSource.fields || [];
-        if (typeof tableSource.toJSON === 'function') {
-            const json = tableSource.toJSON();
-            fields = json.fields || fields;
-            if (data.length === 0) {
-                if (json.origin) data = json.origin;
-                else if (json.data) {
-                    if (json.data.length > 0 && json.data[0].value) data = json.data.map(r => r.value);
-                    else data = json.data;
-                }
-            }
-        }
-
-        const sourceLength = fields.length;
-        const [attr, predict] = this.table.select || [[], []];
-        const maxIndex = Math.max(...attr, ...predict);
-
-        if (maxIndex >= sourceLength && this.table.id !== 'test_table_1') {
+        if (this.table.fieldsInfo && this.table.fieldsInfo.length !== tableSource.fields.length) {
             Entry.toast.alert(Lang.Msgs.warn, Lang.AiLearning.train_param_error);
             throw Error(Lang.AiLearning.train_param_error);
         }

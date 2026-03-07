@@ -89,8 +89,29 @@ module.exports = {
                 class: 'ai_learning',
                 isNotFor: ['ai_learning_svm'],
                 func(sprite, script) {
+                    if (!Entry.aiLearning.isTrained()) {
+                        Entry.Utils.stopProjectWithToast(script, 'IncompatibleError', {
+                            toast:
+                                typeof Lang !== 'undefined' && Lang.AiLearning?.no_model_error
+                                    ? Lang.AiLearning.no_model_error
+                                    : '학습된 모델이 없습니다. 학습 창에서 다시 학습시켜 주세요.',
+                        });
+                        return script.callReturn();
+                    }
                     const option = script.getStringField('OPTION', script);
                     const value = script.getNumberValue('VALUE', script);
+
+                    if (option === 'C' && value <= 0) {
+                        Entry.toast.alert(
+                            typeof Lang !== 'undefined' ? (Lang.Msgs?.warn || '경고') : '경고',
+                            typeof Lang !== 'undefined' && Lang.AiLearning?.svm_c_error
+                                ? Lang.AiLearning.svm_c_error
+                                : 'C 값은 0보다 큰 값으로 입력해 주세요.'
+                        );
+                        Entry.engine.toggleStop();
+                        return script.callReturn();
+                    }
+
                     Entry.aiLearning.setTrainOption(option, parseFloat(value));
                     return script.callReturn();
                 },
@@ -131,6 +152,15 @@ module.exports = {
                 class: 'ai_learning',
                 isNotFor: ['ai_learning_svm'],
                 async func(sprite, script) {
+                    if (!Entry.aiLearning.isTrained()) {
+                        Entry.Utils.stopProjectWithToast(script, 'IncompatibleError', {
+                            toast:
+                                typeof Lang !== 'undefined' && Lang.AiLearning?.no_model_error
+                                    ? Lang.AiLearning.no_model_error
+                                    : '학습된 모델이 없습니다. 학습 창에서 다시 학습시켜 주세요.',
+                        });
+                        return script.callReturn();
+                    }
                     const defaultValue = { degree: 3, gamma: 1 };
                     Entry.aiLearning.setTrainOption('kernel', 'linear');
                     Entry.aiLearning.setTrainOption('degree', defaultValue.degree);
@@ -183,6 +213,15 @@ module.exports = {
                 class: 'ai_learning',
                 isNotFor: ['ai_learning_svm'],
                 func(sprite, script) {
+                    if (!Entry.aiLearning.isTrained()) {
+                        Entry.Utils.stopProjectWithToast(script, 'IncompatibleError', {
+                            toast:
+                                typeof Lang !== 'undefined' && Lang.AiLearning?.no_model_error
+                                    ? Lang.AiLearning.no_model_error
+                                    : '학습된 모델이 없습니다. 학습 창에서 다시 학습시켜 주세요.',
+                        });
+                        return script.callReturn();
+                    }
                     // 초기화
                     Entry.aiLearning.setTrainOption('gamma', OPTION_DEFAULT_VALUE.gamma);
                     Entry.aiLearning.setTrainOption('degree', OPTION_DEFAULT_VALUE.degree);
@@ -190,6 +229,28 @@ module.exports = {
                     const kernel = script.getStringField('KERNEL', script);
                     const option = script.getStringField('OPTION', script);
                     const value = script.getNumberValue('VALUE', script);
+
+                    if (option === 'degree' && value < 1) {
+                        Entry.toast.alert(
+                            typeof Lang !== 'undefined' ? (Lang.Msgs?.warn || '경고') : '경고',
+                            typeof Lang !== 'undefined' && Lang.AiLearning?.svm_degree_error
+                                ? Lang.AiLearning.svm_degree_error
+                                : '차수는 1 이상의 정수로 입력해 주세요.'
+                        );
+                        Entry.engine.toggleStop();
+                        return script.callReturn();
+                    }
+                    if (option === 'gamma' && value <= 0) {
+                        Entry.toast.alert(
+                            typeof Lang !== 'undefined' ? (Lang.Msgs?.warn || '경고') : '경고',
+                            typeof Lang !== 'undefined' && Lang.AiLearning?.svm_gamma_error
+                                ? Lang.AiLearning.svm_gamma_error
+                                : '감마 값은 0보다 큰 값으로 입력해 주세요.'
+                        );
+                        Entry.engine.toggleStop();
+                        return script.callReturn();
+                    }
+
                     Entry.aiLearning.setTrainOption('kernel', kernel);
                     Entry.aiLearning.setTrainOption(option, parseFloat(value));
                     return script.callReturn();

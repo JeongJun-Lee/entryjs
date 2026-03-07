@@ -30,9 +30,9 @@ module.exports = {
                     {
                         type: 'Dropdown',
                         options: [
-                            [Lang.AiLearning.train_param_minNumSamples || '노드의 최소 데이터 수', 'minNumSamples'],
-                            [Lang.AiLearning.train_param_maxDepth || '최대 깊이', 'maxDepth'],
-                            [Lang.AiLearning.train_param_gainThreshold || '가지를 나눌 기준값', 'gainThreshold'],
+                            [Lang.AiLearning.train_param_minNumSamples, 'minNumSamples'],
+                            [Lang.AiLearning.train_param_maxDepth, 'maxDepth'],
+                            [Lang.AiLearning.train_param_gainThreshold, 'gainThreshold'],
                         ],
                         value: 'minNumSamples',
                         bgColor: EntryStatic.colorSet.block.darken.AI_LEARNING,
@@ -51,6 +51,7 @@ module.exports = {
                 ],
                 events: {},
                 def: {
+                    params: ['minNumSamples', 3],
                     type: 'set_decisiontree_option',
                 },
                 pyHelpDef: {
@@ -64,16 +65,55 @@ module.exports = {
                 class: 'ai_learning',
                 isNotFor: ['ai_learning_decisiontree'],
                 func(sprite, script) {
+                    if (!Entry.aiLearning.isTrained()) {
+                        Entry.Utils.stopProjectWithToast(script, 'IncompatibleError', {
+                            toast:
+                                typeof Lang !== 'undefined' && Lang.AiLearning?.no_model_error
+                                    ? Lang.AiLearning.no_model_error
+                                    : '학습된 모델이 없습니다. 학습 창에서 다시 학습시켜 주세요.',
+                        });
+                        return script.callReturn();
+                    }
                     const option = script.getField('OPTION', script);
                     const value = script.getNumberValue('VALUE', script);
+
                     if (option === 'maxDepth' && value < 2) {
-                        const msg = '트리의 최대 깊이는 2 이상으로 입력해 주세요.';
                         Entry.toast.alert(
                             typeof Lang !== 'undefined' ? (Lang.Msgs?.warn || '경고') : '경고',
-                            msg
+                            typeof Lang !== 'undefined' && Lang.AiLearning?.max_depth_error
+                                ? Lang.AiLearning.max_depth_error
+                                : '트리의 최대 깊이는 2 이상으로 입력해 주세요.'
                         );
-                        throw new Error(msg);
+                        Entry.engine.toggleStop();
+                        return script.callReturn();
                     }
+                    if (option === 'minNumSamples') {
+                        if (value < 2) {
+                            Entry.toast.alert(
+                                typeof Lang !== 'undefined' ? (Lang.Msgs?.warn || '경고') : '경고',
+                                typeof Lang !== 'undefined' && Lang.AiLearning?.min_samples_error_under
+                                    ? Lang.AiLearning.min_samples_error_under
+                                    : '노드의 최소 데이터 수는 2 이상으로 입력해 주세요.'
+                            );
+                            Entry.engine.toggleStop();
+                            return script.callReturn();
+                        }
+
+                        const table = Entry.aiLearning?.getTableData?.();
+                        const trainDataLength = table?.data?.length || 0;
+                        if (trainDataLength > 0 && value > trainDataLength) {
+                            const errorMsg = typeof Lang !== 'undefined' && Lang.AiLearning?.min_samples_error
+                                ? Lang.AiLearning.min_samples_error.replace('%d', trainDataLength)
+                                : `노드의 최소 데이터 수는 전체 학습 데이터 수(${trainDataLength})보다 작거나 같아야 합니다.`;
+                            Entry.toast.alert(
+                                typeof Lang !== 'undefined' ? (Lang.Msgs?.warn || '경고') : '경고',
+                                errorMsg
+                            );
+                            Entry.engine.toggleStop();
+                            return script.callReturn();
+                        }
+                    }
+
                     Entry.aiLearning.setTrainOption(option, parseFloat(value));
                     return script.callReturn();
                 },
@@ -119,6 +159,15 @@ module.exports = {
                 class: 'ai_learning',
                 isNotFor: ['ai_learning_decisiontree'],
                 async func(sprite, script) {
+                    if (!Entry.aiLearning.isTrained()) {
+                        Entry.Utils.stopProjectWithToast(script, 'IncompatibleError', {
+                            toast:
+                                typeof Lang !== 'undefined' && Lang.AiLearning?.no_model_error
+                                    ? Lang.AiLearning.no_model_error
+                                    : '학습된 모델이 없습니다. 학습 창에서 다시 학습시켜 주세요.',
+                        });
+                        return script.callReturn();
+                    }
                     const visible = script.getField('VISIBLE');
                     Entry.aiLearning.setChartVisible(visible === 'open');
                     return script.callReturn();

@@ -41,7 +41,9 @@ class Executor {
                 const schema = this.scope.block.getSchema();
                 /*
                 if (schema.class === 'ai_learning' && isOffline) {
-                    throw new Entry.Utils.OfflineError();
+                    if (!Entry.aiLearning || !Entry.aiLearning.isLoaded) {
+                        throw new Entry.Utils.OfflineError();
+                    }
                 }
                 */
                 if (schema && Entry.skeleton[schema.skeleton].executable) {

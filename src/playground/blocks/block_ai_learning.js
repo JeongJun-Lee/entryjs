@@ -3,7 +3,7 @@ import _floor from 'lodash/floor';
 const DropDownDynamicGenerator = {
     labels: () => {
         if (Entry?.aiLearning?.labels?.length) {
-            return Entry.aiLearning.labels.map((name, index) => [name, index]);
+            return Entry.aiLearning.labels.map((name) => [name, name]);
         } else {
             return [[Lang.Blocks.no_target, 'null']];
         }
@@ -19,15 +19,10 @@ const DropDownDynamicGenerator = {
         }
     },
     valueMap: () => {
-        const valueMap =
-            Object.values(
-                Entry.aiLearning.getTrainResult()?.valueMap ||
-                Entry.aiLearning?.result?.valueMap ||
-                {}
-            ) || [];
-
-        if (valueMap?.length) {
-            return valueMap.map((name) => [name, name]);
+        const valueMap = Entry.aiLearning.getTrainResult()?.valueMap || {};
+        const values = Object.values(valueMap);
+        if (values.length) {
+            return values.map((name) => [name, name]);
         } else {
             return [[Lang.Blocks.no_target, 'null']];
         }
@@ -108,9 +103,9 @@ const createParamBlock = ({
                 type: blockName,
             },
             paramsKeyMap,
-            class: 'ai_learning_result',
+            class: 'ai_learning',
             isNotFor: Array.isArray(type)
-                ? [`core_attr_${index}`]
+                ? type.map(element => `${element}_attr_${index}`)
                 : [`${type}_attr_${index}`],
             func: createFunc(paramsKeyMap),
             syntax: {
@@ -316,6 +311,15 @@ module.exports = {
                 class: 'ai_learning',
                 isNotFor: ['ai_learning_text'],
                 async func(sprite, script) {
+                    if (!Entry.aiLearning.isTrained()) {
+                        Entry.Utils.stopProjectWithToast(script, 'IncompatibleError', {
+                            toast:
+                                typeof Lang !== 'undefined' && Lang.AiLearning?.no_model_error
+                                    ? Lang.AiLearning.no_model_error
+                                    : '학습된 모델이 없습니다. 학습 창에서 다시 학습시켜 주세요.',
+                        });
+                        return script.callReturn();
+                    }
                     const text = script.getStringValue('TEXT', script);
                     await Entry.aiLearning.predict(text);
                     return script.callReturn();
@@ -345,6 +349,15 @@ module.exports = {
                 class: 'ai_learning',
                 isNotFor: ['ai_learning_classification'],
                 func(sprite, script) {
+                    if (!Entry.aiLearning.isTrained()) {
+                        Entry.Utils.stopProjectWithToast(script, 'IncompatibleError', {
+                            toast:
+                                typeof Lang !== 'undefined' && Lang.AiLearning?.no_model_error
+                                    ? Lang.AiLearning.no_model_error
+                                    : '학습된 모델이 없습니다. 학습 창에서 다시 학습시켜 주세요.',
+                        });
+                        return '';
+                    }
                     return Entry.aiLearning.getPredictResult().className;
                 },
                 syntax: {
@@ -389,7 +402,16 @@ module.exports = {
                 class: 'ai_learning',
                 isNotFor: ['ai_learning_classification'],
                 func(sprite, script) {
-                    const group = script.getNumberValue('GROUP', script);
+                    if (!Entry.aiLearning.isTrained()) {
+                        Entry.Utils.stopProjectWithToast(script, 'IncompatibleError', {
+                            toast:
+                                typeof Lang !== 'undefined' && Lang.AiLearning?.no_model_error
+                                    ? Lang.AiLearning.no_model_error
+                                    : '학습된 모델이 없습니다. 학습 창에서 다시 학습시켜 주세요.',
+                        });
+                        return 0;
+                    }
+                    const group = script.getField('GROUP', script);
                     return Entry.aiLearning.getPredictResult(group).probability;
                 },
                 syntax: {
@@ -429,11 +451,20 @@ module.exports = {
                 paramsKeyMap: {
                     GROUP: 0,
                 },
-                func(sprite, script) {
-                    const group = script.getNumberValue('GROUP', script);
-                    const { labels } = Entry.aiLearning;
+                async func(sprite, script) {
+                    if (!Entry.aiLearning.isTrained()) {
+                        Entry.Utils.stopProjectWithToast(script, 'IncompatibleError', {
+                            toast:
+                                typeof Lang !== 'undefined' && Lang.AiLearning?.no_model_error
+                                    ? Lang.AiLearning.no_model_error
+                                    : '학습된 모델이 없습니다. 학습 창에서 다시 학습시켜 주세요.',
+                        });
+                        return false;
+                    }
+                    // 모든 드롭다운이 레이블 이름을 직접 반환하므로 직접 비교 가능.
+                    const selectedLabel = script.getField('GROUP', script);
                     const result = Entry.aiLearning.getPredictResult().className;
-                    return result === labels[group];
+                    return result !== undefined && selectedLabel !== undefined && String(result) === String(selectedLabel);
                 },
                 syntax: {
                     js: [],
@@ -636,6 +667,15 @@ module.exports = {
                 class: 'ai_learning',
                 isNotFor: ['ai_learning_svm', 'ai_learning_logistic_regression', 'ai_learning_decisiontree'],
                 async func(sprite, script) {
+                    if (!Entry.aiLearning.isTrained()) {
+                        Entry.Utils.stopProjectWithToast(script, 'IncompatibleError', {
+                            toast:
+                                typeof Lang !== 'undefined' && Lang.AiLearning?.no_model_error
+                                    ? Lang.AiLearning.no_model_error
+                                    : '학습된 모델이 없습니다. 학습 창에서 다시 학습시켜 주세요.',
+                        });
+                        return script.callReturn();
+                    }
                     const type = script.getField('TYPE', script);
                     const result = Entry.aiLearning?.getTrainResult(); console.log("get_result_info type=", type, "result=", result);
                     return result?.[type];
@@ -654,6 +694,15 @@ const predictBlocks = createParamBlock({
     name: 'get_predict',
     length: 6,
     createFunc: (paramsKeyMap) => async (sprite, script) => {
+        if (!Entry.aiLearning.isTrained()) {
+            Entry.Utils.stopProjectWithToast(script, 'IncompatibleError', {
+                toast:
+                    typeof Lang !== 'undefined' && Lang.AiLearning?.no_model_error
+                        ? Lang.AiLearning.no_model_error
+                        : '학습된 모델이 없습니다. 학습 창에서 다시 학습시켜 주세요.',
+            });
+            return script.callReturn();
+        }
         const params = Object.keys(paramsKeyMap).map((key) => script.getNumberValue(key, script));
         console.log("Prediction params:", params); await Entry.aiLearning.predict(params);
         const result = Entry.aiLearning.getPredictResult();
@@ -666,17 +715,25 @@ const booleanPredictBlocks = createParamBlock({
     skeleton: 'basic_boolean_field',
     length: 6,
     createFunc: (paramsKeyMap) => async (sprite, script) => {
+        if (!Entry.aiLearning.isTrained()) {
+            Entry.Utils.stopProjectWithToast(script, 'IncompatibleError', {
+                toast:
+                    typeof Lang !== 'undefined' && Lang.AiLearning?.no_model_error
+                        ? Lang.AiLearning.no_model_error
+                        : '학습된 모델이 없습니다. 학습 창에서 다시 학습시켜 주세요.',
+            });
+            return script.callReturn();
+        }
         const keys = Object.keys(paramsKeyMap);
         const predictKey = keys.pop();
         const params = keys.map((key) => script.getNumberValue(key, script));
-        const predict = script.getStringField(predictKey, script);
-        console.log("Prediction params:", params); await Entry.aiLearning.predict(params);
+        // DropdownDynamic 타입은 getStringField 아닌 getField로 읽어야 함
+        const predict = script.getField(predictKey, script);
+        await Entry.aiLearning.predict(params);
         const predictResult = Entry.aiLearning.getPredictResult();
-        if (!Array.isArray(predictResult) || predictResult.length === 0) {
-            return false;
-        }
-        const result = [...predictResult].sort((a, b) => b.probability - a.probability)[0];
-        return result && !!result.probability && result.className === predict;
+        const result = predictResult.sort((a, b) => b.probability - a.probability)[0];
+        // 숫자형 className(예: 0)과 문자형 predict(예: '0') 비교 대응
+        return result && !!result.probability && String(result.className) === String(predict);
     },
     params: [
         {

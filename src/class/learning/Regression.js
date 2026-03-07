@@ -26,8 +26,8 @@ class Regression extends LearningBase {
 
     init({ name, url, result, table, trainParam }) {
         this.name = name;
-        this.trainParam = trainParam;
-        this.result = result;
+        this.trainParam = trainParam || {};
+        this.result = result || {};
         this.table = table;
         this.trainCallback = (value) => {
             this.view.setValue(value);
@@ -236,6 +236,9 @@ class Regression extends LearningBase {
                 },
             },
         };
+    }
+    isTrained() {
+        return this.trained && !!this.model;
     }
 }
 

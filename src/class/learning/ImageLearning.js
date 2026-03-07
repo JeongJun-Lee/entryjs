@@ -31,16 +31,13 @@ class ImageLearning {
         }
     }
 
-    get labels() {
-        return this.#labels;
-    }
-
-    getResult(index) {
+    getResult(indexOrName) {
         const result = this.#result.length ? this.#result : this.#popup?.result || [];
         const defaultResult = { probability: 0, className: '' };
-        if (index !== undefined && index > -1) {
+        if (indexOrName !== undefined && indexOrName !== null) {
+            const label = this.#labels[indexOrName] || indexOrName;
             return (
-                result.find(({ className }) => className === this.#labels[index]) || defaultResult
+                result.find(({ className }) => String(className) === String(label)) || defaultResult
             );
         }
         return result[0] || defaultResult;
@@ -145,9 +142,8 @@ class ImageLearning {
         this.isLoaded = true;
     }
 
-    async reload(url) {
-        this.model = await tf.loadLayersModel(url || this.#url);
-        this.isLoaded = true;
+    isTrained() {
+        return !!this.isLoaded && !!this.model;
     }
 }
 

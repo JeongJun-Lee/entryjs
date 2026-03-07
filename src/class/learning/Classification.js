@@ -16,12 +16,13 @@ class Classification {
         this.#recordTime = recordTime;
     }
 
-    getResult(index) {
+    getResult(indexOrName) {
         const result = this.#popup?.result || [];
         const defaultResult = { probability: 0, className: '' };
-        if (index !== undefined && index > -1) {
+        if (indexOrName !== undefined && indexOrName !== null) {
+            const label = this.#labels[indexOrName] || indexOrName;
             return (
-                result.find(({ className }) => className === this.#labels[index]) || defaultResult
+                result.find(({ className }) => String(className) === String(label)) || defaultResult
             );
         }
         return result[0] || defaultResult;
@@ -42,6 +43,10 @@ class Classification {
             recordTime: this.#recordTime,
         });
         this.#popup.open();
+    }
+
+    isTrained() {
+        return true;
     }
 }
 

@@ -24,10 +24,10 @@ export const classes = [
 class DecisionTree extends LearningBase {
     type = 'decisiontree';
 
-    init({ name, url, result, table, trainParam, modelId, loadModel }) {
+    init({ name, url, result, table, trainParam, model }) {
         this.name = name;
-        this.trainParam = trainParam;
-        this.result = result;
+        this.trainParam = trainParam || {};
+        this.result = result || {};
         this.table = table;
         this.loadModel = loadModel;
         this.trainCallback = (value) => {
@@ -38,10 +38,11 @@ class DecisionTree extends LearningBase {
 
         this.fields = table?.select?.[0]?.map((index) => table?.fields[index]);
         this.predictFields = table?.select?.[1]?.map((index) => table?.fields[index]);
-        if (this.url !== url || this.modelId !== modelId) {
-            this.load(url, modelId);
-            this.url = url;
-            this.modelId = modelId;
+        if (model) {
+            this.model = DTClassifier.load(model);
+            this.valueMap = result?.valueMap;
+        } else if (url) {
+            this.load(`/uploads/${url}/model.json`);
         }
         if (!Utils.isWebGlSupport()) {
             tf.setBackend('cpu');
@@ -101,6 +102,15 @@ class DecisionTree extends LearningBase {
             }
             this.tree.show();
         }
+        // 트리가 가로로 많이 길어질 수 있으므로 모달 최소 너비 확장
+        requestAnimationFrame(() => {
+            const modalEl = document.querySelector('.entry-learning-chart .entry-modal, .entry-learning-chart [class*="modal"], .entry-learning-chart > div');
+            if (modalEl) {
+                modalEl.style.minWidth = '1100px';
+                modalEl.style.width = 'auto';
+                modalEl.style.maxWidth = '90vw';
+            }
+        });
     }
 
     closeChart() {
@@ -116,7 +126,11 @@ class DecisionTree extends LearningBase {
     }
 
     async train() {
-        this.setTable();
+        try {
+            this.setTable();
+        } catch (e) {
+            return;
+        }
         this.trained = false;
         this.result = null;
         if (this.tree) {
@@ -128,10 +142,12 @@ class DecisionTree extends LearningBase {
 
         const {
             testRate = 0.2,
-            maxDepth = 3,
+            maxDepth = 5,
             minNumSamples = 3,
             gainThreshold = 0.01,
-        } = this.trainParam || {};
+            epochs = 1,
+            batchSize = 1,
+        } = this.trainParam;
 
         if (maxDepth < 2) {
             Entry.toast.alert(
@@ -141,27 +157,22 @@ class DecisionTree extends LearningBase {
             return;
         }
 
-
-        const { trainX, trainY, testArr, select, fields, valueMap, numClass } = getData(
+        const { trainX, trainY, testArr, select, fields, valueMap, numClass, hasMissing } = getData(
             testRate,
             this.table
         );
-        this.valueMap = valueMap;
 
-        // V22: Robust fields resolution logic for retraining loaded models where this.table.fields might be missing/stripped
-        let parsedFields = fields;
-        if ((!parsedFields || parsedFields.every(f => typeof f === 'undefined' || f === null)) && this.result && this.result.fields) {
-            // Fallback to the saved outcome's fields if data retrieval provided blanks
-            parsedFields = this.result.fields;
-        } else if (parsedFields) {
-            // Safely stringify objects or provide "Col N" generic names
-            parsedFields = parsedFields.map((f, idx) => {
-                if (typeof f === 'object' && f !== null) return f.name || JSON.stringify(f);
-                if (f === undefined || f === null) return `Col ${select[0][idx]}`;
-                return String(f);
-            });
+        if (hasMissing) {
+            this.trainCallback(0);
+            Entry.toast.alert(
+                typeof Lang !== 'undefined' ? (Lang.Msgs?.warn || '경고') : '경고',
+                '결측치가 존재하여 학습을 중단합니다. 결측치를 처리한 후에 재학습을 진행하세요.'
+            );
+            return;
         }
-
+        this.valueMap = Object.fromEntries(
+            Object.entries(valueMap).map(([key, value]) => [value, key])
+        );
         this.model = createModel(maxDepth, minNumSamples, gainThreshold);
         this.model?.train(trainX, trainY);
 
@@ -170,12 +181,9 @@ class DecisionTree extends LearningBase {
         this.trainCallback(100);
         const { accuracy, f1, precision, recall } = score;
 
-        const modelJson = this.model.toJSON();
-        let rootNode = modelJson && modelJson.root;
-        if (rootNode) {
-            rootNode = JSON.parse(JSON.stringify(rootNode));
-            traverse(rootNode, numClass, parsedFields, this.valueMap);
-        }
+        const rootNode = this.model.toJSON().root;
+        this._addFeatureNames(rootNode, fields, select[0]);
+
         this.result = {
             graphData: rootNode,
             select,
@@ -236,8 +244,26 @@ class DecisionTree extends LearningBase {
             console.error('DecisionTree model load failed:', e);
         }
         this.valueMap = result?.valueMap;
-        this.result = { ...result, graphData };
-        this.trained = true;
+
+        const rootNode = this.model?.toJSON().root;
+        if (rootNode) {
+            this._addFeatureNames(rootNode, result?.fields, result?.select?.[0] || []);
+        }
+
+        this.result = {
+            ...result,
+            graphData: rootNode,
+        };
+    }
+
+    _addFeatureNames(node, fields, attrFiltered) {
+        if (!node) return;
+        if (node.splitColumn !== undefined && node.splitColumn !== null) {
+            const originalIndex = attrFiltered[node.splitColumn] !== undefined ? attrFiltered[node.splitColumn] : node.splitColumn;
+            node.featureName = fields && fields[originalIndex] ? fields[originalIndex] : `Feature ${node.splitColumn}`;
+        }
+        if (node.left) this._addFeatureNames(node.left, fields, attrFiltered);
+        if (node.right) this._addFeatureNames(node.right, fields, attrFiltered);
     }
 
     async predict(array) {
@@ -245,11 +271,48 @@ class DecisionTree extends LearningBase {
             const msg = (typeof Lang !== 'undefined' && Lang.AiLearning?.model_status_3) || '아직 로딩된 모델이 없습니다.';
             throw new Error(msg);
         }
-        const preds = this.model.predict([array]);
+        const xs = [array];
+        // ml-cart 내부 버그 방어: classify()가 Matrix가 아닌 배열을 반환할 수 있음
+        let preds;
+        try {
+            preds = this.model.predict(xs);
+        } catch (e) {
+            // maxRowIndex 등 Matrix 메서드 미지원 시 직접 argmax 계산
+            preds = this._predictFallback(xs);
+        }
         this.predictResult = preds.map((target) => ({
             className: this.valueMap[target + 1] || target,
             probability: 1,
         }));
+    }
+
+    _predictFallback(xs) {
+        return xs.map((row) => {
+            const dist = this.model.root.classify(row);
+            if (!dist) return 0;
+            // Matrix 객체인 경우 maxRowIndex 메서드 사용
+            if (typeof dist.maxRowIndex === 'function') {
+                return dist.maxRowIndex(0)[1];
+            }
+            // ml-matrix Matrix 내부 data 배열 접근 (dist.data = [[v0, v1, ...]])
+            let arr = dist;
+            if (dist.data && Array.isArray(dist.data)) {
+                arr = dist.data[0];
+            } else if (dist.data && !Array.isArray(dist.data)) {
+                arr = Array.from(dist.data);
+            }
+            if (!Array.isArray(arr)) return 0;
+            let maxIdx = 0;
+            let maxVal = -Infinity;
+            for (let i = 0; i < arr.length; i++) {
+                const v = typeof arr[i] === 'object' ? arr[i][0] : arr[i];
+                if (v > maxVal) { maxVal = v; maxIdx = i; }
+            }
+            return maxIdx;
+        });
+    }
+    isTrained() {
+        return this.trained && !!this.model;
     }
 }
 
@@ -260,7 +323,7 @@ function createModel(maxDepth, minNumSamples, gainThreshold) {
         gainFunction: 'gini',
         maxDepth,
         minNumSamples,
-        gainThreshold: gainThreshold !== undefined ? gainThreshold : 0.01,
+        gainThreshold,
     });
 }
 
@@ -283,14 +346,28 @@ function getData(testRate, data) {
     }
 
     const [attr, predict] = select;
-    const filtered = table.filter(row => {
-        const label = row[predict[0]];
-        return label !== undefined && label !== null && String(label).trim() !== '';
-    });
-    const dataArray = filtered.map(row => ({
-        x: attr.map(i => parseFloat(row[i]) || 0),
-        y: Utils.stringToNumber(predict[0], row[predict[0]], tempMap, tempMapCount) - 1,
-    }));
+    // predict 컬럼이 attr에 포함되면 label leakage 발생 → 강제 제외
+    const predictSet = new Set(predict);
+    const attrFiltered = attr.filter((i) => !predictSet.has(i));
+
+    const hasMissing = table.some(
+        (row) => attrFiltered.some((selected) => _isNaN(_toNumber(row[selected]))) ||
+            row[predict[0]] === undefined || row[predict[0]] === null || row[predict[0]] === ''
+    );
+
+    const filtered = table.filter(
+        (row) => !attrFiltered.some((selected) => _isNaN(_toNumber(row[selected]))) &&
+            row[predict[0]] !== undefined && row[predict[0]] !== null && row[predict[0]] !== ''
+    );
+    const dataArray = filtered
+        .map((row) => ({
+            x: attrFiltered.map((i) => parseFloat(row[i]) || 0),
+            y: Utils.stringToNumber(predict[0], row[predict[0]], tempMap, tempMapCount),
+        }))
+        .map((row) => ({
+            x: row.x,
+            y: row.y - 1,
+        }));
     const [train, test] = sliceArray(dataArray, testRate);
     const mappedFields = attr.map(i => dataFields && dataFields[i] ? dataFields[i] : undefined);
 
@@ -298,10 +375,11 @@ function getData(testRate, data) {
         trainX: train.map(v => v.x),
         trainY: train.map(v => v.y),
         testArr: test,
-        select,
-        fields: mappedFields,
-        valueMap: Object.fromEntries(Object.entries(tempMap[predict[0]] || {}).map(([k, v]) => [v, k])),
+        select: [attrFiltered, predict],
+        fields,
+        valueMap: { ...tempMap[predict[0]] },
         numClass: tempMapCount[predict[0]] || 1,
+        hasMissing,
     };
 }
 

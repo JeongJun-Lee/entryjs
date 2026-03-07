@@ -42,8 +42,8 @@ class Svm extends LearningBase {
 
     init({ name, url, result, table, trainParam, modelId, loadModel }) {
         this.name = name;
-        this.trainParam = trainParam;
-        this.result = result;
+        this.trainParam = trainParam || {};
+        this.result = result || {};
         this.table = table;
         this.loadModel = loadModel;
         this.trainCallback = (value) => {
@@ -99,7 +99,11 @@ class Svm extends LearningBase {
 
     async train() {
         this.trained = false;
-        this.setTable();
+        try {
+            this.setTable();
+        } catch (e) {
+            return;
+        }
         this.trainCallback(1);
         this.checkTrainOptionValidation();
         const { testRate = 0.2, C, kernel, degree, gamma } = this.trainParam;
@@ -237,6 +241,9 @@ class Svm extends LearningBase {
         }
         const score = Utils.getScores(confusionMatrix, numClass);
         return { confusionMatrix, score };
+    }
+    isTrained() {
+        return this.trained && !!this.model;
     }
 }
 

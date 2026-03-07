@@ -73,6 +73,8 @@ export default class LearningChart {
             data: {
                 source,
                 title,
+                width: 1100,
+                minWidth: 1100,
                 togglePause: () => Entry.engine.togglePause(),
                 stop: () => Entry.engine.toggleStop(),
                 isIframe: self !== top,

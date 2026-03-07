@@ -53,7 +53,26 @@ module.exports = {
                 class: 'ai_learning',
                 isNotFor: ['ai_learning_cluster'],
                 async func(sprite, script) {
+                    if (!Entry.aiLearning.isTrained()) {
+                        Entry.Utils.stopProjectWithToast(script, 'IncompatibleError', {
+                            toast:
+                                typeof Lang !== 'undefined' && Lang.AiLearning?.no_model_error
+                                    ? Lang.AiLearning.no_model_error
+                                    : '학습된 모델이 없습니다. 학습 창에서 다시 학습시켜 주세요.',
+                        });
+                        return script.callReturn();
+                    }
                     const value = script.getStringValue('VALUE', script);
+                    if (parseInt(value, 10) < 1) {
+                        Entry.toast.alert(
+                            typeof Lang !== 'undefined' ? (Lang.Msgs?.warn || '경고') : '경고',
+                            typeof Lang !== 'undefined' && Lang.AiLearning?.k_cluster_error
+                                ? Lang.AiLearning.k_cluster_error
+                                : '군집 개수는 1 이상의 정수로 입력해 주세요.'
+                        );
+                        Entry.engine.toggleStop();
+                        return script.callReturn();
+                    }
                     Entry.aiLearning.setTrainOption('k', parseInt(value, 10));
                     return script.callReturn();
                 },
@@ -100,6 +119,15 @@ module.exports = {
                 class: 'ai_learning',
                 isNotFor: ['ai_learning_cluster'],
                 async func(sprite, script) {
+                    if (!Entry.aiLearning.isTrained()) {
+                        Entry.Utils.stopProjectWithToast(script, 'IncompatibleError', {
+                            toast:
+                                typeof Lang !== 'undefined' && Lang.AiLearning?.no_model_error
+                                    ? Lang.AiLearning.no_model_error
+                                    : '학습된 모델이 없습니다. 학습 창에서 다시 학습시켜 주세요.',
+                        });
+                        return script.callReturn();
+                    }
                     const value = script.getField('CENTRIOD_TYPE');
                     Entry.aiLearning.setTrainOption('initialCentroids', value);
                     return script.callReturn();
@@ -129,6 +157,15 @@ module.exports = {
                 class: 'ai_learning',
                 isNotFor: ['ai_learning_cluster'],
                 func(sprite, script) {
+                    if (!Entry.aiLearning.isTrained()) {
+                        Entry.Utils.stopProjectWithToast(script, 'IncompatibleError', {
+                            toast:
+                                typeof Lang !== 'undefined' && Lang.AiLearning?.no_model_error
+                                    ? Lang.AiLearning.no_model_error
+                                    : '학습된 모델이 없습니다. 학습 창에서 다시 학습시켜 주세요.',
+                        });
+                        return script.callReturn();
+                    }
                     const { k = 0 } = Entry.aiLearning.getTrainOption() || {};
                     return k;
                 },
@@ -181,6 +218,15 @@ module.exports = {
                 class: 'ai_learning',
                 isNotFor: ['ai_learning_cluster'],
                 func(sprite, script) {
+                    if (!Entry.aiLearning.isTrained()) {
+                        Entry.Utils.stopProjectWithToast(script, 'IncompatibleError', {
+                            toast:
+                                typeof Lang !== 'undefined' && Lang.AiLearning?.no_model_error
+                                    ? Lang.AiLearning.no_model_error
+                                    : '학습된 모델이 없습니다. 학습 창에서 다시 학습시켜 주세요.',
+                        });
+                        return script.callReturn();
+                    }
                     const k = script.getNumberValue('K');
                     const attr = script.getField('ATTR');
                     const { centroids } = Entry.aiLearning.getTrainResult();
@@ -232,6 +278,15 @@ module.exports = {
                 class: 'ai_learning',
                 isNotFor: ['cluster_attr_1'],
                 async func(sprite, script) {
+                    if (!Entry.aiLearning.isTrained()) {
+                        Entry.Utils.stopProjectWithToast(script, 'IncompatibleError', {
+                            toast:
+                                typeof Lang !== 'undefined' && Lang.AiLearning?.no_model_error
+                                    ? Lang.AiLearning.no_model_error
+                                    : '학습된 모델이 없습니다. 학습 창에서 다시 학습시켜 주세요.',
+                        });
+                        return script.callReturn();
+                    }
                     const x = script.getNumberValue('ATTR1', script);
                     await Entry.aiLearning.predict([x]);
                     return Entry.aiLearning.getPredictResult();
@@ -302,6 +357,15 @@ module.exports = {
                 class: 'ai_learning',
                 isNotFor: ['cluster_attr_2'],
                 async func(sprite, script) {
+                    if (!Entry.aiLearning.isTrained()) {
+                        Entry.Utils.stopProjectWithToast(script, 'IncompatibleError', {
+                            toast:
+                                typeof Lang !== 'undefined' && Lang.AiLearning?.no_model_error
+                                    ? Lang.AiLearning.no_model_error
+                                    : '학습된 모델이 없습니다. 학습 창에서 다시 학습시켜 주세요.',
+                        });
+                        return script.callReturn();
+                    }
                     const x = script.getNumberValue('ATTR1', script);
                     const y = script.getNumberValue('ATTR2', script);
                     await Entry.aiLearning.predict([x, y]);
@@ -393,6 +457,15 @@ module.exports = {
                 class: 'ai_learning',
                 isNotFor: ['cluster_attr_3'],
                 async func(sprite, script) {
+                    if (!Entry.aiLearning.isTrained()) {
+                        Entry.Utils.stopProjectWithToast(script, 'IncompatibleError', {
+                            toast:
+                                typeof Lang !== 'undefined' && Lang.AiLearning?.no_model_error
+                                    ? Lang.AiLearning.no_model_error
+                                    : '학습된 모델이 없습니다. 학습 창에서 다시 학습시켜 주세요.',
+                        });
+                        return script.callReturn();
+                    }
                     const x = script.getNumberValue('ATTR1', script);
                     const y = script.getNumberValue('ATTR2', script);
                     const z = script.getNumberValue('ATTR3', script);
@@ -505,6 +578,15 @@ module.exports = {
                 class: 'ai_learning',
                 isNotFor: ['cluster_attr_4'],
                 async func(sprite, script) {
+                    if (!Entry.aiLearning.isTrained()) {
+                        Entry.Utils.stopProjectWithToast(script, 'IncompatibleError', {
+                            toast:
+                                typeof Lang !== 'undefined' && Lang.AiLearning?.no_model_error
+                                    ? Lang.AiLearning.no_model_error
+                                    : '학습된 모델이 없습니다. 학습 창에서 다시 학습시켜 주세요.',
+                        });
+                        return script.callReturn();
+                    }
                     const a = script.getNumberValue('ATTR1', script);
                     const b = script.getNumberValue('ATTR2', script);
                     const c = script.getNumberValue('ATTR3', script);
@@ -638,6 +720,15 @@ module.exports = {
                 class: 'ai_learning',
                 isNotFor: ['cluster_attr_5'],
                 async func(sprite, script) {
+                    if (!Entry.aiLearning.isTrained()) {
+                        Entry.Utils.stopProjectWithToast(script, 'IncompatibleError', {
+                            toast:
+                                typeof Lang !== 'undefined' && Lang.AiLearning?.no_model_error
+                                    ? Lang.AiLearning.no_model_error
+                                    : '학습된 모델이 없습니다. 학습 창에서 다시 학습시켜 주세요.',
+                        });
+                        return script.callReturn();
+                    }
                     const a = script.getNumberValue('ATTR1', script);
                     const b = script.getNumberValue('ATTR2', script);
                     const c = script.getNumberValue('ATTR3', script);
@@ -792,6 +883,15 @@ module.exports = {
                 class: 'ai_learning',
                 isNotFor: ['cluster_attr_6'],
                 async func(sprite, script) {
+                    if (!Entry.aiLearning.isTrained()) {
+                        Entry.Utils.stopProjectWithToast(script, 'IncompatibleError', {
+                            toast:
+                                typeof Lang !== 'undefined' && Lang.AiLearning?.no_model_error
+                                    ? Lang.AiLearning.no_model_error
+                                    : '학습된 모델이 없습니다. 학습 창에서 다시 학습시켜 주세요.',
+                        });
+                        return script.callReturn();
+                    }
                     const a = script.getNumberValue('ATTR1', script);
                     const b = script.getNumberValue('ATTR2', script);
                     const c = script.getNumberValue('ATTR3', script);
