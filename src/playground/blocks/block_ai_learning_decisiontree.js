@@ -30,8 +30,9 @@ module.exports = {
                     {
                         type: 'Dropdown',
                         options: [
-                            [Lang.AiLearning.train_param_minNumSamples, 'minNumSamples'],
-                            [Lang.AiLearning.train_param_maxDepth, 'maxDepth'],
+                            [Lang.AiLearning.train_param_minNumSamples || '노드의 최소 데이터 수', 'minNumSamples'],
+                            [Lang.AiLearning.train_param_maxDepth || '최대 깊이', 'maxDepth'],
+                            [Lang.AiLearning.train_param_gainThreshold || '가지를 나눌 기준값', 'gainThreshold'],
                         ],
                         value: 'minNumSamples',
                         bgColor: EntryStatic.colorSet.block.darken.AI_LEARNING,
@@ -65,6 +66,14 @@ module.exports = {
                 func(sprite, script) {
                     const option = script.getField('OPTION', script);
                     const value = script.getNumberValue('VALUE', script);
+                    if (option === 'maxDepth' && value < 2) {
+                        const msg = '트리의 최대 깊이는 2 이상으로 입력해 주세요.';
+                        Entry.toast.alert(
+                            typeof Lang !== 'undefined' ? (Lang.Msgs?.warn || '경고') : '경고',
+                            msg
+                        );
+                        throw new Error(msg);
+                    }
                     Entry.aiLearning.setTrainOption(option, parseFloat(value));
                     return script.callReturn();
                 },

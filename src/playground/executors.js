@@ -39,9 +39,11 @@ class Executor {
             executedBlocks.push(this.scope.block);
             try {
                 const schema = this.scope.block.getSchema();
+                /*
                 if (schema.class === 'ai_learning' && isOffline) {
                     throw new Entry.Utils.OfflineError();
                 }
+                */
                 if (schema && Entry.skeleton[schema.skeleton].executable) {
                     Entry.dispatchEvent('blockExecute', this.scope.block && this.scope.block.view);
                     returnVal = this.scope.run(entity);

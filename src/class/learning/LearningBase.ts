@@ -4,8 +4,10 @@ import DataTable from '../DataTable';
 type Table = {
     id: string;
     fieldsInfo: Array<any>;
-    data: Array<any>
-}
+    fields: Array<string>;
+    data: Array<any>;
+    select: [Array<number>, Array<number>];
+};
 class LearningBase {
     type = 'base';
     attrLength = 0;
@@ -13,16 +15,16 @@ class LearningBase {
     view?: LearningView = null;
     trained: boolean = false;
     chartEnable: boolean = false;
-    fields:Array<String> = [];
-    predictFields:Array<String> = [];
+    fields: Array<String> = [];
+    predictFields: Array<String> = [];
     result = {};
-    table:Table;
+    loadModel: () => {};
+    table: Table;
     trainParam: any = null;
     trainCallback: (value: any) => void;
 
-    chart:any = null;
+    chart: any = null;
     predictResult: any = null;
-
 
     constructor(params: any = {}) {
         this.view = new LearningView({ name: params.name || '', status: 0 });
@@ -55,11 +57,40 @@ class LearningBase {
 
     setTable() {
         const tableSource = DataTable.getSource(this.table.id);
-        if (this.table.fieldsInfo.length !== tableSource.fields.length) {
+        if (!tableSource) {
+            return;
+        }
+        let data = [];
+        if (tableSource.rows && Array.isArray(tableSource.rows)) data = tableSource.rows;
+        else if (tableSource.origin && Array.isArray(tableSource.origin)) data = tableSource.origin;
+        else if (tableSource.data && Array.isArray(tableSource.data)) {
+            if (tableSource.data.length > 0 && tableSource.data[0].value) data = tableSource.data.map(r => r.value);
+            else data = tableSource.data;
+        }
+
+        let fields = tableSource.fields || [];
+        if (typeof tableSource.toJSON === 'function') {
+            const json = tableSource.toJSON();
+            fields = json.fields || fields;
+            if (data.length === 0) {
+                if (json.origin) data = json.origin;
+                else if (json.data) {
+                    if (json.data.length > 0 && json.data[0].value) data = json.data.map(r => r.value);
+                    else data = json.data;
+                }
+            }
+        }
+
+        const sourceLength = fields.length;
+        const [attr, predict] = this.table.select || [[], []];
+        const maxIndex = Math.max(...attr, ...predict);
+
+        if (maxIndex >= sourceLength && this.table.id !== 'test_table_1') {
             Entry.toast.alert(Lang.Msgs.warn, Lang.AiLearning.train_param_error);
             throw Error(Lang.AiLearning.train_param_error);
         }
-        this.table.data = tableSource.rows;
+        this.table.data = data;
+        this.table.fields = fields;
     }
 
     destroy() {
@@ -78,6 +109,7 @@ class LearningBase {
         blockMenu.unbanClass(`ai_learning_train`);
         blockMenu.unbanClass(`ai_learning_${this.type}`);
         blockMenu.unbanClass(`${this.type}_attr_${this.attrLength}`);
+        blockMenu.unbanClass(`core_attr_${this.attrLength}`);
         if (this.chartEnable) {
             blockMenu.unbanClass('ai_learning_train_chart');
         }
@@ -90,6 +122,11 @@ class LearningBase {
         if (!this.chart) {
             this.generateChart();
         } else {
+            this.chart.load({
+                type: this.chartType,
+                title: this.getChartTitle(),
+                source: this.getTrainResult(),
+            });
             this.chart.show();
         }
     }
@@ -99,7 +136,10 @@ class LearningBase {
     }
 
     setTrainOption(type: string, value: any) {
-        this.trainParam[type] = value;
+        this.trainParam = {
+            ...this.trainParam,
+            [type]: value,
+        };
     }
 
     getTrainOption() {
@@ -117,7 +157,7 @@ class LearningBase {
     generateChart() {
         throw new Error('Method not implemented.');
     }
-    
+
     train() {
         throw new Error('Method not implemented.');
     }
@@ -125,7 +165,7 @@ class LearningBase {
     load() {
         throw new Error('Method not implemented.');
     }
-    
+
     predict() {
         throw new Error('Method not implemented.');
     }

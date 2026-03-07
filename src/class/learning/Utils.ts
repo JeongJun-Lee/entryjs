@@ -1,9 +1,7 @@
- 
-
 const toFixed = (num: number) => parseFloat(num.toFixed(2));
 
 export const CommonUtil = {
-    isWebGlSupport:() => {
+    isWebGlSupport: () => {
         try {
             const currentCanvas = document.createElement('canvas');
             return !!currentCanvas.getContext('webgl', { premultipliedalpha: false });
@@ -27,20 +25,23 @@ export const CommonUtil = {
         // if (!isNaN(parseFloat(value))) {
         //     return parseFloat(value);
         // }
+        const trimmedValue = typeof value === 'string' ? value.trim() : value;
         if (!tempMap[i]) {
             tempMap[i] = {};
         }
-        if (!tempMap[i]?.[value]) {
+        if (!tempMap[i]?.[trimmedValue]) {
             if (!tempMapCount[i]) {
                 tempMapCount[i] = 0;
             }
             tempMapCount[i] = tempMapCount[i] + 1;
-            tempMap[i][value] = tempMapCount[i];
+            tempMap[i][trimmedValue] = tempMapCount[i];
         }
-        return tempMap[i][value];
+        return tempMap[i][trimmedValue];
     },
     shuffle: (arr: Array<any>) => {
-        let j; let x; let i;
+        let j;
+        let x;
+        let i;
         for (i = arr.length; i; i -= 1) {
             j = Math.floor(Math.random() * i);
             x = arr[i - 1];
@@ -69,19 +70,17 @@ export const CommonUtil = {
         const precision = precisions.reduce((a, b) => a + b, 0) / precisions.length;
         const recall = recalls.reduce((a, b) => a + b, 0) / recalls.length;
         return {
-            accuracy: toFixed(acc / total),
-            precision: toFixed(precision),
-            recall: toFixed(recall),
-            f1: toFixed(2 / (1 / precision + 1 / recall)),
+            accuracy: toFixed((acc / total) * 100),
+            precision: toFixed(precision * 100),
+            recall: toFixed(recall * 100),
+            f1: toFixed((2 / (1 / precision + 1 / recall)) * 100),
         };
     },
     arrayToMatrix(array: Array<number>, columns: number) {
         return Array(Math.ceil(array.length / columns))
             .fill('')
-            .reduce((acc, cur, index) => (
-                [...acc, [...array].splice(index * columns, columns)]
-            ), []);
-    }
+            .reduce((acc, cur, index) => [...acc, [...array].splice(index * columns, columns)], []);
+    },
 };
 
 export default CommonUtil;

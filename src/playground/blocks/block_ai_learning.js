@@ -18,15 +18,14 @@ const DropDownDynamicGenerator = {
             return [[Lang.Blocks.no_target, 'null']];
         }
     },
-    tablePredictDataDistinct: () => {
-        if (Entry.aiLearning.labels) {
-            return Entry.aiLearning.labels.map((item) => [item, item]);
-        } else {
-            return [[Lang.Blocks.no_target, 'null']];
-        }
-    },
     valueMap: () => {
-        const valueMap = Object.values(Entry.aiLearning.getTrainResult()?.valueMap || []);
+        const valueMap =
+            Object.values(
+                Entry.aiLearning.getTrainResult()?.valueMap ||
+                Entry.aiLearning?.result?.valueMap ||
+                {}
+            ) || [];
+
         if (valueMap?.length) {
             return valueMap.map((name) => [name, name]);
         } else {
@@ -91,10 +90,10 @@ const createParamBlock = ({
                                     fields = [],
                                 } = Entry.aiLearning?.getTableData?.();
                                 return (
-                                    fields[select?.[0]?.[i / 2]] || Lang.AiLearning.model_attr_str
+                                    fields[select?.[0]?.[i / 2]] || `${Lang.AiLearning.model_attr_str} ${i / 2 + 1}`
                                 );
                             }
-                            return Lang.AiLearning.model_attr_str;
+                            return `${Lang.AiLearning.model_attr_str} ${i / 2 + 1}`;
                         },
                     };
                 }),
@@ -109,9 +108,9 @@ const createParamBlock = ({
                 type: blockName,
             },
             paramsKeyMap,
-            class: 'ai_learning',
-            isNotFor: Array.isArray(type) 
-                ? type.map(element => `${element}_attr_${index}`) 
+            class: 'ai_learning_result',
+            isNotFor: Array.isArray(type)
+                ? [`core_attr_${index}`]
                 : [`${type}_attr_${index}`],
             func: createFunc(paramsKeyMap),
             syntax: {
@@ -147,6 +146,7 @@ module.exports = {
                 class: 'ai_learning',
                 isNotFor: ['ai_learning_image'],
                 events: {},
+                wikiClass: 'ai_image',
             },
             learning_title_speech: {
                 skeleton: 'basic_text',
@@ -165,6 +165,7 @@ module.exports = {
                 class: 'ai_learning',
                 isNotFor: ['ai_learning_speech'],
                 events: {},
+                wikiClass: 'ai_speech',
             },
             learning_title_text: {
                 skeleton: 'basic_text',
@@ -183,6 +184,7 @@ module.exports = {
                 class: 'ai_learning',
                 isNotFor: ['ai_learning_text'],
                 events: {},
+                wikiClass: 'ai_text',
             },
             insert_data_for_test: {
                 color: EntryStatic.colorSet.block.default.AI_LEARNING,
@@ -275,6 +277,7 @@ module.exports = {
                     js: [],
                     py: [],
                 },
+                wikiClass: 'ai_image',
             },
             insert_text_block_for_test: {
                 color: EntryStatic.colorSet.block.default.AI_LEARNING,
@@ -321,6 +324,7 @@ module.exports = {
                     js: [],
                     py: [],
                 },
+                wikiClass: 'ai_text',
             },
             test_result: {
                 color: EntryStatic.colorSet.block.default.AI_LEARNING,
@@ -462,8 +466,23 @@ module.exports = {
                 },
                 class: 'ai_learning',
                 isNotFor: ['ai_learning_train'],
-                async func(sprite, script) {
-                    Entry.aiLearning.train();
+                func(sprite, script) {
+                    if (!script.isStart) {
+                        script.isStart = true;
+                        script.isDone = false;
+                        Entry.aiLearning.train().then(() => {
+                            script.isDone = true;
+                        }).catch((e) => {
+                            console.error('AI Training Error:', e);
+                            script.isDone = true;
+                        });
+                        return script;
+                    }
+                    if (!script.isDone) {
+                        return script;
+                    }
+                    delete script.isStart;
+                    delete script.isDone;
                     return script.callReturn();
                 },
                 syntax: {
@@ -618,7 +637,7 @@ module.exports = {
                 isNotFor: ['ai_learning_svm', 'ai_learning_logistic_regression', 'ai_learning_decisiontree'],
                 async func(sprite, script) {
                     const type = script.getField('TYPE', script);
-                    const result = Entry.aiLearning?.getTrainResult();
+                    const result = Entry.aiLearning?.getTrainResult(); console.log("get_result_info type=", type, "result=", result);
                     return result?.[type];
                 },
                 syntax: {
@@ -636,7 +655,7 @@ const predictBlocks = createParamBlock({
     length: 6,
     createFunc: (paramsKeyMap) => async (sprite, script) => {
         const params = Object.keys(paramsKeyMap).map((key) => script.getNumberValue(key, script));
-        await Entry.aiLearning.predict(params);
+        console.log("Prediction params:", params); await Entry.aiLearning.predict(params);
         const result = Entry.aiLearning.getPredictResult();
         return result.sort((a, b) => b.probability - a.probability)[0].className;
     },
@@ -651,9 +670,12 @@ const booleanPredictBlocks = createParamBlock({
         const predictKey = keys.pop();
         const params = keys.map((key) => script.getNumberValue(key, script));
         const predict = script.getStringField(predictKey, script);
-        await Entry.aiLearning.predict(params);
+        console.log("Prediction params:", params); await Entry.aiLearning.predict(params);
         const predictResult = Entry.aiLearning.getPredictResult();
-        const result = predictResult.sort((a, b) => b.probability - a.probability)[0];
+        if (!Array.isArray(predictResult) || predictResult.length === 0) {
+            return false;
+        }
+        const result = [...predictResult].sort((a, b) => b.probability - a.probability)[0];
         return result && !!result.probability && result.className === predict;
     },
     params: [

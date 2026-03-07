@@ -1,6 +1,5 @@
 import LearningView from './LearningView';
 import Chart from './Chart';
-const { callApi } = require('../../util/common');
 import _uniq from 'lodash/uniq';
 import _floor from 'lodash/floor';
 import _sum from 'lodash/sum';
@@ -33,7 +32,7 @@ class NumberClassification {
     #name = '';
     #fields = [];
     #predictField = [];
-
+    #loadModel;
     constructor(params = {}) {
         this.#view = new LearningView({ name: params.name || '', status: 0 });
         // 정지시 data 초기화.
@@ -43,31 +42,60 @@ class NumberClassification {
         this.init({ ...params });
     }
 
-    init({ name, url, table, trainParam }) {
+    init({ name, url, table, trainParam, modelId, loadModel, result }) {
         this.#name = name;
-        this.#trainParam = trainParam;
         this.#table = table;
+        this.result = result;
         this.#trainCallback = (value) => {
             this.#view.setValue(value);
         };
         this.#isTrained = true;
+        this.#loadModel = loadModel;
 
         this.#attrLength = table?.select?.[0]?.length || 0;
-        this.#fields = table?.select?.[0]?.map((index) => table?.fields[index]);
-        this.#predictField = table?.select?.[1]?.map((index) => table?.fields[index]);
+
+        // V23: Restore fallback for default sample data (test_table_1) if fields are lost
+        let dataFields = table?.fields;
+        if ((!dataFields || dataFields.length === 0) && table?.id === 'test_table_1') {
+            const def = typeof Lang !== 'undefined' && Lang.AiLearningTree ? Lang.AiLearningTree : null;
+            dataFields = [
+                (def && def.sample_field_1) || '꽃받침 길이',
+                (def && def.sample_field_2) || '꽃받침 너비',
+                (def && def.sample_field_3) || '꽃잎 길이',
+                (def && def.sample_field_4) || '꽃잎 너비',
+                (def && def.sample_field_5) || '품종'
+            ];
+        }
+
+        this.#fields = table?.select?.[0]?.map((index) => dataFields && dataFields[index] ? dataFields[index] : `Col ${index}`);
+        this.#predictField = table?.select?.[1]?.map((index) => dataFields && dataFields[index] ? dataFields[index] : `Col ${index}`);
         if (this.#attrLength === 2) {
             this.#chartEnable = true;
         }
-        this.load(`/uploads/${url}/model.json`);
+        if (this.url !== url || this.modelId !== modelId) {
+            // load시 trainParam에 추가되는 파라미터가 있어서 로드 직전 추가.
+            this.#trainParam = trainParam;
+            this.load(url, modelId);
+            this.url = url;
+            this.modelId = modelId;
+        }
     }
 
     setTable() {
         const tableSource = DataTable.getSource(this.#table.id);
-        if (this.#table.fieldsInfo.length !== tableSource.fields.length) {
+        if (!tableSource) {
+            return;
+        }
+        const sourceLength = tableSource.fields.length;
+        const [attr, predict] = this.#table.select || [[], []];
+        const maxIndex = Math.max(...attr, ...predict);
+
+        if (maxIndex >= sourceLength) {
             Entry.toast.alert(Lang.Msgs.warn, Lang.AiLearning.train_param_error);
             throw Error(Lang.AiLearning.train_param_error);
         }
         this.#table.data = tableSource.rows;
+        this.#table.fields = tableSource.fields;
     }
 
     destroy() {
@@ -112,11 +140,9 @@ class NumberClassification {
         if (!this.#chart) {
             this.#chart = new Chart({
                 title: Lang.AiLearning.chart_title,
-                description: `<em>${Lang.AiLearning.class}</em>   ${this.#predictField[0]}<em>${
-                    Lang.AiLearning.model_attr_str
-                } 1</em>${this.#fields[0]}<em>${Lang.AiLearning.model_attr_str} 2</em>${
-                    this.#fields[1]
-                }`,
+                description: `<em>${Lang.AiLearning.class}</em>   ${this.#predictField[0]}<em>${Lang.AiLearning.model_attr_str
+                    } 1</em>${this.#fields[0]}<em>${Lang.AiLearning.model_attr_str} 2</em>${this.#fields[1]
+                    }`,
                 source: this.chartData,
             });
         } else {
@@ -129,7 +155,10 @@ class NumberClassification {
     }
 
     setTrainOption(type, value) {
-        this.#trainParam[type] = value;
+        this.trainParam = {
+            ...this.trainParam,
+            [type]: value,
+        };
     }
 
     getTrainOption() {
@@ -138,6 +167,10 @@ class NumberClassification {
 
     getResult() {
         return this.#predictResult;
+    }
+
+    getTrainResult() {
+        return this.result;
     }
 
     getLabels() {
@@ -183,18 +216,24 @@ class NumberClassification {
         this.#trainCallback(100);
     }
 
-    async load(url) {
-        const { data: savedData } = await callApi(url, { url });
-        this.#trainParam.trainData = savedData.data;
-        this.#trainParam.trainLabels = savedData.labels;
-        this.#trainParam.labels = _uniq(savedData.labels).sort((a, b) =>
-            String(a).localeCompare(String(b))
-        );
-        this.#trainParam.maxVector = savedData.maxVector;
-        this.#trainParam.minVector = savedData.minVector;
-        this.#trainParam.numLabels = savedData.numLabels;
-        this.#trainParam.neighbors = savedData.neighbors;
-        this.#trainParam.isLoaded = true;
+    async load(url, modelId) {
+        const savedData = await this.#loadModel({ url, modelId });
+        if (!savedData) {
+            return;
+        }
+        this.#trainParam = {
+            ...this.#trainParam,
+            trainData: savedData.data,
+            trainLabels: savedData.labels,
+            labels: _uniq(savedData.labels).sort((a, b) =>
+                String(a).localeCompare(String(b))
+            ),
+            maxVector: savedData.maxVector,
+            minVector: savedData.minVector,
+            numLabels: savedData.numLabels,
+            neighbors: savedData.neighbors,
+            isLoaded: true,
+        };
         this.colors = this.createColor();
     }
 
@@ -292,9 +331,8 @@ class NumberClassification {
                         const label = this.findLabel(x, value);
                         return `
                         <div class="chart_handle_wrapper">
-                            ${Lang.AiLearning.class}: ${label}, ${this.#fields[0]}: ${x}, ${
-                            this.#fields[1]
-                        }: ${value}
+                            ${Lang.AiLearning.class}: ${label}, ${this.#fields[0]}: ${x}, ${this.#fields[1]
+                            }: ${value}
                         <div>`;
                     },
                 },
@@ -334,9 +372,10 @@ function eudist(a, b) {
 function convertTableToKnnData(tableData = {}) {
     const { select = [[0], [1]], data: table = [] } = tableData;
     const [attr, predict] = select;
-    const filtered = table.filter(
-        (row) => !select[0].some((selected) => _isNaN(_toNumber(row[selected])))
-    );
+    const filtered = table.filter((row) => {
+        const label = row[predict[0]];
+        return label !== undefined && label !== null && String(label).trim() !== '';
+    });
     return filtered.reduce(
         (accumulator, row) => {
             const { data = [], labels = [] } = accumulator;

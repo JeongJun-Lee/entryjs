@@ -6,7 +6,6 @@ import _mean from 'lodash/mean';
 import _toNumber from 'lodash/toNumber';
 import _isNaN from 'lodash/isNaN';
 import Utils from './Utils';
-const { callApi } = require('../../util/common');
 const SVM = require('libsvm-js/asm');
 
 export const classes = [
@@ -41,11 +40,12 @@ export const OPTION_DEFAULT_VALUE = {
 class Svm extends LearningBase {
     type = 'svm';
 
-    init({ name, url, result, table, trainParam }) {
+    init({ name, url, result, table, trainParam, modelId, loadModel }) {
         this.name = name;
         this.trainParam = trainParam;
         this.result = result;
         this.table = table;
+        this.loadModel = loadModel;
         this.trainCallback = (value) => {
             this.view.setValue(value);
         };
@@ -56,7 +56,11 @@ class Svm extends LearningBase {
 
         this.fields = table?.select?.[0]?.map((index) => table?.fields[index]);
         this.predictFields = table?.select?.[1]?.map((index) => table?.fields[index]);
-        this.load(`/uploads/${url}/model.json`);
+        if (this.url !== url || this.modelId !== modelId) {
+            this.load(url, modelId);
+            this.url = url;
+            this.modelId = modelId;
+        }
     }
 
     checkTrainOptionValidation() {
@@ -140,14 +144,26 @@ class Svm extends LearningBase {
             precision,
             recall,
         };
+        this.trained = true;
     }
 
-    async load(url) {
-        const { data } = await callApi(url, { url });
+    async load(url, modelId) {
+        let data;
+        if (typeof modelId === 'object' && modelId !== null) {
+            data = { serializeModel: modelId, result: this.result };
+        } else if (typeof url === 'object' && url !== null) {
+            data = { serializeModel: url, result: this.result };
+        } else {
+            data = await this.loadModel({ url, modelId });
+        }
+        if (!data) {
+            return;
+        }
         const { serializeModel, result } = data;
         this.model = SVM.load(serializeModel);
         this.valueMap = result?.valueMap;
         this.result = result;
+        this.trained = true;
     }
 
     // INFO: 예상치 전체를 가져옴. Deeplearning 레포의 predictArrays와 동일
@@ -168,9 +184,10 @@ class Svm extends LearningBase {
         const STR2NUM_MAP_COUNT = {};
         const { select = [[0], [1]], data: table, fields } = data;
         const [attr, predict] = select;
-        const filtered = table.filter(
-            (row) => !select[0].some((selected) => _isNaN(_toNumber(row[selected])))
-        );
+        const filtered = table.filter((row) => {
+            const label = row[predict[0]];
+            return label !== undefined && label !== null && String(label).trim() !== '';
+        });
         const dataArray = filtered
             .map((row) => ({
                 x: attr.map((i) => parseFloat(row[i]) || 0),
@@ -191,7 +208,7 @@ class Svm extends LearningBase {
             trainY: trainArr.map((v) => v.y),
             testArr,
             select,
-            fields,
+            fields: attr.map((i) => fields[i]),
             PREDICT_STR2NUM_MAP: { ...STR2NUM_MAP[predict[0]] },
             numClass: STR2NUM_MAP_COUNT[predict[0]],
         };

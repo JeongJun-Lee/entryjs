@@ -2,7 +2,7 @@ import TextLearning, { classes as TextClasses } from './learning/TextLearning';
 import Cluster, { classes as ClusterClasses } from './learning/Cluster';
 import Regression, { classes as RegressionClasses } from './learning/Regression';
 import ImageLearning, { classes as ImageClasses } from './learning/ImageLearning';
-import Classification, { classes as ClassificationClasses } from './learning/Classification';
+import SpeechClassification, { classes as SpeechClasses } from './learning/SpeechClassification';
 import NumberClassification, {
     classes as NumberClassificationClasses,
 } from './learning/NumberClassification';
@@ -13,16 +13,46 @@ import LogisticRegression, {
 import Svm, { classes as SvmClasses } from './learning/Svm';
 import DataTable from './DataTable';
 
+import blockAiLearning from '../playground/blocks/block_ai_learning';
+import blockAiLearningKnn from '../playground/blocks/block_ai_learning_knn';
+import blockAiLearningCluster from '../playground/blocks/block_ai_learning_cluster';
+import blockAiLearningRegression from '../playground/blocks/block_ai_learning_regression';
+// eslint-disable-next-line max-len
+import blockAiLearningLogisticRegression from '../playground/blocks/block_ai_learning_logistic_regression';
+import blockAiLearningDecisiontree from '../playground/blocks/block_ai_learning_decisiontree';
+import blockAiLearningSvm from '../playground/blocks/block_ai_learning_svm';
+import blockAiUtilizeMediaPipe from '../playground/blocks/block_ai_utilize_media_pipe';
+import InputPopup from './learning/InputPopup';
+import _isEmpty from 'lodash/isEmpty';
+
+Entry.MlPopup = InputPopup;
+const basicBlockList = [
+    blockAiLearning,
+    blockAiLearningKnn,
+    blockAiLearningCluster,
+    blockAiLearningRegression,
+    blockAiLearningLogisticRegression,
+    blockAiLearningDecisiontree,
+    blockAiLearningSvm,
+    blockAiUtilizeMediaPipe,
+];
+
 const banClasses = [
     ...ClusterClasses,
     ...RegressionClasses,
     ...TextClasses,
     ...ImageClasses,
-    ...ClassificationClasses,
+    ...SpeechClasses,
     ...NumberClassificationClasses,
     ...DecisionTreeClasses,
     ...LogisticRegressionClasses,
     ...SvmClasses,
+    'core_attr_1',
+    'core_attr_2',
+    'core_attr_3',
+    'core_attr_4',
+    'core_attr_5',
+    'core_attr_6',
 ];
 
 export default class AILearning {
@@ -40,6 +70,7 @@ export default class AILearning {
     #recordTime = 2000;
     #module = null;
     #tableData = null;
+    #dataApi = undefined;
 
     constructor(playground, isEnable = true) {
         this.#playground = playground;
@@ -48,6 +79,20 @@ export default class AILearning {
 
     get labels() {
         return this.#labels;
+    }
+
+    init() {
+        const blockObject = {};
+        basicBlockList.forEach((value) => {
+            if ('getBlocks' in value) {
+                Object.assign(blockObject, value.getBlocks());
+            }
+        });
+        Entry.block = Object.assign(Entry.block, blockObject);
+    }
+
+    setDataApi(api) {
+        this.#dataApi = api;
     }
 
     removeAllBlocks() {
@@ -89,14 +134,127 @@ export default class AILearning {
         this.destroy();
     }
 
-    load(modelInfo) {
+    async loadModel({ url, trainParam, tableData, isActive, classes }) {
+        let modelPath = '';
+        try {
+            modelPath = await this.#dataApi?.getModelDownloadUrl(url) || url;
+        } catch (e) {
+            modelPath = url;
+        }
+
+        if (!this.isEnable || !isActive) {
+            return;
+        }
+
+        // Type normalization for robustness between different naming conventions
+        let type = this.#type;
+        const typeMap = {
+            'decisiontree': 'decisionTree',
+            'logistic_regression': 'logisticRegression'
+        };
+        if (type && typeMap[type.toLowerCase()]) {
+            type = typeMap[type.toLowerCase()];
+        }
+
+        const name = this.name;
+        const recordTime = this.#recordTime;
+
+        if (type === 'text') {
+            this.#module = new TextLearning({
+                url: modelPath,
+                labels: this.#labels,
+                type,
+                modelId: this.#modelId,
+                loadModel: this.#dataApi?.loadModel,
+            });
+        } else if (type === 'number') {
+            this.#tableData = tableData || createDataTable(classes, name);
+            this.#module = new NumberClassification({
+                name,
+                result: this.result,
+                url: modelPath,
+                trainParam,
+                table: this.#tableData,
+                modelId: this.#modelId,
+                loadModel: this.#dataApi?.loadModel,
+            });
+            this.#labels = this.#module.getLabels();
+        } else if (type === 'cluster') {
+            this.#tableData = tableData || createDataTable(classes, name);
+            this.#module = new Cluster({
+                name,
+                result: this.result,
+                trainParam,
+                table: this.#tableData,
+            });
+        } else if (type === 'regression') {
+            this.#tableData = tableData || createDataTable(classes, name);
+            this.#module = new Regression({
+                name,
+                result: this.result,
+                url: modelPath,
+                trainParam,
+                table: this.#tableData,
+            });
+        } else if (type === 'image') {
+            this.#module = new ImageLearning({
+                url: modelPath,
+                labels: this.#labels,
+                type,
+            });
+        } else if (type === 'speech') {
+            this.#module = new SpeechClassification({
+                url: modelPath,
+                labels: this.#labels,
+                type,
+                recordTime,
+            });
+        } else if (type === 'logisticRegression') {
+            this.#tableData = tableData || createDataTable(classes, name);
+            this.#module = new LogisticRegression({
+                name,
+                result: this.result,
+                url: modelPath,
+                trainParam,
+                table: this.#tableData,
+            });
+        } else if (type === 'decisionTree') {
+            this.#tableData = tableData || createDataTable(classes, name);
+            this.#module = new DecisionTree({
+                name,
+                result: this.result,
+                url: modelPath,
+                trainParam,
+                table: this.#tableData,
+                modelId: this.#modelId,
+                loadModel: this.#dataApi?.loadModel,
+            });
+        } else if (type === 'svm') {
+            this.#tableData = tableData || createDataTable(classes, name);
+            this.#module = new Svm({
+                name,
+                result: this.result,
+                url: modelPath,
+                trainParam,
+                table: this.#tableData,
+                modelId: this.#modelId,
+                loadModel: this.#dataApi?.loadModel,
+            });
+        }
+
+        if (this.#module) {
+            this.unbanBlocks();
+            this.isLoaded = true;
+        }
+    }
+    async load(modelInfo) {
         const {
-            url,
             labels,
             type,
             classes = [],
             model,
             id,
+            url,
             _id,
             isActive = true,
             name,
@@ -106,9 +264,12 @@ export default class AILearning {
             result,
         } = modelInfo || {};
 
-        if (!url || !this.isEnable || !isActive) {
+        if (_isEmpty(modelInfo)) {
+            console.warn('Empty modelInfo provided to AILearning.js');
             return;
         }
+
+        // Offline integration: If we have the model data, we don't strictly need a dataApi.
         this.destroy();
 
         this.#labels = labels || classes.map(({ name }) => name);
@@ -119,99 +280,43 @@ export default class AILearning {
         this.#modelId = model || id;
         this.#recordTime = recordTime;
         this.result = result;
+        this.#tableData = tableData;
 
+        // Ensure isEnable is true if we are loading a model
+        this.isEnable = true;
+
+        await this.loadModel({
+            url: this.#url,
+            trainParam,
+            tableData: this.#tableData,
+            isActive,
+            classes,
+        });
+
+        if (this.#module && result) {
+            this.#module.result = result;
+            if (this.#module.load && typeof model === 'object') {
+                await this.#module.load(model);
+            }
+        }
+        this.unbanBlocks();
         if (this.#playground) {
             this.#playground.reloadPlayground();
         }
+    }
 
-        if (type === 'text') {
-            this.#module = new TextLearning({
-                url,
-                labels: this.#labels,
-                type,
-                recordTime,
-            });
-        } else if (type === 'number') {
-            this.#tableData = tableData || createDataTable(classes, name);
-            this.#module = new NumberClassification({
-                name,
-                result,
-                url,
-                trainParam,
-                table: this.#tableData,
-            });
-            this.#labels = this.#module.getLabels();
-        } else if (type === 'cluster') {
-            this.#tableData = tableData || createDataTable(classes, name);
-            this.#module = new Cluster({
-                name,
-                result,
-                trainParam,
-                table: this.#tableData,
-            });
-        } else if (type === 'regression') {
-            this.#tableData = tableData || createDataTable(classes, name);
-            this.#module = new Regression({
-                name,
-                result,
-                url,
-                trainParam,
-                table: this.#tableData,
-            });
-        } else if (type === 'image') {
-            this.#module = new ImageLearning({
-                url,
-                labels: this.#labels,
-                type,
-            });
-        } else if (type === 'speech') {
-            this.#module = new Classification({
-                url,
-                labels: this.#labels,
-                type,
-                recordTime,
-            });
-        } else if (type === 'logisticRegression') {
-            this.#tableData = tableData || createDataTable(classes, name);
-            this.#module = new LogisticRegression({
-                name,
-                result,
-                url,
-                trainParam,
-                table: this.#tableData,
-            });
-        } else if (type === 'decisionTree') {
-            this.#tableData = tableData || createDataTable(classes, name);
-            this.#module = new DecisionTree({
-                name,
-                result,
-                url,
-                trainParam,
-                table: this.#tableData,
-            });
-        } else if (type === 'svm') {
-            this.#tableData = tableData || createDataTable(classes, name);
-            this.#module = new Svm({
-                name,
-                result,
-                url,
-                trainParam,
-                table: this.#tableData,
-            });
-        }
-
-        if (this.#module) {
-            this.unbanBlocks();
-            this.isLoaded = true;
-        }
+    async reload(url) {
+        await this.#module?.reload?.(url);
     }
 
     openInputPopup() {
         this.#module?.openInputPopup?.();
     }
 
-    train() {
-        this.#module?.train?.();
+    async train() {
+        if (this.#module && typeof this.#module.train === 'function') {
+            await this.#module.train();
+        }
     }
 
     isTrained() {
@@ -231,7 +336,9 @@ export default class AILearning {
     }
 
     getTrainResult() {
-        return this.#module?.getTrainResult?.();
+        const res = this.#module?.getTrainResult?.() || this.result;
+        console.log('getTrainResult() called, returning:', res);
+        return res;
     }
 
     getPredictResult(index) {
@@ -264,7 +371,10 @@ export default class AILearning {
 
     async predict(obj) {
         if (this.#module && this.#module.predict) {
-            this.result = await this.#module.predict(obj);
+            const predRes = await this.#module.predict(obj);
+            if (predRes !== undefined) {
+                this.result = predRes;
+            }
         }
         return [];
     }
@@ -352,10 +462,11 @@ function createDataTable(classes, name) {
         const [{ samples }] = classes;
         const [sample = {}] = samples || [];
         let data = sample.data;
+        data.id = data.id || data._id;
         if (typeof data === 'string') {
             data = JSON.parse(data);
         }
-        if (data && data.id && !DataTable.getSource(data.id)) {
+        if (data && data?.id && !DataTable.getSource(data?.id)) {
             DataTable.addSource(data, false);
         }
         return data;

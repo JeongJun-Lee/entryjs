@@ -76,11 +76,19 @@ class Cluster {
 
     setTable() {
         const tableSource = DataTable.getSource(this.#table.id);
-        if (this.#table.fieldsInfo.length !== tableSource.fields.length) {
+        if (!tableSource) {
+            return;
+        }
+        const sourceLength = tableSource.fields.length;
+        const [attr, predict] = this.#table.select || [[], []];
+        const maxIndex = Math.max(...attr, ...predict);
+
+        if (maxIndex >= sourceLength) {
             Entry.toast.alert(Lang.Msgs.warn, Lang.AiLearning.train_param_error);
             throw Error(Lang.AiLearning.train_param_error);
         }
         this.#table.data = tableSource.rows;
+        this.#table.fields = tableSource.fields;
     }
 
     destroy() {
@@ -120,9 +128,9 @@ class Cluster {
                 description: `
                     <em>${Lang.AiLearning.cluster_number}</em>   ${k}
                     ${this.#fields.map(
-                        (field, index) =>
-                            `<em>${Lang.AiLearning.model_attr_str} ${index + 1}</em>${field}`
-                    )}
+                    (field, index) =>
+                        `<em>${Lang.AiLearning.model_attr_str} ${index + 1}</em>${field}`
+                )}
                 `,
             });
         } else {
@@ -135,7 +143,10 @@ class Cluster {
     }
 
     setTrainOption(type, value) {
-        this.#trainParam[type] = value;
+        this.#trainParam = {
+            ...this.#trainParam,
+            [type]: value,
+        };
     }
 
     getTrainOption() {
@@ -155,8 +166,11 @@ class Cluster {
         this.#trainCallback(1);
         this.#isTrained = false;
         const { data, select } = this.#table;
-        const filtered = data.filter(
-            (row) => !select.flat().some((selected) => _isNaN(_toNumber(row[selected])))
+        const filtered = data.filter((row) =>
+            select.flat().some((selected) => {
+                const val = row[selected];
+                return val !== undefined && val !== null && String(val).trim() !== '';
+            })
         );
         const [attr] = select;
 
@@ -175,9 +189,9 @@ class Cluster {
             description: `
                     <em>${Lang.AiLearning.cluster_number}</em>   ${k}
                     ${this.#fields.map(
-                        (field, index) =>
-                            `<em>${Lang.AiLearning.model_attr_str} ${index + 1}</em>${field}`
-                    )}
+                (field, index) =>
+                    `<em>${Lang.AiLearning.model_attr_str} ${index + 1}</em>${field}`
+            )}
                 `,
         });
         this.#trainCallback(100);
@@ -236,9 +250,8 @@ class Cluster {
                             const type = centroids?.findIndex(([a, b]) => x === a && value === b);
                             return `
                                 <div class="chart_handle_wrapper">
-                                    ${Lang.AiLearning.centriod} ${type + 1}| ${
-                                this.#fields[0]
-                            }: ${x}, ${this.#fields[1]}: ${value}
+                                    ${Lang.AiLearning.centriod} ${type + 1}| ${this.#fields[0]
+                                }: ${x}, ${this.#fields[1]}: ${value}
                                 <div>
                             `;
                         }

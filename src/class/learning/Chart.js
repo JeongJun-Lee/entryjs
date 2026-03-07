@@ -1,4 +1,5 @@
-import { BillBoard, Tree } from '@entrylabs/tool';
+import { BillBoard } from '@entrylabs/tool';
+import Tree from './LocalTree';
 
 export default class LearningChart {
     constructor(modalData, type = 'chart') {
@@ -7,7 +8,11 @@ export default class LearningChart {
         } else {
             this.modal = this.createChart(modalData);
         }
-        this.modal.show();
+        // LocalTree doesn't need explicit show() if it renders immediately,
+        // but we'll call it for consistency if needed.
+        if (this.modal.show) {
+            this.modal.show();
+        }
     }
 
     show() {
@@ -19,8 +24,18 @@ export default class LearningChart {
     }
 
     destroy() {
-        this.modal.hide();
+        if (this.modal) {
+            if (typeof this.modal.destroy === 'function') {
+                this.modal.destroy();
+            } else if (typeof this.modal.hide === 'function') {
+                this.modal.hide();
+            }
+            if (this.container && this.container.parentNode) {
+                this.container.parentNode.removeChild(this.container);
+            }
+        }
         this.modal = null;
+        this.container = null;
     }
 
     load(data) {
@@ -32,6 +47,7 @@ export default class LearningChart {
             class: 'entry-learning-chart',
             parent: $(Entry.modalContainer),
         })[0];
+        this.container = container;
 
         return new BillBoard({
             data: {
@@ -51,6 +67,7 @@ export default class LearningChart {
             class: 'entry-learning-chart',
             parent: $(Entry.modalContainer),
         })[0];
+        this.container = container;
 
         return new Tree({
             data: {

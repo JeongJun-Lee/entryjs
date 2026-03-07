@@ -38,7 +38,10 @@ class Regression extends LearningBase {
         if (this.attrLength === 1) {
             this.chartEnable = true;
         }
-        this.load(`/uploads/${url}/model.json`);
+        if (this.url !== url) {
+            this.load(url);
+            this.url = url;
+        }
 
         this.fields = table?.select?.[0]?.map((index) => table?.fields[index]);
         this.predictFields = table?.select?.[1]?.map((index) => table?.fields[index]);
@@ -54,12 +57,11 @@ class Regression extends LearningBase {
             title: Lang.AiLearning.chart_title,
             description: `
                 ${this.fields.map(
-                    (field, index) =>
-                        `<em>${Lang.AiLearning.model_attr_str} ${index + 1}</em>: ${field}`
-                )}
-                <em>${Lang.AiLearning.predict}</em>${this.predictFields[0]}<em>${
-                Lang.AiLearning.equation
-            }</em>${this.result.equation}
+                (field, index) =>
+                    `<em>${Lang.AiLearning.model_attr_str} ${index + 1}</em>: ${field}`
+            )}
+                <em>${Lang.AiLearning.predict}</em>${this.predictFields[0]}<em>${Lang.AiLearning.equation
+                }</em>${this.result.equation}
             `,
         });
     }
@@ -112,12 +114,11 @@ class Regression extends LearningBase {
                 source: this.chartData,
                 description: `
                     ${this.fields.map(
-                        (field, index) =>
-                            `<em>${Lang.AiLearning.model_attr_str} ${index + 1}</em> ${field}`
-                    )}
-                    <em>${Lang.AiLearning.predict}</em> ${this.predictFields[0]}<em>${
-                    Lang.AiLearning.equation
-                }</em>${this.result.equation}
+                    (field, index) =>
+                        `<em>${Lang.AiLearning.model_attr_str} ${index + 1}</em> ${field}`
+                )}
+                    <em>${Lang.AiLearning.predict}</em> ${this.predictFields[0]}<em>${Lang.AiLearning.equation
+                    }</em>${this.result.equation}
                 `,
             });
         } catch (e) {
@@ -126,7 +127,31 @@ class Regression extends LearningBase {
     }
 
     async load(url) {
-        this.model = await tf.loadLayersModel(url);
+        const model = await tf.loadLayersModel(url);
+        const modelData = new Promise((resolve) =>
+            model.save({
+                save: (data) => {
+                    const layers = data?.modelTopology?.config?.layers;
+                    if (Array.isArray(layers)) {
+                        data.modelTopology.config.layers.forEach((layer) => {
+                            if (layer?.config?.name) {
+                                layer.config.name = `${layer.config.name}_ws`;
+                            }
+                        });
+                    }
+                    if (Array.isArray(data.weightSpecs)) {
+                        data.weightSpecs.forEach((spec) => {
+                            const splits = spec.name.split('/');
+                            splits[0] = `${splits[0]}_ws`;
+                            spec.name = splits.join('/');
+                        });
+                    }
+                    resolve(data);
+                },
+            })
+        );
+        this.model = await tf.loadLayersModel({ load: () => modelData });
+        model.dispose();
     }
 
     convertNomalResult() {
@@ -224,9 +249,12 @@ function convertToTfData(data, trainParam) {
     const { select = [[0], [1]], data: table } = data;
     const [attr, predict] = select;
     const { epochs = 1, batchSize = 1 } = trainParam;
-    const filtered = table.filter(
-        (row) => !select.flat().some((selected) => _isNaN(_toNumber(row[selected])))
-    );
+    const filtered = table.filter((row) => {
+        return predict.every((i) => {
+            const val = row[i];
+            return val !== undefined && val !== null && String(val).trim() !== '';
+        });
+    });
     const totalDataSize = Math.ceil(filtered.length / batchSize) * epochs;
     return filtered.reduce(
         (accumulator, row) => {
@@ -274,7 +302,7 @@ function convertToTensor(inputs, outputs) {
 
 function createModel(inputShape) {
     const model = tf.sequential();
-    model.add(tf.layers.dense({ inputShape: [inputShape], units: 1 }));
+    model.add(tf.layers.dense({ inputShape: [inputShape], units: 1, name: 'reg_dense_ws' }));
     return model;
 }
 async function trainModel(model, inputs, outputs, trainParam, onBatchEnd, onEpochEnd) {

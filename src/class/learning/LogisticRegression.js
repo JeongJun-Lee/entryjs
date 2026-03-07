@@ -36,7 +36,10 @@ class LogisticRegression extends LearningBase {
         if (this.attrLength === 1) {
             this.chartEnable = true;
         }
-        this.load(`/uploads/${url}/model.json`);
+        if (this.url !== url) {
+            this.load(url);
+            this.url = url;
+        }
 
         this.fields = table?.select?.[0]?.map((index) => table?.fields[index]);
         this.predictFields = table?.select?.[1]?.map((index) => table?.fields[index]);
@@ -47,7 +50,36 @@ class LogisticRegression extends LearningBase {
     }
 
     async load(url) {
-        this.model = await tf.loadLayersModel(url);
+        const model = await tf.loadLayersModel(url);
+        const modelData = new Promise((resolve) =>
+            model.save({
+                save: (data) => {
+                    const layers = data?.modelTopology?.config?.layers;
+                    if (Array.isArray(layers)) {
+                        data.modelTopology.config.layers.forEach((layer) => {
+                            if (layer?.config?.name) {
+                                layer.config.name = `${layer.config.name}_ws`;
+                            }
+                        });
+                    }
+                    if (Array.isArray(data.weightSpecs)) {
+                        data.weightSpecs.forEach((spec) => {
+                            const splits = spec.name.split('/');
+                            splits[0] = `${splits[0]}_ws`;
+                            spec.name = splits.join('/');
+                        });
+                    }
+                    resolve(data);
+                },
+            })
+        );
+        this.model = await tf.loadLayersModel({ load: () => modelData });
+        model.dispose();
+    }
+
+    async reload(url) {
+        this.model = await tf.loadLayersModel(url || this.url);
+        this.isLoaded = true;
     }
 
     async train() {
@@ -102,6 +134,7 @@ class LogisticRegression extends LearningBase {
             precision,
             recall,
         };
+        this.trainCallback(100);
     }
 
     async predict(array) {
@@ -145,6 +178,7 @@ function createModel(inputShape, numClasses = 1) {
     const model = tf.sequential({
         layers: [
             tf.layers.dense({
+                name: 'log_dense_ws',
                 inputShape: [inputShape],
                 units: numClasses,
                 activation: numClasses === 2 ? 'sigmoid' : 'softmax',
@@ -182,11 +216,25 @@ async function trainModel(model, inputs, outputs, trainParam, onEpochEnd) {
 function getData(validationRate, testRate, data, trainParam) {
     const tempMap = {};
     const tempMapCount = {};
-    const { select = [[0], [1]], data: table, fields } = data;
+    let { select = [[0], [1]], data: table, fields, id: tableId } = data;
+
+    // V23: Restore fallback for default sample data (test_table_1) if fields are lost
+    if ((!fields || fields.length === 0) && tableId === 'test_table_1') {
+        const def = typeof Lang !== 'undefined' && Lang.AiLearningTree ? Lang.AiLearningTree : null;
+        fields = [
+            (def && def.sample_field_1) || '꽃받침 길이',
+            (def && def.sample_field_2) || '꽃받침 너비',
+            (def && def.sample_field_3) || '꽃잎 길이',
+            (def && def.sample_field_4) || '꽃잎 너비',
+            (def && def.sample_field_5) || '품종'
+        ];
+    }
+
     const [attr, predict] = select;
-    const filtered = table.filter(
-        (row) => !select[0].some((selected) => _isNaN(_toNumber(row[selected])))
-    );
+    const filtered = table.filter((row) => {
+        const label = row[predict[0]];
+        return label !== undefined && label !== null && String(label).trim() !== '';
+    });
     const dataArray = filtered
         .map((row) => ({
             x: attr.map((i) => parseFloat(row[i]) || 0),
@@ -207,7 +255,7 @@ function getData(validationRate, testRate, data, trainParam) {
         validateData: arrayToZip(validate),
         testArr: test,
         select,
-        fields,
+        fields: attr.map((i) => fields && fields[i] ? fields[i] : `Col ${i}`),
         valueMap: { ...tempMap[predict[0]] },
         dataLength: attr.length,
         numClass: tempMapCount[predict[0]],
