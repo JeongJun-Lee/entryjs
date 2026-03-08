@@ -17,11 +17,13 @@ class ImageLearning {
     #isPredicting = false;
     #captureCanvas;
     #captureTimeoutClear;
-    constructor({ url, labels, type }) {
+    #mobilenetModel = null; // For offline head models that need MobileNet feature extraction
+    #isOfflineHead = false;
+    constructor({ url, labels, type, modelArtifacts }) {
         this.#type = type;
         this.#url = url;
         this.#labels = labels;
-        this.load(url);
+        this.load(url, modelArtifacts);
         Entry.addEventListener('stop', () => {
             this.#result = [];
             this.#isPredicting = false;
@@ -105,8 +107,27 @@ class ImageLearning {
             return [];
         }
         tf.engine().startScope();
-        const tensor = await this.preprocess(canvas);
-        const logits = this.model.predict(tensor);
+
+        let logits;
+        if (this.#isOfflineHead && this.#mobilenetModel) {
+            // Offline head model: MobileNet embedding → dense head
+            // Normalize to [-1, 1] to match mobilenet.infer() preprocessing
+            const pixelTensor = tf.browser.fromPixels(canvas)
+                .resizeBilinear([224, 224])
+                .toFloat()
+                .div(tf.scalar(127.5))
+                .sub(tf.scalar(1))
+                .expandDims(0);
+            const embedding = this.#inferMobileNet(pixelTensor);
+            logits = this.model.predict(embedding);
+            pixelTensor.dispose();
+            embedding.dispose();
+        } else {
+            // Online full model: normalized pixels → full model
+            const tensor = await this.preprocess(canvas);
+            logits = this.model.predict(tensor);
+        }
+
         const result = await this.namePredictions(logits);
         logits.dispose();
         tf.engine().endScope();
@@ -141,9 +162,31 @@ class ImageLearning {
         });
     }
 
-    async load(url) {
+    async load(url, modelArtifacts) {
+        // Priority 1: Load from in-memory artifacts (offline training)
+        if (modelArtifacts && modelArtifacts.modelTopology && modelArtifacts.weightDataBase64) {
+            try {
+                const weightData = base64ToArrayBuffer(modelArtifacts.weightDataBase64);
+                this.model = await tf.loadLayersModel(tf.io.fromMemory(
+                    modelArtifacts.modelTopology,
+                    modelArtifacts.weightSpecs,
+                    weightData
+                ));
+                this.isLoaded = true;
+                this.#isOfflineHead = true;
+                console.log('ImageLearning: Loaded head model from memory artifacts (offline).');
+
+                // Load MobileNet as feature extractor for prediction
+                await this.#loadMobileNet();
+                return;
+            } catch (e) {
+                console.error('ImageLearning: Failed to load from memory artifacts', e);
+            }
+        }
+
+        // Priority 2: Load from URL (online)
         if (!url) {
-            console.warn("ImageLearning: No model URL provided. Using mock/offline mode.");
+            console.warn('ImageLearning: No model URL provided. Using mock/offline mode.');
             this.isLoaded = true;
             return;
         }
@@ -151,9 +194,52 @@ class ImageLearning {
             this.model = await tf.loadLayersModel(url);
             this.isLoaded = true;
         } catch (e) {
-            console.error("ImageLearning: Failed to load model", e);
-            this.isLoaded = true; // prevent infinite loading sequences
+            console.error('ImageLearning: Failed to load model', e);
+            this.isLoaded = true;
         }
+    }
+
+    async #loadMobileNet() {
+        try {
+            // Load MobileNet v1 as a GraphModel (TF Hub format)
+            // In offline Electron, use local path
+            const isOfflineApp = window.location.protocol === 'file:';
+            let mobilenetUrl;
+            if (isOfflineApp) {
+                mobilenetUrl = '../../renderer/resources/lib/tensorflow/models/mobilenet/model.json';
+            } else {
+                mobilenetUrl = 'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_1.0_224/model.json';
+            }
+
+            // This is a GraphModel, not LayersModel
+            this.#mobilenetModel = await tf.loadGraphModel(mobilenetUrl);
+            console.log('ImageLearning: MobileNet GraphModel loaded for offline prediction.');
+        } catch (e) {
+            console.error('ImageLearning: Failed to load MobileNet for offline prediction', e);
+            this.#isOfflineHead = false;
+        }
+    }
+
+    // Mimic mobilenet.infer(img, embedding=true): returns [1, 1024] tensor
+    #inferMobileNet(imgTensor) {
+        // Possible node names for global average pooling output in MobileNet v1 TF Hub
+        const CANDIDATE_NODES = [
+            'module_apply_default/MobilenetV1/Logits/global_pool',
+            'module_apply_default/MobilenetV1/MobilenetV1/global_pool',
+        ];
+
+        for (const nodeName of CANDIDATE_NODES) {
+            try {
+                const result = this.#mobilenetModel.execute(imgTensor, nodeName);
+                // Shape is [1, 1, 1, 1024] from the Mean op, squeeze to [1, 1024]
+                return result.reshape([1, 1024]);
+            } catch (e) {
+                // Try next candidate
+            }
+        }
+
+        console.error('ImageLearning: No valid embedding node found in MobileNet');
+        throw new Error('MobileNet embedding extraction failed');
     }
 
     isTrained() {
@@ -171,4 +257,13 @@ function isWebGlSupport() {
         console.log('error', e);
         return false;
     }
+}
+
+function base64ToArrayBuffer(base64) {
+    const binaryString = atob(base64);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes.buffer;
 }

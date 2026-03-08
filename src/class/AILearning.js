@@ -77,6 +77,7 @@ export default class AILearning {
     #module = null;
     #tableData = null;
     #dataApi = undefined;
+    #modelArtifacts = null;
 
     constructor(playground, isEnable = true) {
         this.#playground = playground;
@@ -210,6 +211,7 @@ export default class AILearning {
                 url: modelPath,
                 labels: this.#labels,
                 type,
+                modelArtifacts: this.#modelArtifacts,
             });
         } else if (type === 'speech') {
             this.#module = new SpeechClassification({
@@ -272,6 +274,7 @@ export default class AILearning {
             trainParam,
             tableData,
             result,
+            modelArtifacts,
         } = modelInfo || {};
 
         if (_isEmpty(modelInfo)) {
@@ -291,6 +294,7 @@ export default class AILearning {
         this.#recordTime = recordTime;
         this.result = result;
         this.#tableData = tableData;
+        this.#modelArtifacts = modelArtifacts || null;
 
         // Ensure isEnable is true if we are loading a model
         this.isEnable = true;
