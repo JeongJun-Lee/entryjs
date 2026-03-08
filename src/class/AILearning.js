@@ -398,6 +398,7 @@ export default class AILearning {
             const predRes = await this.#module.predict(obj);
             if (predRes !== undefined) {
                 this.result = predRes;
+                return predRes;
             }
         }
         return [];

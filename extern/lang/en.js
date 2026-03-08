@@ -6751,6 +6751,13 @@ Lang.AiLearning = {
     svm_gamma_error: 'Please enter a gamma value greater than 0.',
     neighbor_count_error: 'Please enter the number of neighbors as an integer of 1 or more.',
     no_model_error: 'No trained model found. Please train again in the AI learning window.',
+    data_input: 'Data Input',
+    mode_upload: 'Upload',
+    mode_webcam: 'Capture',
+    upload_box_text: 'File Upload',
+    classification_result: 'Classification Result: ',
+    apply: 'Apply',
+    unknown: 'Unknown',
 };
 Lang.Category = {
     entrybot_friends: 'Entrybot friends',

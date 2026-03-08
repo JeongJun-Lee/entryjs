@@ -9743,6 +9743,13 @@ Lang.AiLearning = {
     svm_gamma_error: '감마 값은 0보다 큰 값으로 입력해 주세요.',
     neighbor_count_error: '이웃 개수는 1 이상의 정수로 입력해 주세요.',
     no_model_error: '학습된 모델이 없습니다. 학습 창에서 다시 학습시켜 주세요.',
+    data_input: '데이터 입력',
+    mode_upload: '업로드',
+    mode_webcam: '촬영',
+    upload_box_text: '파일 업로드',
+    classification_result: '분류 결과: ',
+    apply: '적용하기',
+    unknown: '알 수 없음',
 };
 Lang.SharePolicy = {
     title: '엔트리 작품/게시물 공유 가이드',
