@@ -1,14 +1,14 @@
 import PopupHelper from '../popup_helper';
 
 const MlPopup = class InputPopup {
-    #popupKey = 'ai_learning';
+    _popupKey = 'ai_learning';
 
     constructor(source) {
         this.generatePopupView(source);
     }
 
     open() {
-        this.popupHelper.show(this.#popupKey);
+        this.popupHelper.show(this._popupKey);
     }
 
     generatePopupView({ url, labels, type, recordTime, setResult }) {
@@ -20,14 +20,14 @@ const MlPopup = class InputPopup {
             }
         }
         let isPauseClicked = false;
-        this.popupHelper.addPopup(this.#popupKey, {
+        this.popupHelper.addPopup(this._popupKey, {
             type: 'confirm',
             title: Lang.Blocks.learn_popup_title,
             onShow: () => {
                 this.popupHelper.addClass('learning_popup');
                 isPauseClicked = false;
                 localStorage.setItem(
-                    this.#popupKey,
+                    this._popupKey,
                     JSON.stringify({ url, labels, type, recordTime })
                 );
                 this.isLoading = true;

@@ -62,30 +62,30 @@ const banClasses = [
 ];
 
 export default class AILearning {
-    #playground;
-    #categoryName = 'ai_learning';
-    #labels = [];
-    #url;
-    #type;
-    #oid;
-    #modelId;
+    _playground;
+    _categoryName = 'ai_learning';
+    _labels = [];
+    _url;
+    _type;
+    _oid;
+    _modelId;
     isLoaded = false;
     isLoading = false;
     result = [];
     isEnable;
-    #recordTime = 2000;
-    #module = null;
-    #tableData = null;
-    #dataApi = undefined;
-    #modelArtifacts = null;
+    _recordTime = 2000;
+    _module = null;
+    _tableData = null;
+    _dataApi = undefined;
+    _modelArtifacts = null;
 
     constructor(playground, isEnable = true) {
-        this.#playground = playground;
+        this._playground = playground;
         this.isEnable = isEnable;
     }
 
     get labels() {
-        return this.#labels;
+        return this._labels;
     }
 
     init() {
@@ -99,7 +99,7 @@ export default class AILearning {
     }
 
     setDataApi(api) {
-        this.#dataApi = api;
+        this._dataApi = api;
     }
 
     removeAllBlocks() {
@@ -128,7 +128,7 @@ export default class AILearning {
         if (!this.isLoaded) {
             return;
         }
-        this.#modelId = undefined;
+        this._modelId = undefined;
         const { blocks } = EntryStatic.getAllBlocks().find(
             ({ category }) => category === 'ai_utilize'
         );
@@ -144,7 +144,7 @@ export default class AILearning {
     async loadModel({ url, trainParam, tableData, isActive, classes, model }) {
         let modelPath = '';
         try {
-            modelPath = await this.#dataApi?.getModelDownloadUrl(url) || url;
+            modelPath = await this._dataApi?.getModelDownloadUrl(url) || url;
         } catch (e) {
             modelPath = url;
         }
@@ -154,7 +154,7 @@ export default class AILearning {
         }
 
         // Type normalization for robustness between different naming conventions
-        let type = this.#type;
+        let type = this._type;
         const typeMap = {
             'decisiontree': 'decisionTree',
             'logistic_regression': 'logisticRegression'
@@ -164,97 +164,97 @@ export default class AILearning {
         }
 
         const name = this.name;
-        const recordTime = this.#recordTime;
+        const recordTime = this._recordTime;
 
         if (type === 'text') {
-            this.#module = new TextLearning({
+            this._module = new TextLearning({
                 url: modelPath,
-                labels: this.#labels,
+                labels: this._labels,
                 type,
-                modelId: this.#modelId,
-                loadModel: this.#dataApi?.loadModel,
+                modelId: this._modelId,
+                loadModel: this._dataApi?.loadModel,
             });
         } else if (type === 'number') {
-            this.#tableData = tableData || createDataTable(classes, name);
-            this.#module = new NumberClassification({
+            this._tableData = tableData || createDataTable(classes, name);
+            this._module = new NumberClassification({
                 name,
                 result: this.result,
                 url: modelPath,
                 trainParam,
-                table: this.#tableData,
+                table: this._tableData,
                 model,
-                loadModel: this.#dataApi?.loadModel,
+                loadModel: this._dataApi?.loadModel,
             });
-            this.#labels = this.#module.getLabels();
+            this._labels = this._module.getLabels();
         } else if (type === 'cluster') {
-            this.#tableData = tableData || createDataTable(classes, name);
-            this.#module = new Cluster({
+            this._tableData = tableData || createDataTable(classes, name);
+            this._module = new Cluster({
                 name,
                 result: this.result,
                 url: modelPath,
                 trainParam,
-                table: this.#tableData,
+                table: this._tableData,
                 model,
             });
         } else if (type === 'regression') {
-            this.#tableData = tableData || createDataTable(classes, name);
-            this.#module = new Regression({
+            this._tableData = tableData || createDataTable(classes, name);
+            this._module = new Regression({
                 name,
                 result: this.result,
                 url: modelPath,
                 trainParam,
-                table: this.#tableData,
+                table: this._tableData,
                 model,
             });
         } else if (type === 'image') {
-            this.#module = new ImageLearning({
+            this._module = new ImageLearning({
                 url: modelPath,
-                labels: this.#labels,
+                labels: this._labels,
                 type,
-                modelArtifacts: this.#modelArtifacts,
+                modelArtifacts: this._modelArtifacts,
             });
         } else if (type === 'speech') {
-            this.#module = new SpeechClassification({
+            this._module = new SpeechClassification({
                 url: modelPath,
-                labels: this.#labels,
+                labels: this._labels,
                 type,
                 recordTime,
             });
         } else if (type === 'logisticRegression') {
-            this.#tableData = tableData || createDataTable(classes, name);
-            this.#module = new LogisticRegression({
+            this._tableData = tableData || createDataTable(classes, name);
+            this._module = new LogisticRegression({
                 name,
                 result: this.result,
                 url: modelPath,
                 trainParam,
-                table: this.#tableData,
+                table: this._tableData,
                 model,
             });
         } else if (type === 'decisionTree') {
-            this.#tableData = tableData || createDataTable(classes, name);
-            this.#module = new DecisionTree({
+            this._tableData = tableData || createDataTable(classes, name);
+            this._module = new DecisionTree({
                 name,
                 result: this.result,
                 url: modelPath,
                 trainParam,
-                table: this.#tableData,
+                table: this._tableData,
                 model,
-                loadModel: this.#dataApi?.loadModel,
+                loadModel: this._dataApi?.loadModel,
             });
         } else if (type === 'svm') {
-            this.#tableData = tableData || createDataTable(classes, name);
-            this.#module = new Svm({
+            this._tableData = tableData || createDataTable(classes, name);
+            this._module = new Svm({
                 name,
                 result: this.result,
                 url: modelPath,
                 trainParam,
-                table: this.#tableData,
+                table: this._tableData,
                 model,
-                loadModel: this.#dataApi?.loadModel,
+                loadModel: this._dataApi?.loadModel,
             });
         }
 
-        if (this.#module) {
+        if (this._module) {
             this.unbanBlocks();
             this.isLoaded = true;
         }
@@ -285,103 +285,103 @@ export default class AILearning {
         // Offline integration: If we have the model data, we don't strictly need a dataApi.
         this.destroy();
 
-        this.#labels = labels || classes.map(({ name }) => name);
-        this.#type = type;
-        this.#url = url;
-        this.#oid = _id;
+        this._labels = labels || classes.map(({ name }) => name);
+        this._type = type;
+        this._url = url;
+        this._oid = _id;
         this.name = name;
-        this.#modelId = model || id;
-        this.#recordTime = recordTime;
+        this._modelId = model || id;
+        this._recordTime = recordTime;
         this.result = result;
-        this.#tableData = tableData;
-        this.#modelArtifacts = modelArtifacts || null;
+        this._tableData = tableData;
+        this._modelArtifacts = modelArtifacts || null;
 
         // Ensure isEnable is true if we are loading a model
         this.isEnable = true;
 
         await this.loadModel({
-            url: this.#url,
+            url: this._url,
             trainParam,
-            tableData: this.#tableData,
+            tableData: this._tableData,
             isActive,
             classes,
-            model: this.#modelId,
+            model: this._modelId,
         });
 
-        if (this.#module && result) {
+        if (this._module && result) {
             // Only set module.result if the module's own load() didn't already
             // process and set it (with _addFeatureNames / traverse annotations).
             // Otherwise we'd overwrite the processed graphData with raw saved data.
-            if (!this.#module.result?.graphData) {
-                this.#module.result = result;
+            if (!this._module.result?.graphData) {
+                this._module.result = result;
             }
-            if (this.#module.load && typeof model === 'object') {
-                await this.#module.load(model);
+            if (this._module.load && typeof model === 'object') {
+                await this._module.load(model);
             }
         }
         this.unbanBlocks();
-        if (this.#playground) {
-            this.#playground.reloadPlayground();
+        if (this._playground) {
+            this._playground.reloadPlayground();
         }
     }
 
     async reload(url) {
-        await this.#module?.reload?.(url);
+        await this._module?.reload?.(url);
     }
 
     openInputPopup() {
-        this.#module?.openInputPopup?.();
+        this._module?.openInputPopup?.();
     }
 
     async train() {
-        if (this.#module && typeof this.#module.train === 'function') {
-            await this.#module.train();
+        if (this._module && typeof this._module.train === 'function') {
+            await this._module.train();
             this.unbanBlocks();
-            if (this.#playground) {
-                this.#playground.reloadPlayground();
+            if (this._playground) {
+                this._playground.reloadPlayground();
             }
         }
     }
 
     isTrained() {
-        return !!this.#module?.isTrained?.();
+        return !!this._module?.isTrained?.();
     }
 
     setTrainOption(type, value) {
-        this.#module?.setTrainOption?.(type, value);
+        this._module?.setTrainOption?.(type, value);
     }
 
     getTrainOption() {
-        return this.#module?.getTrainOption?.();
+        return this._module?.getTrainOption?.();
     }
 
     getTableData() {
-        return this.#tableData;
+        return this._tableData;
     }
 
     getTrainResult() {
-        const res = this.#module?.getTrainResult?.() || this.result;
+        const res = this._module?.getTrainResult?.() || this.result;
         console.log('getTrainResult() called, returning:', res);
         return res;
     }
 
     getPredictResult(index) {
-        return this.#module?.getResult?.(index);
+        return this._module?.getResult?.(index);
     }
 
     getId() {
-        return this.#modelId;
+        return this._modelId;
     }
 
     setVisible(visible) {
-        this.#module?.setVisible?.(visible);
+        this._module?.setVisible?.(visible);
     }
 
     setChartVisible(visible) {
         if (visible) {
-            this.#module?.openChart?.();
+            this._module?.openChart?.();
         } else {
-            this.#module?.closeChart?.();
+            this._module?.closeChart?.();
         }
     }
 
@@ -394,8 +394,8 @@ export default class AILearning {
     }
 
     async predict(obj) {
-        if (this.#module && this.#module.predict) {
-            const predRes = await this.#module.predict(obj);
+        if (this._module && this._module.predict) {
+            const predRes = await this._module.predict(obj);
             if (predRes !== undefined) {
                 this.result = predRes;
                 return predRes;
@@ -405,27 +405,27 @@ export default class AILearning {
     }
 
     startPredict() {
-        if (this.#module && this.#module.startPredict) {
-            this.#module.startPredict();
+        if (this._module && this._module.startPredict) {
+            this._module.startPredict();
         }
     }
 
     stopPredict() {
-        if (this.#module && this.#module.stopPredict) {
-            this.#module.stopPredict();
+        if (this._module && this._module.stopPredict) {
+            this._module.stopPredict();
         }
     }
 
     unbanBlocks() {
         this.banBlocks();
-        const blockMenu = getBlockMenu(this.#playground);
+        const blockMenu = getBlockMenu(this._playground);
         if (blockMenu) {
-            this.#module?.unbanBlocks?.(blockMenu);
+            this._module?.unbanBlocks?.(blockMenu);
         }
     }
 
     banBlocks() {
-        const blockMenu = getBlockMenu(this.#playground);
+        const blockMenu = getBlockMenu(this._playground);
         if (blockMenu) {
             banClasses.forEach((clazz) => {
                 blockMenu.banClass(clazz);
@@ -434,17 +434,17 @@ export default class AILearning {
     }
 
     destroy() {
-        this.#labels = [];
-        this.#url = null;
-        this.#type = null;
+        this._labels = [];
+        this._url = null;
+        this._type = null;
         this.isLoading = false;
         this.result = [];
         this.isLoaded = false;
-        this.#recordTime = 2000;
-        this.#tableData = null;
-        if (this.#module) {
-            this.#module?.destroy?.();
-            this.#module = null;
+        this._recordTime = 2000;
+        this._tableData = null;
+        if (this._module) {
+            this._module?.destroy?.();
+            this._module = null;
         }
     }
 
@@ -453,15 +453,15 @@ export default class AILearning {
             return;
         }
         return {
-            labels: this.#labels,
-            url: this.#url,
-            type: this.#type,
-            id: this.#modelId,
-            _id: this.#oid,
-            recordTime: this.#recordTime,
+            labels: this._labels,
+            url: this._url,
+            type: this._type,
+            id: this._modelId,
+            _id: this._oid,
+            recordTime: this._recordTime,
             trainParam: this.getTrainOption(),
             result: this.getTrainResult(),
-            tableData: this.#tableData,
+            tableData: this._tableData,
         };
     }
 }

@@ -8,25 +8,25 @@ export const classes = [
 const SCALAR_VALUE = 127.5;
 const SIZE = 224;
 class ImageLearning {
-    #type = null;
-    #url = '';
-    #labels = [];
-    #popup = null;
-    #result = [];
-    #axis = 0;
-    #isPredicting = false;
-    #captureCanvas;
-    #captureTimeoutClear;
-    #mobilenetModel = null; // For offline head models that need MobileNet feature extraction
-    #isOfflineHead = false;
+    _type = null;
+    _url = '';
+    _labels = [];
+    _popup = null;
+    _result = [];
+    _axis = 0;
+    _isPredicting = false;
+    _captureCanvas;
+    _captureTimeoutClear;
+    _mobilenetModel = null; // For offline head models that need MobileNet feature extraction
+    _isOfflineHead = false;
     constructor({ url, labels, type, modelArtifacts }) {
-        this.#type = type;
-        this.#url = url;
-        this.#labels = labels;
+        this._type = type;
+        this._url = url;
+        this._labels = labels;
         this.load(url, modelArtifacts);
         Entry.addEventListener('stop', () => {
-            this.#result = [];
-            this.#isPredicting = false;
+            this._result = [];
+            this._isPredicting = false;
         });
         if (!isWebGlSupport()) {
             tf.setBackend('cpu');
@@ -34,10 +34,10 @@ class ImageLearning {
     }
 
     getResult(indexOrName) {
-        const result = this.#result.length ? this.#result : this.#popup?.result || [];
+        const result = this._result.length ? this._result : this._popup?.result || [];
         const defaultResult = { probability: 0, className: '' };
         if (indexOrName !== undefined && indexOrName !== null) {
-            const label = this.#labels[indexOrName] || indexOrName;
+            const label = this._labels[indexOrName] || indexOrName;
             return (
                 result.find(({ className }) => String(className) === String(label)) || defaultResult
             );
@@ -47,8 +47,41 @@ class ImageLearning {
 
     unbanBlocks(blockMenu) {
         blockMenu.unbanClass(`ai_learning_classification`);
-        if (this.#type) {
-            blockMenu.unbanClass(`ai_learning_${this.#type}`);
+        if (this._type) {
+            blockMenu.unbanClass(`ai_learning_${this._type}`);
+        }
+        if (this._type === 'image') {
+            const hasVideoBlocks = Entry.aiUtilizeBlocks?.includes('video');
+            if (!hasVideoBlocks) {
+                Entry.aiUtilize?.addAIUtilizeBlocks(['video']);
+            }
+            // Limit shown video blocks
+            const videoBlocks = [
+                'video_title',
+                'video_change_cam',
+                'video_check_webcam',
+                'video_draw_webcam',
+                'video_set_camera_opacity_option',
+                'video_flip_camera'
+            ];
+            const allBlocks = Entry.AI_UTILIZE_BLOCK.video.getBlocks();
+            Object.keys(allBlocks).forEach(block => {
+                const blockInfo = Entry.block[block];
+                if (!blockInfo) return;
+                
+                if (!blockInfo._isNotFor) {
+                    blockInfo._isNotFor = blockInfo.isNotFor;
+                }
+
+                if (videoBlocks.includes(block)) {
+                    blockInfo.isNotFor = [block];
+                    blockMenu.unbanClass(block);
+                } else {
+                    blockInfo.isNotFor = [block];
+                    blockMenu.banClass(block);
+                }
+            });
+            blockMenu.unbanClass('video');
         }
     }
 
@@ -56,13 +89,13 @@ class ImageLearning {
         Entry.dispatchEvent('openMLInputPopup', {
             type: 'image',
             predict: async (canvas) => {
-                this.#result = await this.predict(canvas);
-                return this.#result;
+                this._result = await this.predict(canvas);
+                return this._result;
             },
-            url: this.#url,
-            labels: this.#labels,
+            url: this._url,
+            labels: this._labels,
             setResult: (result) => {
-                this.#result = result;
+                this._result = result;
             },
         });
     }
@@ -71,35 +104,53 @@ class ImageLearning {
         if (VideoUtils.isInitialized) {
             return VideoUtils.video;
         }
+        if (Entry.VideoUtils && Entry.VideoUtils.isInitialized) {
+            return Entry.VideoUtils.video;
+        }
         if (mediaPipeUtils.isInitialized) {
             return mediaPipeUtils.video;
         }
         return null;
     }
     async startPredict() {
-        if (!this.isLoaded || this.#isPredicting) {
+        console.log('[ImageLearning] startPredict called. isLoaded:', this.isLoaded, 'isPredicting:', this._isPredicting);
+        if (!this.isLoaded || this._isPredicting) {
             return false;
         }
 
-        this.#isPredicting = true;
+        this._isPredicting = true;
         if (!this.captureCanvas) {
-            this.#captureCanvas = document.createElement('canvas');
-            this.#captureCanvas.width = SIZE;
-            this.#captureCanvas.height = SIZE;
+            this._captureCanvas = document.createElement('canvas');
+            this._captureCanvas.width = SIZE;
+            this._captureCanvas.height = SIZE;
         }
 
-        this.#captureTimeoutClear = Entry.Utils.asyncAnimationFrame(async () => {
-            const video = this.getVideo();
-            if (!video) {
+        const predictLoop = async () => {
+            if (!this._isPredicting) {
                 return;
             }
-            const context = this.#captureCanvas.getContext('2d');
+            const video = this.getVideo();
+            if (!video) {
+                this._captureTimeoutClear = requestAnimationFrame(predictLoop);
+                return;
+            }
+            const context = this._captureCanvas.getContext('2d');
             context.drawImage(video, 0, 0, SIZE, SIZE);
 
-            this.#result = await this.predict(this.#captureCanvas);
-        });
+            try {
+                this._result = await this.predict(this._captureCanvas);
+            } catch (err) {
+                console.error('[ImageLearning] Prediction failed in loop:', err);
+            }
+            
+            if (this._isPredicting) {
+                this._captureTimeoutClear = requestAnimationFrame(predictLoop);
+            }
+        };
 
-        return this.#result;
+        predictLoop();
+
+        return this._result;
     }
 
     async predict(canvas) {
@@ -108,44 +159,52 @@ class ImageLearning {
             return [];
         }
         tf.engine().startScope();
+        try {
+            let logits;
+            if (this._isOfflineHead && this._mobilenetModel) {
+                // Offline head model: MobileNet embedding → dense head
+                // Normalize to [-1, 1] to match mobilenet.infer() preprocessing
+                const pixelTensor = tf.browser.fromPixels(canvas)
+                    .resizeBilinear([224, 224])
+                    .toFloat()
+                    .div(tf.scalar(127.5))
+                    .sub(tf.scalar(1))
+                    .expandDims(0);
+                const embedding = this._inferMobileNet(pixelTensor);
+                logits = this.model.predict(embedding);
+                pixelTensor.dispose();
+                embedding.dispose();
+            } else {
+                // Online full model: normalized pixels → full model
+                const tensor = await this.preprocess(canvas);
+                logits = this.model.predict(tensor);
+            }
 
-        let logits;
-        if (this.#isOfflineHead && this.#mobilenetModel) {
-            // Offline head model: MobileNet embedding → dense head
-            // Normalize to [-1, 1] to match mobilenet.infer() preprocessing
-            const pixelTensor = tf.browser.fromPixels(canvas)
-                .resizeBilinear([224, 224])
-                .toFloat()
-                .div(tf.scalar(127.5))
-                .sub(tf.scalar(1))
-                .expandDims(0);
-            const embedding = this.#inferMobileNet(pixelTensor);
-            logits = this.model.predict(embedding);
-            pixelTensor.dispose();
-            embedding.dispose();
-        } else {
-            // Online full model: normalized pixels → full model
-            const tensor = await this.preprocess(canvas);
-            logits = this.model.predict(tensor);
-        }
-
-        const result = await this.namePredictions(logits);
-        logits.dispose();
+            const result = await this.namePredictions(logits);
+            logits.dispose();
+            tf.engine().endScope();
+            return result;
+        } catch (err) {
+        console.error("ImageLearning: Prediction crash!", err);
         tf.engine().endScope();
-        return result;
+        return [];
     }
+}
 
     stopPredict() {
-        this.#result = [];
-        this.#isPredicting = false;
-        this.#captureTimeoutClear && this.#captureTimeoutClear();
+        this._result = [];
+        this._isPredicting = false;
+        if (this._captureTimeoutClear) {
+            clearTimeout(this._captureTimeoutClear);
+            this._captureTimeoutClear = null;
+        }
     }
 
     async namePredictions(logits) {
         const values = Array.from(await logits.data());
         return values
             .map((probability, index) => ({
-                className: this.#labels[index] || index,
+                className: this._labels[index] || index,
                 probability,
             }))
             .sort((a, b) => a.probability > b.probability ? -1 : a.probability < b.probability ? 1 : 0);
@@ -159,7 +218,7 @@ class ImageLearning {
                 .toFloat()
                 .sub(offset)
                 .div(offset)
-                .expandDims(this.#axis);
+                .expandDims(this._axis);
         });
     }
 
@@ -174,11 +233,11 @@ class ImageLearning {
                     weightData
                 ));
                 this.isLoaded = true;
-                this.#isOfflineHead = true;
+                this._isOfflineHead = true;
                 console.log('ImageLearning: Loaded head model from memory artifacts (offline).');
 
                 // Load MobileNet as feature extractor for prediction
-                await this.#loadMobileNet();
+                await this._loadMobileNet();
                 return;
             } catch (e) {
                 console.error('ImageLearning: Failed to load from memory artifacts', e);
@@ -200,29 +259,30 @@ class ImageLearning {
         }
     }
 
-    async #loadMobileNet() {
+    async _loadMobileNet() {
         try {
             // Load MobileNet v1 as a GraphModel (TF Hub format)
             // In offline Electron, use local path
             const isOfflineApp = window.location.protocol === 'file:';
             let mobilenetUrl;
             if (isOfflineApp) {
+                // Return to original path that was known to work
                 mobilenetUrl = '../../renderer/resources/lib/tensorflow/models/mobilenet/model.json';
             } else {
                 mobilenetUrl = 'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_1.0_224/model.json';
             }
 
             // This is a GraphModel, not LayersModel
-            this.#mobilenetModel = await tf.loadGraphModel(mobilenetUrl);
-            console.log('ImageLearning: MobileNet GraphModel loaded for offline prediction.');
+            this._mobilenetModel = await tf.loadGraphModel(mobilenetUrl);
+            console.log('ImageLearning: MobileNet GraphModel loaded from:', mobilenetUrl);
         } catch (e) {
-            console.error('ImageLearning: Failed to load MobileNet for offline prediction', e);
-            this.#isOfflineHead = false;
+            console.error('ImageLearning: Failed to load MobileNet from:', mobilenetUrl, e);
+            this._isOfflineHead = false;
         }
     }
 
     // Mimic mobilenet.infer(img, embedding=true): returns [1, 1024] tensor
-    #inferMobileNet(imgTensor) {
+    _inferMobileNet(imgTensor) {
         // Possible node names for global average pooling output in MobileNet v1 TF Hub
         const CANDIDATE_NODES = [
             'module_apply_default/MobilenetV1/Logits/global_pool',
@@ -231,7 +291,7 @@ class ImageLearning {
 
         for (const nodeName of CANDIDATE_NODES) {
             try {
-                const result = this.#mobilenetModel.execute(imgTensor, nodeName);
+                const result = this._mobilenetModel.execute(imgTensor, nodeName);
                 // Shape is [1, 1, 1, 1024] from the Mean op, squeeze to [1, 1024]
                 return result.reshape([1, 1024]);
             } catch (e) {
