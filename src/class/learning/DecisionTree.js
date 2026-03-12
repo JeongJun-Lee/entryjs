@@ -177,7 +177,6 @@ class DecisionTree extends LearningBase {
         }
 
         const dataRes = getData(testRate, this.table);
-        console.log('DecisionTree getData Result:', dataRes);
         const {
             trainX,
             trainY,
@@ -371,11 +370,6 @@ class DecisionTree extends LearningBase {
     }
 
     async predict(array) {
-        console.log('DecisionTree Predict State:', {
-            result: this.result,
-            table: this.table,
-            attrValueMaps: this.attrValueMaps,
-        });
         if (!this.model) {
             const msg = (typeof Lang !== 'undefined' && Lang.AiLearning?.model_status_3) || '아직 로딩된 모델이 없습니다.';
             throw new Error(msg);
@@ -409,20 +403,12 @@ class DecisionTree extends LearningBase {
         });
 
         const xs = [encodedArray];
-        console.log('DecisionTree Predict Input:', {
-            array,
-            attrFiltered,
-            attrValueMaps: this.attrValueMaps,
-            encodedArray,
-        });
 
         let preds;
         try {
             preds = this.model.predict(xs);
-            console.log('DecisionTree Predict Output (model.predict):', preds);
         } catch (e) {
             preds = this._predictFallback(xs);
-            console.log('DecisionTree Predict Output (fallback):', preds);
         }
         this.predictResult = preds.map((target) => {
             let className = getLabelFromValueMap(target, this.valueMap);
@@ -505,12 +491,6 @@ function getData(testRate, data) {
     // predict 컬럼이 attr에 포함되면 label leakage 발생 → 강제 제외
     const predictSet = new Set(predict);
     const attrFiltered = attr.filter((i) => !predictSet.has(i));
-    console.log('DecisionTree getData details:', {
-        select,
-        attr,
-        predict,
-        attrFiltered,
-    });
 
     const ATTR_STR2NUM_MAP = {};
     const ATTR_STR2NUM_MAP_COUNT = {};

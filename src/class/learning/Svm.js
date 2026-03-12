@@ -38,7 +38,7 @@ export const OPTION_DEFAULT_VALUE = {
     initialCentroids: 'kmpp',
     neighbors: 10,
     validationRate: 0.25,
-    C: 0.00001,
+    C: 1.0,
     degree: 3,
     gamma: 1,
 };

@@ -47,6 +47,7 @@ const banClasses = [
     ...DecisionTreeClasses,
     ...LogisticRegressionClasses,
     ...SvmClasses,
+    'ai_learning_classification',
     'core_attr_1',
     'core_attr_2',
     'core_attr_3',
@@ -59,6 +60,9 @@ const banClasses = [
     'core_attr_10',
     'core_attr_11',
     'core_attr_12',
+    'video',
+    'video_legacy',
+    'ai_utilize_video',
 ];
 
 export default class AILearning {
@@ -360,9 +364,7 @@ export default class AILearning {
     }
 
     getTrainResult() {
-        const res = this._module?.getTrainResult?.() || this.result;
-        console.log('getTrainResult() called, returning:', res);
-        return res;
+        return this._module?.getTrainResult?.() || this.result;
     }
 
     getPredictResult(index) {
@@ -428,8 +430,36 @@ export default class AILearning {
         const blockMenu = getBlockMenu(this._playground);
         if (blockMenu) {
             banClasses.forEach((clazz) => {
-                blockMenu.banClass(clazz);
+                blockMenu.banClass(clazz, true);
             });
+
+            // ImageLearning에서 개별적으로 unban/isNotFor 변경한 비디오 블록들 원복 및 ban 처리
+            const videoBlockInfo = Entry.AI_UTILIZE_BLOCK?.video;
+            if (videoBlockInfo && typeof videoBlockInfo.getBlocks === 'function') {
+                const allBlocks = videoBlockInfo.getBlocks();
+                Object.keys(allBlocks).forEach((block) => {
+                    const blockInfo = Entry.block[block];
+                    if (blockInfo) {
+                        if (blockInfo._isNotFor) {
+                            blockInfo.isNotFor = blockInfo._isNotFor;
+                            delete blockInfo._isNotFor;
+                        }
+                        blockMenu.banClass(block, true);
+                    }
+                });
+            }
+
+            // 비디오 블록이 프로젝트에서 사용 중이 아니라면, 비디오 감지 확장 블록 자체를 제거
+            if (
+                this._type !== 'image' &&
+                Entry.aiUtilize &&
+                typeof Entry.aiUtilize.isActive === 'function' &&
+                Entry.playground?.object
+            ) {
+                if (!Entry.aiUtilize.isActive('video')) {
+                    Entry.aiUtilize.banAIUtilizeBlocks(['video']);
+                }
+            }
         }
     }
 

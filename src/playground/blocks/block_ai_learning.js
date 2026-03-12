@@ -680,7 +680,7 @@ module.exports = {
                         return script.callReturn();
                     }
                     const type = script.getField('TYPE', script);
-                    const result = Entry.aiLearning?.getTrainResult(); console.log("get_result_info type=", type, "result=", result);
+                    const result = Entry.aiLearning?.getTrainResult();
                     return result?.[type];
                 },
                 syntax: {
@@ -707,7 +707,7 @@ const predictBlocks = createParamBlock({
             return script.callReturn();
         }
         const params = Object.keys(paramsKeyMap).map((key) => script.getNumberValue(key, script));
-        console.log("Prediction params:", params); await Entry.aiLearning.predict(params);
+        await Entry.aiLearning.predict(params);
         const result = Entry.aiLearning.getPredictResult();
         return result.sort((a, b) => b.probability - a.probability)[0].className;
     },
