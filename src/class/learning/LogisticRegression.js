@@ -28,13 +28,15 @@ export const classes = [
 class LogisticRegression extends LearningBase {
     type = 'logistic_regression';
 
-    init({ name, url, result, table, trainParam }) {
+    init({ name, url, result, table, trainParam, model }) {
         this.name = name;
         this.trainParam = trainParam || {};
         // Preserve trained result across stop-event re-init.
         // The 'stop' event calls init() with stale constructor params;
         // if we already have a trained result, keep it intact.
-        if (!this.result?.fields) {
+        if (this.result?.fields) {
+            // Keep current result
+        } else {
             this.result = result || {};
         }
         this.table = table;
@@ -47,7 +49,11 @@ class LogisticRegression extends LearningBase {
         if (this.attrLength === 1) {
             this.chartEnable = true;
         }
-        if (this.url !== url) {
+        if (this.model) {
+            // Already loaded or trained
+        } else if (model && typeof model === 'object') {
+            this.load(model);
+        } else if (this.url !== url) {
             this.load(url);
             this.url = url;
         }
@@ -62,7 +68,12 @@ class LogisticRegression extends LearningBase {
 
     async load(url) {
         try {
-            const model = await tf.loadLayersModel(url);
+            let model;
+            if (typeof url === 'object' && url !== null) {
+                model = await tf.loadLayersModel({ load: () => Promise.resolve(url) });
+            } else {
+                model = await tf.loadLayersModel(url);
+            }
             const modelData = new Promise((resolve) =>
                 model.save({
                     save: (data) => {

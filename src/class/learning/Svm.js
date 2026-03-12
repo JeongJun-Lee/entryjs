@@ -46,7 +46,7 @@ export const OPTION_DEFAULT_VALUE = {
 class Svm extends LearningBase {
     type = 'svm';
 
-    init({ name, url, result, table, trainParam, modelId, loadModel }) {
+    init({ name, url, result, table, trainParam, model, loadModel }) {
         this.name = name;
         this.trainParam = trainParam || {};
         // Preserve trained result across stop-event re-init.
@@ -67,10 +67,10 @@ class Svm extends LearningBase {
 
         this.fields = table?.select?.[0]?.map((index) => table?.fields[index]);
         this.predictFields = table?.select?.[1]?.map((index) => table?.fields[index]);
-        if (this.url !== url || this.modelId !== modelId) {
-            this.load(url, modelId);
+        if (this.url !== url || this.modelId !== model) {
+            this.load(url, model);
             this.url = url;
-            this.modelId = modelId;
+            this.modelId = model;
         }
     }
 
@@ -181,14 +181,14 @@ class Svm extends LearningBase {
         this.trained = true;
     }
 
-    async load(url, modelId) {
+    async load(url, model) {
         let data;
-        if (typeof modelId === 'object' && modelId !== null) {
-            data = { serializeModel: modelId, result: this.result };
+        if (typeof model === 'object' && model !== null) {
+            data = { serializeModel: model, result: this.result };
         } else if (typeof url === 'object' && url !== null) {
             data = { serializeModel: url, result: this.result };
         } else {
-            data = await this.loadModel({ url, modelId });
+            data = await this.loadModel({ url, modelId: model });
         }
         if (!data) {
             return;

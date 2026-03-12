@@ -49,7 +49,7 @@ class NumberClassification {
         this.init({ ...params });
     }
 
-    init({ name, url, table, trainParam, modelId, loadModel, result }) {
+    init({ name, url, table, trainParam, model, loadModel, result }) {
         this.#name = name;
         this.#trainParam = trainParam || {};
         this.#table = table;
@@ -85,12 +85,12 @@ class NumberClassification {
         if (this.#attrLength === 2) {
             this.#chartEnable = true;
         }
-        if (this.url !== url || this.modelId !== modelId) {
+        if (this.url !== url || this.model !== model) {
             // load시 trainParam에 추가되는 파라미터가 있어서 로드 직전 추가.
             this.#trainParam = trainParam;
-            this.load(url, modelId);
+            this.load(url, model);
             this.url = url;
-            this.modelId = modelId;
+            this.model = model;
         }
     }
 
@@ -278,8 +278,15 @@ class NumberClassification {
         this.#trainCallback(100);
     }
 
-    async load(url, modelId) {
-        const savedData = await this.#loadModel({ url, modelId });
+    async load(url, model) {
+        let savedData;
+        if (typeof model === 'object' && model !== null) {
+            savedData = { ...model, result: this.result };
+        } else if (typeof url === 'object' && url !== null) {
+            savedData = { ...url, result: this.result };
+        } else {
+            savedData = await this.#loadModel({ url, modelId: model });
+        }
         if (!savedData) {
             return;
         }
