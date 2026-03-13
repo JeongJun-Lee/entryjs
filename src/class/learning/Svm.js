@@ -75,8 +75,15 @@ class Svm extends LearningBase {
     }
 
     checkTrainOptionValidation() {
+        this.trainParam = {
+            kernel: KERNEL_STRING_TYPE.LINEAR,
+            C: OPTION_DEFAULT_VALUE.C,
+            degree: OPTION_DEFAULT_VALUE.degree,
+            gamma: OPTION_DEFAULT_VALUE.gamma,
+            ...this.trainParam,
+        };
         const { kernel, C, degree, gamma } = this.trainParam;
-        if (!kernel || !C || !degree || !gamma) {
+        if (!kernel || C === undefined || degree === undefined || gamma === undefined) {
             throw new Error("can't train: trainOptions contain undefined");
         }
         switch (kernel) {
@@ -183,10 +190,18 @@ class Svm extends LearningBase {
 
     async load(url, model) {
         let data;
-        if (typeof model === 'object' && model !== null) {
+        if (typeof model === 'string') {
             data = { serializeModel: model, result: this.result };
+        } else if (typeof model === 'object' && model !== null) {
+            data = { 
+                serializeModel: model.serializeModel || model, 
+                result: model.result || this.result 
+            };
         } else if (typeof url === 'object' && url !== null) {
-            data = { serializeModel: url, result: this.result };
+            data = { 
+                serializeModel: url.serializeModel || url, 
+                result: url.result || this.result 
+            };
         } else {
             data = await this.loadModel({ url, modelId: model });
         }
