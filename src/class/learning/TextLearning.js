@@ -22,25 +22,26 @@ const KhaiiModule = {
 };
 
 class TextNaiveBaye {
-    #type = 'text';
-    #url = '';
-    #labels = [];
-    #popup = null;
-    #result = [];
-    #loadModel;
+    _type = 'text';
+    _url = '';
+    _labels = [];
+    _result = [];
+    _loadModel;
 
     constructor({ url, labels, modelId, loadModel }) {
-        this.#url = url;
-        this.#labels = labels;
-        this.#loadModel = loadModel;
+        this._url = url;
+        this._labels = labels;
+        this._loadModel = loadModel;
         this.classifier = new Bayes({
             tokenizer: this.tokenizer,
         });
-        this.load(url, modelId);
+        if (url || modelId) {
+            this.load(url, modelId);
+        }
     }
 
     get labels() {
-        return this.#labels;
+        return this._labels;
     }
 
     unbanBlocks(blockMenu) {
@@ -56,10 +57,10 @@ class TextNaiveBaye {
     }
 
     getResult(indexOrName) {
-        const result = this.#result.length ? this.#result : this.#popup?.result || [];
+        const result = this._result || [];
         const defaultResult = { probability: 0, className: '' };
         if (indexOrName !== undefined && indexOrName !== null) {
-            const label = this.#labels[indexOrName] || indexOrName;
+            const label = this._labels[indexOrName] || indexOrName;
             return (
                 result.find(({ className }) => String(className) === String(label)) || defaultResult
             );
@@ -72,51 +73,70 @@ class TextNaiveBaye {
         if (!isAvailable) {
             return;
         }
-        this.#result = [];
-        this.#popup = new InputPopup({
-            url: this.#url,
-            labels: this.#labels,
+        Entry.dispatchEvent('openMLInputPopup', {
+            type: this._type,
+            predict: async (data) => {
+                this._result = await this.predict(data);
+                return this._result;
+            },
+            url: this._url,
+            labels: this._labels,
             setResult: (result) => {
-                this.#result = result;
+                this._result = result;
             },
         });
     }
 
     tokenizer = async (text) => {
-        if (!KhaiiModule.module) {
-            throw new Error('module not loaded');
-        }
         if (!text) {
             return [];
         }
-        const analized = KhaiiModule.module.analyze(text); // 형태소 분석 진행
-        const filtered = analized
-            .map((wordInfo) =>
-                wordInfo.morphs
-                    .filter((morph) => {
-                        const category = morph.tag.charAt(0);
-                        return category === 'V' || category === 'N' || category === 'S';
-                    })
-                    .map((morph) => morph.lex)
-            )
-            .flat();
-        return filtered;
+        try {
+            if (!KhaiiModule.module) {
+                await KhaiiModule.load();
+            }
+            const analized = KhaiiModule.module.analyze(text); // 형태소 분석 진행
+            const filtered = analized
+                .map((wordInfo) =>
+                    wordInfo.morphs
+                        .filter((morph) => {
+                            const category = morph.tag.charAt(0);
+                            return category === 'V' || category === 'N' || category === 'S';
+                        })
+                        .map((morph) => morph.lex)
+                )
+                .flat();
+            return filtered;
+        } catch (e) {
+            // Fallback for non-Korean languages or if Khaiii fails to load/parse
+            return text.split(/\s+/).filter(w => w.length > 0);
+        }
     };
 
     async predict(textData) {
-        await KhaiiModule.load();
-        this.#result = await this.classifier.categorize(textData);
-        return this.#result;
+        if (!this.classifier) {
+            return [];
+        }
+        this._result = await this.classifier.categorize(textData);
+        return this._result;
     }
 
-    async load(url, modelId) {
-        const data = await this.#loadModel({ url, modelId });
+    async load(urlOrData, modelId) {
+        let data;
+        if (typeof urlOrData === 'object' && urlOrData !== null) {
+            data = urlOrData;
+        } else if (this._loadModel && typeof this._loadModel === 'function') {
+            data = await this._loadModel({ url: urlOrData, modelId });
+        }
         if (!data) {
             return;
         }
-        this.classifier = fromJson(JSON.stringify(data));
-        this.classifier.tokenizer = this.tokenizer;
-        this.isLoaded = true;
+        const classifier = fromJson(typeof data === 'string' ? data : JSON.stringify(data));
+        if (classifier) {
+            this.classifier = classifier;
+            this.classifier.tokenizer = this.tokenizer;
+            this.isLoaded = true;
+        }
     }
 
     isTrained() {

@@ -223,6 +223,7 @@ export default class AILearning {
                 labels: this._labels,
                 type,
                 recordTime,
+                modelArtifacts: this._modelArtifacts,
             });
         } else if (type === 'logisticRegression') {
             this._tableData = tableData || createDataTable(classes, name);
