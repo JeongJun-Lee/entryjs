@@ -42,12 +42,18 @@ class Classification {
         }
     }
 
+    isTrained() {
+        // Model is considered "trained" once it has been loaded from artifacts/URL
+        return this.isLoaded === true;
+    }
+
     openInputPopup() {
         Entry.dispatchEvent('openMLInputPopup', {
             type: this._type,
             recordTime: this._recordTime,
             predict: async (data) => {
                 this._result = await this.predict(data);
+                return this._result;
             },
             url: this._url,
             labels: this._labels,
@@ -60,7 +66,12 @@ class Classification {
     async namePredictions(logits) {
         if (!logits) return [];
         const values = Array.from(await logits.data());
-        return values
+        
+        // The transferRecognizer ALWAYS outputs _background_noise_ at index 0.
+        // We slice it off to align the remaining probabilities with our user-defined labels.
+        const userValues = values.slice(1);
+        
+        return userValues
             .map((probability, index) => ({
                 className: this._labels[index] || index,
                 probability,
@@ -221,11 +232,11 @@ class Classification {
                 }
                 const weightData = bytes.buffer;
 
-                this.model = await tf.loadLayersModel(tf.io.fromMemory(
-                    modelArtifacts.modelTopology,
-                    modelArtifacts.weightSpecs,
-                    weightData
-                ));
+                this.model = await tf.loadLayersModel(tf.io.fromMemory({
+                    modelTopology: modelArtifacts.modelTopology,
+                    weightSpecs: modelArtifacts.weightSpecs,
+                    weightData: weightData
+                }));
                 this.isLoaded = true;
                 return;
             } catch (e) {

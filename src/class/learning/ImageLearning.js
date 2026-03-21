@@ -227,11 +227,11 @@ class ImageLearning {
         if (modelArtifacts && modelArtifacts.modelTopology && modelArtifacts.weightDataBase64) {
             try {
                 const weightData = base64ToArrayBuffer(modelArtifacts.weightDataBase64);
-                this.model = await tf.loadLayersModel(tf.io.fromMemory(
-                    modelArtifacts.modelTopology,
-                    modelArtifacts.weightSpecs,
-                    weightData
-                ));
+                this.model = await tf.loadLayersModel(tf.io.fromMemory({
+                    modelTopology: modelArtifacts.modelTopology,
+                    weightSpecs: modelArtifacts.weightSpecs,
+                    weightData: weightData
+                }));
                 this.isLoaded = true;
                 this._isOfflineHead = true;
                 console.log('ImageLearning: Loaded head model from memory artifacts (offline).');
