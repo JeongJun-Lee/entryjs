@@ -220,7 +220,7 @@ class NumberClassification {
                 result.find(({ className }) => String(className) === String(label)) || defaultResult
             );
         }
-        return result[0] || defaultResult;
+        return result.length ? result : [defaultResult];
     }
 
     getTrainResult() {
@@ -319,7 +319,7 @@ class NumberClassification {
     predict(data) {
         const distData = [];
         const attrFiltered = this.#table?.select?.[0] || [];
-        const { attrValueMaps } = this.#trainParam;
+        const { attrValueMaps, trainData = [], trainLabels = [], neighbors = 3 } = this.#trainParam || {};
         const encodedData = data.map((val, index) => {
             const originalIndex = attrFiltered[index];
             const num = parseFloat(val);
