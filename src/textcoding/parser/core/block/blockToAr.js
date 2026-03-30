@@ -1103,6 +1103,8 @@ byte findI2CAddress() {
                 if (this._pramVal[0]) stat = stat.replace('%1', this._pramVal[0]);
                 if (this._pramVal[1]) stat = stat.replace('%2', this._pramVal[1]);
 
+                this.insertIntoGlobal(block.type);
+
                 this.AddUserFunc(
                     `float getMPUValue(String key) {
     Wire.beginTransmission(MPU_ADDR);

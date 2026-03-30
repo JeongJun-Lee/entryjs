@@ -672,7 +672,20 @@ Entry.ArduinoNanoExt.getBlocks = function () {
 
                 return Entry.hw.portData[`a${port}`] || 0;
             },
-            syntax: { ar: [{ syntax: 'analogRead(%1)' }] },
+            syntax: {
+                ar: [{ syntax: 'analogRead(%1)' }],
+                py: [
+                    {
+                        syntax: 'ArduinoNanoExt.analogRead(%1)',
+                        textParams: [
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                        ],
+                    },
+                ],
+            },
         },
         arduino_nano_ext_get_analog_value_map: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
@@ -783,7 +796,21 @@ Entry.ArduinoNanoExt.getBlocks = function () {
 
                 return result;
             },
-            syntax: { ar: [{ syntax: 'map(%1, %2, %3, %4, %5)' }] },
+            syntax: {
+                ar: [{ syntax: 'map(%1, %2, %3, %4, %5)' }],
+                py: [
+                    {
+                        syntax: 'ArduinoNanoExt.map(%1, %2, %3, %4, %5)',
+                        textParams: [
+                            { type: 'Block', accept: 'string' },
+                            { type: 'Block', accept: 'string' },
+                            { type: 'Block', accept: 'string' },
+                            { type: 'Block', accept: 'string' },
+                            { type: 'Block', accept: 'string' },
+                        ],
+                    },
+                ],
+            },
         },
         arduino_nano_ext_is_sensor_value_compare: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
@@ -859,7 +886,19 @@ Entry.ArduinoNanoExt.getBlocks = function () {
                         return false;
                 }
             },
-            syntax: { ar: [{ syntax: 'analogRead(%1) %2 %3' }] },
+            syntax: {
+                ar: [{ syntax: 'analogRead(%1) %2 %3' }],
+                py: [
+                    {
+                        syntax: 'ArduinoNanoExt.analogRead(%1) %2 %3',
+                        textParams: [
+                            { type: 'Block', accept: 'string' },
+                            { type: 'Block', accept: 'string' },
+                            { type: 'Block', accept: 'string' },
+                        ],
+                    },
+                ],
+            },
         },
         arduino_nano_ext_get_potentiometer: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
@@ -883,7 +922,14 @@ Entry.ArduinoNanoExt.getBlocks = function () {
 
                 return Entry.hw.portData[`a${port}`] || 0;
             },
-            syntax: { ar: [{ syntax: 'analogRead(3)' }] },
+            syntax: {
+                ar: [{ syntax: 'analogRead(3)' }],
+                py: [
+                    {
+                        syntax: 'ArduinoNanoExt.analogRead(3)',
+                    },
+                ],
+            },
         },
         arduino_nano_ext_get_ultrasonic_one_pin: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
@@ -921,7 +967,17 @@ Entry.ArduinoNanoExt.getBlocks = function () {
                 else if (port === '16') mappedPort = '2';
                 return Entry.hw.portData['a' + mappedPort] || 0;
             },
-            syntax: { ar: [{ syntax: 'getDistance(%1)' }] },
+            syntax: {
+                ar: [{ syntax: 'getDistance(%1)' }],
+                py: [
+                    {
+                        syntax: 'ArduinoNanoExt.getDistance(%1)',
+                        textParams: [
+                            { type: 'Block', accept: 'string' },
+                        ],
+                    },
+                ],
+            },
         },
         arduino_nano_ext_get_sound_sensor: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
@@ -959,7 +1015,17 @@ Entry.ArduinoNanoExt.getBlocks = function () {
 
                 return Entry.hw.portData[`a${port}`] || 0;
             },
-            syntax: { ar: [{ syntax: 'getSoundLevel(%1)' }] },
+            syntax: {
+                ar: [{ syntax: 'getSoundLevel(%1)' }],
+                py: [
+                    {
+                        syntax: 'ArduinoNanoExt.getSoundLevel(%1)',
+                        textParams: [
+                            { type: 'Block', accept: 'string' },
+                        ],
+                    },
+                ],
+            },
         },
         // arduino_nano_ext_get_infrared_value: {
         //     color: EntryStatic.colorSet.block.default.HARDWARE,
@@ -1023,7 +1089,20 @@ Entry.ArduinoNanoExt.getBlocks = function () {
                 const port = script.getField('AXIS');
                 return Entry.hw.portData[`a${port}`] || 0;
             },
-            syntax: { ar: [{ syntax: 'analogRead(%1)' }] },
+            syntax: {
+                ar: [{ syntax: 'analogRead(%1)' }],
+                py: [
+                    {
+                        syntax: 'ArduinoNanoExt.analogRead(%1)',
+                        textParams: [
+                            {
+                                type: 'Block',
+                                accept: 'string',
+                            },
+                        ],
+                    },
+                ],
+            },
         },
         arduino_nano_ext_get_joystick_button: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
@@ -1040,7 +1119,14 @@ Entry.ArduinoNanoExt.getBlocks = function () {
                 // 이제 하드웨어 쪽 코드에서 (누를 때 1, 뗄 때 0)으로 보내주기 때문에 1일 때 true 반환
                 return result === 1;
             },
-            syntax: { ar: [{ syntax: 'digitalRead(8) == LOW' }] },
+            syntax: {
+                ar: [{ syntax: 'digitalRead(8) == LOW' }],
+                py: [
+                    {
+                        syntax: 'ArduinoNanoExt.digitalRead(8) == 0',
+                    },
+                ],
+            },
         },
         arduino_nano_ext_get_mpu6050_value: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
@@ -1085,7 +1171,18 @@ Entry.ArduinoNanoExt.getBlocks = function () {
 
                 return Entry.hw.portData[key] || 0;
             },
-            syntax: { ar: [{ syntax: 'getMPUValue("%2%1")' }] },
+            syntax: {
+                ar: [{ syntax: 'getMPUValue("%2%1")' }],
+                py: [
+                    {
+                        syntax: 'ArduinoNanoExt.getMPUValue(%1, %2)',
+                        textParams: [
+                            { type: 'Block', accept: 'string' },
+                            { type: 'Block', accept: 'string' },
+                        ],
+                    },
+                ],
+            },
         },
         arduino_nano_ext_get_mpu_angle: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
@@ -1119,7 +1216,17 @@ Entry.ArduinoNanoExt.getBlocks = function () {
                 };
                 return Entry.hw.portData[type] || 0;
             },
-            syntax: { ar: [{ syntax: 'getMPUValue("%1")' }] },
+            syntax: {
+                ar: [{ syntax: 'getMPUValue("%1")' }],
+                py: [
+                    {
+                        syntax: 'ArduinoNanoExt.getMPUValue(%1)',
+                        textParams: [
+                            { type: 'Block', accept: 'string' },
+                        ],
+                    },
+                ],
+            },
         },
         /*
         arduino_nano_ext_get_mpu_temp: {
@@ -1194,7 +1301,18 @@ Entry.ArduinoNanoExt.getBlocks = function () {
                 };
                 return script.callReturn();
             },
-            syntax: { ar: [{ syntax: 'digitalWrite(%1, %2);' }] },
+            syntax: {
+                ar: [{ syntax: 'digitalWrite(%1, %2);' }],
+                py: [
+                    {
+                        syntax: 'ArduinoNanoExt.digitalWrite(%1, %2)',
+                        textParams: [
+                            { type: 'Block', accept: 'string' },
+                            { type: 'Block', accept: 'string' },
+                        ],
+                    },
+                ],
+            },
         },
         arduino_nano_ext_set_led_pwm: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
@@ -1236,7 +1354,17 @@ Entry.ArduinoNanoExt.getBlocks = function () {
                 };
                 return script.callReturn();
             },
-            syntax: { ar: [{ syntax: 'analogWrite(3, %1);' }] },
+            syntax: {
+                ar: [{ syntax: 'analogWrite(3, %1);' }],
+                py: [
+                    {
+                        syntax: 'ArduinoNanoExt.analogWrite(3, %1)',
+                        textParams: [
+                            { type: 'Block', accept: 'string' },
+                        ],
+                    },
+                ],
+            },
         },
 
         // Motor blocks
@@ -1358,7 +1486,19 @@ Entry.ArduinoNanoExt.getBlocks = function () {
                     return script.callReturn();
                 }
             },
-            syntax: { ar: [{ syntax: 'setMotor(%1, "%2", %3);' }] },
+            syntax: {
+                ar: [{ syntax: 'setMotor(%1, "%2", %3);' }],
+                py: [
+                    {
+                        syntax: 'ArduinoNanoExt.setMotor(%1, %2, %3)',
+                        textParams: [
+                            { type: 'Block', accept: 'string' },
+                            { type: 'Block', accept: 'string' },
+                            { type: 'Block', accept: 'string' },
+                        ],
+                    },
+                ],
+            },
         },
         arduino_nano_ext_stop_motor: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
@@ -1400,7 +1540,17 @@ Entry.ArduinoNanoExt.getBlocks = function () {
                 });
                 return script.callReturn();
             },
-            syntax: { ar: [{ syntax: 'stopMotor(%1);' }] },
+            syntax: {
+                ar: [{ syntax: 'stopMotor(%1);' }],
+                py: [
+                    {
+                        syntax: 'ArduinoNanoExt.stopMotor(%1)',
+                        textParams: [
+                            { type: 'Block', accept: 'string' },
+                        ],
+                    },
+                ],
+            },
         },
 
         // Buzzer blocks
@@ -1490,7 +1640,18 @@ Entry.ArduinoNanoExt.getBlocks = function () {
                     return script.callReturn();
                 }
             },
-            syntax: { ar: [{ syntax: 'tone(7, %2, %3);' }] },
+            syntax: {
+                ar: [{ syntax: 'tone(7, %2, %3);' }],
+                py: [
+                    {
+                        syntax: 'ArduinoNanoExt.tone(7, %1, %2)',
+                        textParams: [
+                            { type: 'Block', accept: 'string' },
+                            { type: 'Block', accept: 'string' },
+                        ],
+                    },
+                ],
+            },
         },
         arduino_nano_ext_stop_buzzer: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
@@ -1516,7 +1677,14 @@ Entry.ArduinoNanoExt.getBlocks = function () {
                 };
                 return script.callReturn();
             },
-            syntax: { ar: [{ syntax: 'noTone(7);' }] },
+            syntax: {
+                ar: [{ syntax: 'noTone(7);' }],
+                py: [
+                    {
+                        syntax: 'ArduinoNanoExt.noTone(7)',
+                    },
+                ],
+            },
         },
 
         // Output blocks
@@ -1568,7 +1736,18 @@ Entry.ArduinoNanoExt.getBlocks = function () {
                 };
                 return script.callReturn();
             },
-            syntax: { ar: [{ syntax: 'digitalWrite(%1, %2);' }] },
+            syntax: {
+                ar: [{ syntax: 'digitalWrite(%1, %2);' }],
+                py: [
+                    {
+                        syntax: 'ArduinoNanoExt.digitalWrite(%1, %2)',
+                        textParams: [
+                            { type: 'Block', accept: 'string' },
+                            { type: 'Block', accept: 'string' },
+                        ],
+                    },
+                ],
+            },
         },
         arduino_nano_ext_set_servo: {
             color: EntryStatic.colorSet.block.default.HARDWARE,
@@ -1628,7 +1807,18 @@ Entry.ArduinoNanoExt.getBlocks = function () {
 
                 return script.callReturn();
             },
-            syntax: { ar: [{ syntax: 'setServo(%1, %2);' }] }, // Custom syntax matching similar nanoboard blocks
+            syntax: {
+                ar: [{ syntax: 'myServo.write(%1);' }],
+                py: [
+                    {
+                        syntax: 'ArduinoNanoExt.servomotorWrite(%1, %2)',
+                        textParams: [
+                            { type: 'Block', accept: 'string' },
+                            { type: 'Block', accept: 'string' },
+                        ],
+                    },
+                ],
+            },
         },
     };
 };
