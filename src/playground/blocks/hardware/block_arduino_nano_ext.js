@@ -665,7 +665,9 @@ Entry.ArduinoNanoExt.getBlocks = function () {
                 if (!Entry.hw.sendQueue.GET) {
                     Entry.hw.sendQueue.GET = {};
                 }
-                Entry.hw.sendQueue.GET[Entry.ArduinoNanoExt.sensorTypes.ANALOG] = {
+                // Composite key: ANALOG_port — ext의 수정 방식 적용
+                // 이전: 인덱스=2 고정 → get_sensor_value(IN1)+get_potentiometer 동시 사용시 계속 덮어쓰여졌음
+                Entry.hw.sendQueue.GET[`${Entry.ArduinoNanoExt.sensorTypes.ANALOG}_${port}`] = {
                     port: port,
                     time: new Date().getTime(),
                 };
@@ -915,7 +917,8 @@ Entry.ArduinoNanoExt.getBlocks = function () {
                 if (!Entry.hw.sendQueue.GET) {
                     Entry.hw.sendQueue.GET = {};
                 }
-                Entry.hw.sendQueue.GET[Entry.ArduinoNanoExt.sensorTypes.ANALOG] = {
+                // Composite key: ANALOG_3 — 다른 ANALOG 블록이나 get_sensor_value와 충돌 방지
+                Entry.hw.sendQueue.GET[`${Entry.ArduinoNanoExt.sensorTypes.ANALOG}_${port}`] = {
                     port: port,
                     time: new Date().getTime(),
                 };
@@ -957,7 +960,8 @@ Entry.ArduinoNanoExt.getBlocks = function () {
             func(sprite, script) {
                 const port = script.getField('PORT');
                 if (!Entry.hw.sendQueue.GET) Entry.hw.sendQueue.GET = {};
-                Entry.hw.sendQueue.GET[Entry.ArduinoNanoExt.sensorTypes.ULTRASONIC] = {
+                // Composite key: ULTRASONIC_port — 동시에 여러 핀 사용할 주문 대비
+                Entry.hw.sendQueue.GET[`${Entry.ArduinoNanoExt.sensorTypes.ULTRASONIC}_${port}`] = {
                     port: [port, port],
                     time: new Date().getTime(),
                 };
@@ -1008,7 +1012,8 @@ Entry.ArduinoNanoExt.getBlocks = function () {
                 if (!Entry.hw.sendQueue.GET) {
                     Entry.hw.sendQueue.GET = {};
                 }
-                Entry.hw.sendQueue.GET[Entry.ArduinoNanoExt.sensorTypes.SOUND] = {
+                // Composite key: SOUND_port — 여러 포트 동시 사용시 충돌 방지
+                Entry.hw.sendQueue.GET[`${Entry.ArduinoNanoExt.sensorTypes.SOUND}_${port}`] = {
                     port: port,
                     time: new Date().getTime(),
                 };

@@ -571,7 +571,7 @@ Entry.ArduinoExt.getBlocks = function () {
                     port,
                     time: new Date().getTime(),
                 };
-                return Entry.hw.portData[`a${port}`];
+                return Entry.hw.portData[`a${port}`] || 0; // null-safe: HW 미연결 시 0 반환
             },
             syntax: {
                 js: [],
@@ -778,7 +778,7 @@ Entry.ArduinoExt.getBlocks = function () {
                         port,
                         time: new Date().getTime(),
                     };
-                    return port ? Entry.hw.portData[port] : 0;
+                    return port ? (Entry.hw.portData[port] || 0) : 0; // null-safe: HW 미연결 시 0 반환
                 } else {
                     return Entry.block.arduino_get_digital_value.func(sprite, script);
                 }
@@ -1067,7 +1067,8 @@ Entry.ArduinoExt.getBlocks = function () {
                 if (!Entry.hw.sendQueue.GET) {
                     Entry.hw.sendQueue.GET = {};
                 }
-                Entry.hw.sendQueue.GET[Entry.ArduinoExt.sensorTypes.ULTRASONIC] = {
+                // Composite key: ULTRASONIC_trig_echo — port가 배열이므로 join 사용
+                Entry.hw.sendQueue.GET[`${Entry.ArduinoExt.sensorTypes.ULTRASONIC}_${port1}_${port2}`] = {
                     port: [port1, port2],
                     time: new Date().getTime(),
                 };
@@ -1766,7 +1767,8 @@ Entry.ArduinoExt.getBlocks = function () {
                     Entry.hw.sendQueue.GET = {};
                 }
 
-                Entry.hw.sendQueue.GET[Entry.ArduinoExt.sensorTypes.DHTTEMP] = {
+                // Composite key: DHTTEMP_port — 동일 타입 다중 사용 대비 (null-safe 읽기 포함)
+                Entry.hw.sendQueue.GET[`${Entry.ArduinoExt.sensorTypes.DHTTEMP}_${temp}`] = {
                     port: temp,
                     time: new Date().getTime(),
                 };
@@ -1815,7 +1817,9 @@ Entry.ArduinoExt.getBlocks = function () {
                     Entry.hw.sendQueue.GET = {};
                 }
 
-                Entry.hw.sendQueue.GET[Entry.ArduinoExt.sensorTypes.DHTHUMI] = {
+                // Composite key: DHTHUMI_port — 온도(DHTTEMP)와 습도(DHTHUMI)가 같은 포트 공유
+                // 타입이 달라 키 충돌은 없지만 일관성 유지
+                Entry.hw.sendQueue.GET[`${Entry.ArduinoExt.sensorTypes.DHTHUMI}_${humi}`] = {
                     port: humi,
                     time: new Date().getTime(),
                 };
@@ -1948,7 +1952,8 @@ Entry.ArduinoExt.getBlocks = function () {
                     Entry.hw.sendQueue.GET = {};
                 }
 
-                Entry.hw.sendQueue.GET[Entry.ArduinoExt.sensorTypes.IRREMOTE] = {
+                // Composite key: IRREMOTE_port — 일관성 유지
+                Entry.hw.sendQueue.GET[`${Entry.ArduinoExt.sensorTypes.IRREMOTE}_${recv}`] = {
                     port: recv,
                     time: new Date().getTime(),
                 };
