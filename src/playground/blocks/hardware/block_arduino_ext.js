@@ -565,7 +565,9 @@ Entry.ArduinoExt.getBlocks = function () {
                 if (!Entry.hw.sendQueue.GET) {
                     Entry.hw.sendQueue.GET = {};
                 }
-                Entry.hw.sendQueue.GET[Entry.ArduinoExt.sensorTypes.ANALOG] = {
+                // Use composite key 'deviceType_port' so multiple analog ports
+                // can be subscribed simultaneously without overwriting each other
+                Entry.hw.sendQueue.GET[`${Entry.ArduinoExt.sensorTypes.ANALOG}_${port}`] = {
                     port,
                     time: new Date().getTime(),
                 };
@@ -770,7 +772,9 @@ Entry.ArduinoExt.getBlocks = function () {
                     if (!Entry.hw.sendQueue.GET) {
                         Entry.hw.sendQueue.GET = {};
                     }
-                    Entry.hw.sendQueue.GET[Entry.ArduinoExt.sensorTypes.DIGITAL] = {
+                    // Use composite key 'deviceType_port' so multiple digital ports
+                    // can be subscribed simultaneously without overwriting each other
+                    Entry.hw.sendQueue.GET[`${Entry.ArduinoExt.sensorTypes.DIGITAL}_${port}`] = {
                         port,
                         time: new Date().getTime(),
                     };
