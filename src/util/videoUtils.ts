@@ -380,6 +380,10 @@ class VideoUtils implements MediaUtilsInterface {
             this.video = video;
             this.stopVideo();
             this.isInitialized = true;
+
+            if (Entry.engine && Entry.engine.state === 'run') {
+                this.initialSetup();
+            }
         } catch (err) {
             console.log(err);
             this.isInitialized = false;
@@ -403,6 +407,9 @@ class VideoUtils implements MediaUtilsInterface {
             this.isFront = !this.isFront;
             this.stream = stream;
             this.video.srcObject = this.stream;
+            try {
+                this.video.play();
+            } catch (e) { }
             this.video.width = this.CANVAS_WIDTH;
             this.video.height = this.CANVAS_HEIGHT;
             const [track] = this.stream.getVideoTracks();
