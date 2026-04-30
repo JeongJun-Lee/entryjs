@@ -8,8 +8,8 @@ Entry.ArduinoNanoExt = {
     url: 'http://www.arduino.cc/',
     imageName: 'rauf_nano.png',
     title: {
-        ko: 'UzRobot Nano',
-        en: 'UzRobot Nano',
+        ko: 'Kashfiyotchi Nano',
+        en: 'Kashfiyotchi Nano',
     },
     setZero() {
         if (!Entry.hw.sendQueue.SET) {
