@@ -866,7 +866,8 @@ Entry.ArduinoNanoExt.getBlocks = function () {
                 if (!Entry.hw.sendQueue.GET) {
                     Entry.hw.sendQueue.GET = {};
                 }
-                Entry.hw.sendQueue.GET[Entry.ArduinoNanoExt.sensorTypes.ANALOG] = {
+                // Composite key: ANALOG_port — 여러 IN 포트 비교 블록 동시 사용 시 충돌 방지
+                Entry.hw.sendQueue.GET[`${Entry.ArduinoNanoExt.sensorTypes.ANALOG}_${port}`] = {
                     port: port,
                     time: new Date().getTime(),
                 };
@@ -1300,7 +1301,10 @@ Entry.ArduinoNanoExt.getBlocks = function () {
                 const value = script.getField('VALUE') === 'on' ? 255 : 0;
                 if (!Entry.hw.sendQueue.SET) Entry.hw.sendQueue.SET = {};
                 Entry.hw.sendQueue.SET[port] = {
-                    type: Entry.ArduinoNanoExt.sensorTypes.DIGITAL,
+                    type:
+                        port === '3'
+                            ? Entry.ArduinoNanoExt.sensorTypes.PWM
+                            : Entry.ArduinoNanoExt.sensorTypes.DIGITAL,
                     data: value,
                     time: new Date().getTime(),
                 };
