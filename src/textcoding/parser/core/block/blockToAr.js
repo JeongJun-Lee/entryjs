@@ -547,30 +547,7 @@ byte findI2CAddress() {
                         break;
                 }
 
-                const isStrLiteral = (v) => typeof v === 'string' && (v.startsWith('"') || v.startsWith("'"));
-                const isVarOrParam = (v) => typeof v === 'string' && (v.startsWith('__') || /^param\d+$/.test(v));
-                const isHardwareExpr = (v) => typeof v === 'string' && (v.includes('(') && !v.startsWith('String('));
-
-                const isNumeric1 = Entry.Utils.isNumber(value) || isHardwareExpr(value);
-                const isNumeric2 = Entry.Utils.isNumber(value2) || isHardwareExpr(value2);
-
-                if (isNumeric1 && isNumeric2) {
-                    // Both are numeric (literals or hardware calls), safe for direct comparison
-                    stat = value + operator + value2;
-                } else if (!isNumeric1 && !isNumeric2) {
-                    // Both are likely strings
-                    stat = value + operator + value2;
-                } else {
-                    // Mixed case: one side is numeric, the other is a variable/param.
-                    const processMixed = (v) => {
-                        if (Entry.Utils.isNumber(v)) return `"${v}"`;
-                        if (isHardwareExpr(v)) return `String(${v})`;
-                        return v;
-                    };
-                    const v1 = (isNumeric1 && !isVarOrParam(value)) ? processMixed(value) : value;
-                    const v2 = (isNumeric2 && !isVarOrParam(value2)) ? processMixed(value2) : value2;
-                    stat = v1 + operator + v2;
-                }
+                stat = value + operator + value2;
                 break;
 
             case 'boolean_not':
